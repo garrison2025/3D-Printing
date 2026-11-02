@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/about/','/privacy/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
 const titles=new Set();
 for(const route of routes){
@@ -20,7 +20,7 @@ for(const route of routes){
 pass(fs.existsSync(path.join(base,'404.html')),'real 404 page');
 pass(fs.existsSync(path.join(base,'sitemap.xml')),'sitemap');
 pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
-pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
+pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'additional tool calculations');
 const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8'));
 pass(map.keywords.length===131,'131 source keywords');
 for(const group of ['P0','P1','P2','EXCLUDE'])pass(map.keywords.some(k=>k.priority===group),'group '+group);
