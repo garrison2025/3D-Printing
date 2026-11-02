@@ -169,3 +169,21 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .geo-method-article .geo-answer{margin-top:20px}
 .geo-method-article table{margin:20px 0}
 @media(max-width:620px){.geo-answer{padding:15px 16px;margin:14px 0 20px}.geo-answer h2{font-size:18px}.geo-answer p{font-size:13px}.geo-method-article{overflow-wrap:anywhere}}
+
+/* Quoting use case: responsive order-size comparisons without extra SEO URLs */
+.batch-quote{margin:14px 0 16px;border:1px solid #d8e5f4;border-radius:12px;overflow:hidden;background:#fbfdff;color:#254261}
+.batch-quote summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 15px;cursor:pointer;font-size:13px;font-weight:770}
+.batch-quote summary span{font-size:11px;line-height:1.4;font-weight:600;color:#64809e;text-align:right}
+.batch-quote[open] summary{border-bottom:1px solid #e0e9f5;background:#f3f8ff}
+.batch-quote>p{font-size:12px;line-height:1.65;color:#59708a;margin:12px 15px}
+.batch-quote-scroll{overflow-x:auto;margin:0 12px;max-width:100%;outline-offset:3px}
+.batch-quote-scroll table{border-collapse:collapse;min-width:455px;width:100%;font-size:12px;line-height:1.45}
+.batch-quote-scroll th{font-size:10px;color:#627e9d;text-align:right;border-bottom:1px solid #d8e5f4;padding:10px 7px}
+.batch-quote-scroll td{text-align:right;color:#315471;padding:11px 7px;border-bottom:1px solid #e1eaf6;white-space:nowrap;font-variant-numeric:tabular-nums}
+.batch-quote-scroll td:first-child,.batch-quote-scroll th:first-child{text-align:left}
+.batch-quote-scroll tr.is-current td{background:#eaf3ff;color:#174e91;font-weight:760}
+.batch-quote-export{margin:13px 15px 16px;background:#e6f0fe;border:1px solid #bad0ef;border-radius:8px;color:#1755a1;font-weight:750;padding:10px 13px;cursor:pointer;min-height:42px;font-size:12px}
+.batch-quote-export:hover{background:#dbeafd}
+.batch-quote-export:focus-visible{outline:3px solid #72aaff;outline-offset:2px}
+@media(max-width:620px){.batch-quote summary{align-items:flex-start}.batch-quote-scroll table{min-width:485px}.batch-quote>p{font-size:11.5px}}
+@media print{.batch-quote{display:none!important}}

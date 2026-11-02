@@ -43,20 +43,38 @@ if(form){
   `Included transaction fees: ${money(r.platformFees)}`,
   `Estimated order profit before income tax: ${money(r.netProfit)}`,
   `Margin on customer revenue: ${pct(r.actualMargin)}`,
+  `Profit divided by item production cost: ${pct(r.markupOnProductionCost)}`,
   `Filament per gram: ${moneyPerGram(r.costPerGram)} (4-decimal unit price)`,
   'Assumption: failed print attempts consume an entire plate cost. Business overhead and taxes not automatically included.'
  ].join('\n')}
  function renderPrint(r){const lines=[['Expected successful item cost',money(r.costPerUnit)],['Items per order',r.inputs.unitsPerOrder],['Item selling price',money(r.recommendedPrice)],['Customer-paid shipping',money(r.inputs.shippingChargedPerOrder)],['Order gross revenue',money(r.orderGross)],['Production and order expenses',money(r.orderExpenses)],['Included fees',money(r.platformFees)],['Estimated pre-income-tax profit',money(r.netProfit)],['Margin after included expenses',pct(r.actualMargin)]];
   const tbl=$('print-table');tbl.replaceChildren();for(const [label,value] of lines){const row=document.createElement('tr');for(const s of [label,String(value)]){const td=document.createElement('td');td.textContent=s;row.append(td);}tbl.append(row);}
  }
+ function quoteScenarios(inputs){
+  const quantities=[...new Set([1,5,10,25,inputs.unitsPerOrder])].sort((x,y)=>x-y);
+  return quantities.map(quantity=>({quantity,current:quantity===inputs.unitsPerOrder,
+   estimate:calculate({...inputs,unitsPerOrder:quantity})}));
+ }
+ function renderBatch(inputs){
+  const target=$('batch-quote-rows');if(!target)return;
+  target.replaceChildren();
+  for(const {quantity,current,estimate} of quoteScenarios(inputs)){
+   if(!estimate.ok)continue;
+   const tr=document.createElement('tr');if(current)tr.className='is-current';
+   for(const text of [current?quantity+' (current)':String(quantity),money(estimate.recommendedPrice),money(estimate.orderGross),money(estimate.netProfit),pct(estimate.actualMargin)]){
+    const td=document.createElement('td');td.textContent=text;tr.append(td);
+   }
+   target.append(tr);
+  }
+ }
  function render(){const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
+  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
   setFieldErrors({});showValue('result-alert','');showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
   else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
   else {focusLabel='FILAMENT COST PER GRAM';focusVal=moneyPerGram(r.costPerGram);focusContext=`Based on ${money(r.inputs.spoolPrice)} per ${r.inputs.spoolGrams} g net spool`;aLabel='Material per print plate';aVal=money(r.materialPerPlate);bLabel='Full cost per item';bVal=money(r.costPerUnit);}
-  for(const [id,text] of Object.entries({'mobile-estimate-label':focusLabel.replaceAll(' / ',' ').toLowerCase(),'mobile-estimate-value':focusVal,'mobile-estimate-side-label':aLabel,'mobile-estimate-side-value':aVal,'result-focus-label':focusLabel,'result-focus-value':focusVal,'result-focus-context':focusContext,'metric-a-label':aLabel,'metric-a':aVal,'metric-b-label':bLabel,'metric-b':bVal,'order-gross':money(r.orderGross),'platform-fees':money(r.platformFees),'machine-hourly':money(r.machineHourly),'achieved-margin':pct(r.actualMargin)}))showValue(id,text);
+  for(const [id,text] of Object.entries({'mobile-estimate-label':focusLabel.replaceAll(' / ',' ').toLowerCase(),'mobile-estimate-value':focusVal,'mobile-estimate-side-label':aLabel,'mobile-estimate-side-value':aVal,'result-focus-label':focusLabel,'result-focus-value':focusVal,'result-focus-context':focusContext,'metric-a-label':aLabel,'metric-a':aVal,'metric-b-label':bLabel,'metric-b':bVal,'order-gross':money(r.orderGross),'platform-fees':money(r.platformFees),'machine-hourly':money(r.machineHourly),'achieved-margin':pct(r.actualMargin),'effective-markup':pct(r.markupOnProductionCost)}))showValue(id,text);
   const ul=$('breakdown');ul.replaceChildren();const bar=$('cost-bar');const spans=[...bar.children];
   const total=r.costBreakdown.reduce((n,item)=>n+item.value,0);
   r.costBreakdown.forEach((item,i)=>{spans[i].style.width=total>0?`${100*item.value/total}%`:'0%';const li=document.createElement('li');const name=document.createElement('span');name.className='name';const sw=document.createElement('i');sw.className='swatch';sw.style.background=['#65b9ff','#7991ff','#9de1cd','#e5b679','#d0a4e5'][i];name.append(sw,document.createTextNode(item.name));const value=document.createElement('b');value.textContent=money(item.value);li.append(name,value);ul.append(li);});
@@ -64,6 +82,7 @@ if(form){
   const driverHints={'Material':'filament grams and spool price','Electricity':'power draw and electricity rate','Machine wear':'printer lifetime and machine cost','Preparation labor':'setup minutes and hourly rate','Finishing / per-item packing':'finishing and supplies per item'};
   showValue('cost-insight-text',`Top cost driver: ${driver.name} (${money(driver.value)} per item). Review ${driverHints[driver.name]}.`);
   renderPrint(r);
+  renderBatch(inputs);
   const value=$('result-focus-value');
   if(value && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.activeElement?.matches('input[name]') && typeof value.animate==='function'){
    valueMotion?.cancel();valueMotion=value.animate([{opacity:.67,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:190,easing:'ease-out'});
@@ -85,13 +104,26 @@ if(form){
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
    const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
  });
- $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['recommendedPrice',r.recommendedPrice,'USD/item'],['orderGross',r.orderGross,'USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['platformFees',r.platformFees,'USD/order'],['netProfit',r.netProfit,'USD/order'],['actualMargin',r.actualMargin??'undefined','fraction']];
+ $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['recommendedPrice',r.recommendedPrice,'USD/item'],['orderGross',r.orderGross,'USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['platformFees',r.platformFees,'USD/order'],['netProfit',r.netProfit,'USD/order'],['actualMargin',r.actualMargin??'undefined','fraction'],['profitOverProductionCost',r.markupOnProductionCost??'undefined','fraction']];
    const csv=rows.map(cells=>cells.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='printcost-studio-estimate.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('CSV exported using current input values.');
+ });
+ $('export-batch-csv')?.addEventListener('click',()=>{
+  if(!lastValid)return;
+  const rows=[['Quantity','Unit price USD','Order revenue USD','Order costs USD','Platform fees USD','Pre-tax profit USD','Achieved margin']];
+  for(const {quantity,estimate} of quoteScenarios(lastValid.inputs)){
+   if(estimate.ok)rows.push([quantity,estimate.recommendedPrice,estimate.orderGross,estimate.orderExpenses,estimate.platformFees,estimate.netProfit,estimate.actualMargin??'']);
+  }
+  const csv=rows.map(cells=>cells.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');
+  const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob),el=document.createElement('a');
+  el.href=url;el.download='printcost-order-size-comparison.csv';
+  document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  announce('Order size comparison exported as CSV.');
  });
  $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Opened your browser print dialog. Choose “Save as PDF” if available.');});
  const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));
  // Hash anchors select an existing interaction mode, not a competing SEO route.
- function modeFromHash(){if(location.hash==='#pricing')setMode('pricing');else if(location.hash==='#filament-mode')setMode('filament');}
+ function modeFromHash(){if(location.hash==='#pricing'||location.hash==='#batch-quote'){setMode('pricing');if(location.hash==='#batch-quote')$('batch-quote').open=true;}else if(location.hash==='#filament-mode')setMode('filament');}
  window.addEventListener('hashchange',modeFromHash);
  try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored});}catch{}
  render();

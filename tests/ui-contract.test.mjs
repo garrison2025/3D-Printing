@@ -37,3 +37,18 @@ test('new style is included in normal and offline builds',()=>{
  assert.match(build,/src\/assets\/finish\.css/);
  assert.match(offline,/dist\/assets\/finish\.css/);
 });
+
+test('selling-price mode has responsive batch quote rows and CSV export',()=>{
+ assert.match(build,/id="batch-quote-rows"/);
+ assert.match(build,/id="export-batch-csv"/);
+ assert.match(build,/Packaging and shipping expenses remain/);
+ assert.match(app,/quoteScenarios\(inputs\)/);
+ assert.match(app,/unitsPerOrder:quantity/);
+ assert.match(app,/renderBatch\(inputs\)/);
+ assert.match(app,/printcost-order-size-comparison\.csv/);
+});
+test('profit over production cost is disclosed separately from revenue margin',()=>{
+ assert.match(build,/id="effective-markup"/);
+ assert.match(app,/markupOnProductionCost/);
+ assert.match(app,/profitOverProductionCost/);
+});
