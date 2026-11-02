@@ -1,0 +1,102 @@
+/* PrintCost Studio — polished tool-first UI. No animation packages or network assets. */
+:root{--finish-line:#e0e8f3;--finish-ink:#132845;--finish-muted:#60718b}
+html{scroll-padding-top:92px}
+body{background:#f5f7fb;color:var(--finish-ink)}
+.container{max-width:1230px}
+.hero{padding-top:29px;padding-bottom:15px}
+.hero:after{opacity:.45}
+.hero h1{font-size:clamp(39px,4.15vw,54px);letter-spacing:-2.5px;margin:12px 0}
+.hero p{max-width:690px;font-size:15px;line-height:1.7}
+.hero-bullets{margin-top:13px}
+.hero-bullets span{font-size:12px;color:#526784}
+.workspace-head{margin-top:22px;margin-bottom:12px}
+.workspace-grid{gap:20px}
+.panel{border-color:var(--finish-line);box-shadow:0 8px 32px rgba(27,53,92,.055)}
+.panel-top{padding:22px 25px 12px}
+.form-section{padding:17px 25px 24px}
+.form-panel .scenario-bar{margin:0 25px 10px;padding:12px}
+.scenario-label,.scenario-note{font-size:11px;letter-spacing:.03em}
+.scenario-button{font-size:12px;min-height:40px;padding:8px 10px}
+.mode-button{font-size:13px;min-height:42px}
+.field label{font-size:13px;line-height:1.45}
+.field-hint{font-size:12px;line-height:1.5}
+.field .unit{font-size:12px}
+.field input{height:48px;font-size:16px}
+.form-title{font-size:15px}
+.details-section summary{font-size:14px}
+.details-section summary .advanced-meta{font-size:12px}
+.form-footer{padding:15px 25px}
+.result-panel{background:#fff;color:var(--finish-ink);border:1px solid #d7e3f2;overflow:hidden;box-shadow:0 19px 48px rgba(25,55,94,.10)}
+.result-top{background:radial-gradient(circle at 98% 0,rgba(69,138,232,.22),transparent 65%),linear-gradient(155deg,#18395f,#112947);padding:23px 26px 20px;color:#fff}
+.result-top:after{opacity:.55}
+.result-focus{padding-top:16px}
+.result-number{font-size:clamp(40px,3.8vw,52px)}
+.result-metrics{margin-top:18px;padding-top:14px}
+.metric-value{font-size:21px}
+.quote-settings{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 25px 13px;border-bottom:1px solid var(--finish-line);background:#f6f9fe}
+.quote-settings-copy{min-width:0;display:grid;gap:4px}
+.quote-settings-copy span{font-size:11px;letter-spacing:.045em;text-transform:uppercase;font-weight:780;color:#6e8098}
+.quote-settings-copy strong{font-size:13px;line-height:1.45;color:#25436b;font-variant-numeric:tabular-nums}
+.inline-edit-pricing{appearance:none;flex-shrink:0;border:1px solid #bcd1ee;background:#fff;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:770;color:#1b58b9;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.inline-edit-pricing:hover{background:#eaf3ff;border-color:#8bb1e8;transform:translateY(-1px)}
+.inline-edit-pricing:focus-visible{outline:3px solid #7eaeff;outline-offset:2px}
+.result-body{padding:17px 25px 21px;color:var(--finish-ink)}
+.result-body h3{color:#304c70;font-size:13px;margin-bottom:12px}
+.cost-bar{background:#e4eaf3;height:10px}
+.cost-insight{margin:13px 0 4px;background:#eef5ff;border:1px solid #d7e6fd;color:#375778;font-size:12px;line-height:1.55}
+.insight-symbol{background:#d9e9ff;color:#2f68c7}
+.breakdown-list{margin-top:13px}
+.breakdown-list li{color:#526984;font-size:12px;margin:9px 0}
+.breakdown-list b{color:#1c3451;font-size:12px}
+.result-divider{background:#e0e8f3;margin:15px 0}
+.extra-stats{gap:10px}
+.extra-stats small{color:#6b809d;font-size:11px}
+.extra-stats strong{color:#1c3451;font-size:16px}
+.result-button{border:1px solid #cfdded;background:#f6f9fe;color:#1c467d;font-size:12px;min-height:42px}
+.result-button:hover{background:#eaf2ff}
+.result-button.primary{background:#1b61db;color:#fff;border-color:#1b61db}
+.result-button.primary:hover{background:#0e50bf}
+.result-button:focus-visible,.mobile-estimate a:focus-visible{outline:3px solid #7eaeff;outline-offset:2px}
+.toast{color:#0f766e;font-size:12px}
+.disclaimer{padding:13px 0 0;background:none;color:#6f8096;font-size:11px;border-top:1px solid #e5edf6;line-height:1.55}
+.result-alert{color:#9c1f32;background:#fff4f6;border-color:#ffcbd2}
+.info-card p,.related-link p{font-size:13px}
+.faq p,.section-lead{font-size:14px}
+.long-section{margin-top:66px}
+/* Avoid hiding important indexable content until an animation observer fires. */
+.motion-ready .long-section,.motion-ready .info-card{opacity:1;transform:none}
+.motion-ready .long-section.in-view,.motion-ready .info-card.in-view{opacity:1;transform:none}
+/* Animate only the live value, not layout or giant shadows. */
+.result-number,.mobile-estimate-value{will-change:auto}
+@media(min-width:931px){.workspace-grid{grid-template-columns:minmax(0,1.08fr) minmax(355px,.92fr)}.result-panel{top:85px}}
+@media(min-width:621px) and (max-height:810px){.result-panel{position:static}}
+@media(max-width:930px){.result-panel{position:static}.quote-settings{padding:14px 22px}}
+@media(max-width:620px){
+ html{scroll-padding-top:75px}
+ .hero{padding:22px 0 13px}
+ .hero h1{font-size:clamp(35px,9vw,42px);letter-spacing:-1.6px}
+ .hero p{font-size:14px}
+ .hero-bullets span{font-size:11px}
+ .form-panel .scenario-bar{margin:0 16px 12px;padding:12px}
+ .scenario-label,.scenario-note{font-size:10px}
+ .scenario-button{font-size:11px;min-height:47px}
+ .field label{font-size:13px}
+ .field-hint{font-size:11.5px}
+ .field input{font-size:16px}
+ .mobile-estimate{top:66px;box-shadow:0 8px 18px rgba(19,62,130,.10)}
+ /* On active number input, free the visible viewport rather than covering input labels. */
+ .mobile-input-active .mobile-estimate{position:relative;top:auto;z-index:auto;box-shadow:none}
+ .mobile-estimate a{font-size:11px}
+ .quote-settings{padding:13px 17px}
+ .quote-settings-copy strong{font-size:12px}
+ .inline-edit-pricing{padding:10px 9px;font-size:11px;min-height:42px}
+ .result-top{padding:22px 20px 20px}
+ .result-body{padding:19px 20px 22px}
+ .result-button{font-size:12px}
+ .info-card{padding:20px}
+ .form-section{padding:17px 18px 23px}
+ .form-panel .scenario-bar{overflow:hidden}
+ .scenario-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){.inline-edit-pricing{transition:none!important}.result-number,.mobile-estimate-value{animation:none!important}}
+@media print{.quote-settings{display:none!important}}

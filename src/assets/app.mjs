@@ -8,7 +8,7 @@ if(form){
   seller:{...DEFAULTS,usedGrams:90,hours:6,unitsPerOrder:3,feeRate:0.11,margin:0.35,packagingPerOrder:1.5,shippingCostPerOrder:5,shippingChargedPerOrder:5}
  };
  const storageKey='printcost.studio.settings.v1';
- let mode='cost', lastValid=null;
+ let mode='cost', lastValid=null, valueMotion=null;
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
  const allFields=[...form.querySelectorAll('input[name]')];
@@ -49,8 +49,8 @@ if(form){
   const tbl=$('print-table');tbl.replaceChildren();for(const [label,value] of lines){const row=document.createElement('tr');for(const s of [label,String(value)]){const td=document.createElement('td');td.textContent=s;row.append(td);}tbl.append(row);}
  }
  function render(){const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
-  setFieldErrors({});showValue('result-alert','');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
+  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
+  setFieldErrors({});showValue('result-alert','');showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
   else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
@@ -63,9 +63,9 @@ if(form){
   const driverHints={'Material':'filament grams and spool price','Electricity':'power draw and electricity rate','Machine wear':'printer lifetime and machine cost','Preparation labor':'setup minutes and hourly rate','Finishing / per-item packing':'finishing and supplies per item'};
   showValue('cost-insight-text',`Top cost driver: ${driver.name} (${money(driver.value)} per item). Review ${driverHints[driver.name]}.`);
   renderPrint(r);
-  const panel=$('live-results');
-  if(panel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.activeElement?.matches('input[name]')){
-   panel.classList.remove('is-updating');void panel.offsetWidth;panel.classList.add('is-updating');
+  const value=$('result-focus-value');
+  if(value && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.activeElement?.matches('input[name]') && typeof value.animate==='function'){
+   valueMotion?.cancel();valueMotion=value.animate([{opacity:.67,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:190,easing:'ease-out'});
   }
  }
  function announce(msg){showValue('action-status',msg);}
@@ -76,6 +76,9 @@ if(form){
   announce(`Loaded ${button.textContent.trim()} example. You can change any value.`);
  }));
  form.addEventListener('submit',e=>e.preventDefault());
+ form.addEventListener('focusin',event=>{if(event.target.matches('input[name]'))form.classList.add('mobile-input-active')});
+ form.addEventListener('focusout',event=>{if(event.target.matches('input[name]'))form.classList.remove('mobile-input-active')});
+ $('edit-price-inputs')?.addEventListener('click',()=>{const details=$('pricing-details');details.open=true;setMode('pricing');const target=$('input-feeRate');target?.focus({preventScroll:false});announce('Pricing details expanded. Edit fees and margin below.');});
  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
  $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message','Example values restored');});
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
