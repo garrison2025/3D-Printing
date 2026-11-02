@@ -22,7 +22,7 @@ Open `http://localhost:4173/`. Windows alternative: `py -m http.server 4173 --di
 - Environment variable `SITE_URL`: **the actual final published origin**, e.g. `https://your-real-domain.example` (replace with your OWN verified domain). This variable controls canonical/OG/sitemap URLs.
 - No database, API keys, secrets, backend functions, redirects, or additional runtime services.
 
-If `SITE_URL` is omitted, this command creates a **local-only noindex preview build** using `http://localhost:4173`. This safeguard prevents indexing unverified domains and makes the production URL an explicit publishing decision. Cloudflare Pages should NOT be launched with local preview settings.
+The current `pages.dev` hostname is **preview-only and noindex**. The build defaults to noindex in every environment. Future indexable publishing requires both `SITE_URL=https://your-verified-custom-domain` and `ENABLE_INDEXING=1` on the Cloudflare `main` deployment. Do not enable before the owner purchases and verifies the domain.
 
 **Deviation from recommended stack:** the owner spec recommends Astro, but npm registry access was unavailable in the execution environment. To provide an actually runnable, verified build rather than untested Astro source, this implementation uses a zero-dependency Node static generator. The output still has pre-rendered HTML, correct internal links, a client-only computation module, mobile CSS, and Cloudflare Pages compatibility. Replacing the build generator with Astro later is optional, not required for SEO.
 
@@ -31,6 +31,9 @@ If `SITE_URL` is omitted, this command creates a **local-only noindex preview bu
 - `/` — the complete FDM cost/pricing/filament calculator; one canonical tool page
 - `/how-much-does-3d-printing-cost/` — unique explanatory cost guide
 - `/how-to-price-3d-prints/` — unique seller pricing guide
+- `/filament-cost-calculator/` — real per-gram/material cost tool
+- `/3d-printing-cost-per-hour/` — real per-hour electricity and machine allocation tool
+- `/calculation-methodology/` — transparent formula reference, assumptions and inspectable source links
 - `/about/`, `/privacy/`, `/contact/` — site support and truthful policies
 
 No generated near-duplicate landing pages. Search-intent assignments for 131 exact US keyword strings, including source metrics and competitor ranking fields, are in `src/content/keyword-intent-map.json` and described in `docs/RESEARCH-HANDOFF.md`.
@@ -45,8 +48,8 @@ No STL/G-code accuracy claims, no invented testimonials, no paid subscriptions, 
 
 ## Verification
 
-- `npm test`: 10 mathematical tests, including direct specification fixtures, shipping, multi-unit fixed fees, invalid percentages, zeros.
+- `npm test`: mathematical, quote, prelaunch indexability, UI and GEO explanation checks; see current CI for test counts.
 - `node scripts/audit.mjs`: checks generated routes, unique titles/H1, canonicals, internal links, static FAQ/guide copy, structured data, sitemap and privacy controls.
-- `docs/BUILD-STATUS.md`: actual attempted checks versus unrun browser/production checks.
+- `docs/BUILD-STATUS.md` and `docs/GEO_RELEASE_EVIDENCE_20261102.md`: actual checks versus unverified live SEO and AI search results.
 
-**Not ready for a public launch until** a real domain, real contact channel and legal/policy confirmation are supplied, and mobile/desktop browser-based visual/functional acceptance is completed. This environment prevented browser automation and external npm access; these checks are marked `NOT RUN` rather than falsely claimed as passed.
+**The site is deliberately not public for search indexing** until the final domain is purchased and approved. GitHub Issues is a public support route, but owner/contact/legal details and real-domain verification remain release gates. No AI-search citation or GSC results have been claimed.

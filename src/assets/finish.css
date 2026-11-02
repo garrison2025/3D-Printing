@@ -101,8 +101,9 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 @media(prefers-reduced-motion:reduce){.inline-edit-pricing{transition:none!important}.result-number,.mobile-estimate-value{animation:none!important}}
 @media print{.quote-settings{display:none!important}}
 
-/* V4: A later unscoped desktop grid in polish.css overrides the earlier
-   site.css mobile breakpoint. Force a usable one-column workspace at <=930px. */
+/* V4: The unscoped desktop grid in polish.css was overriding the responsive
+   grid defined earlier in site.css. Guard the real calculator task on tablets
+   and phones: one usable column, with inputs before the full results panel. */
 @media (max-width: 930px) {
   .workspace .workspace-grid {
     display: grid;
@@ -126,14 +127,23 @@ body{background:#f5f7fb;color:var(--finish-ink)}
   .form-panel .scenario-options { width: 100%; }
   .form-panel .scenario-button { min-width: 0; white-space: normal; }
   .workspace .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .workspace .field,
+  .workspace .field { min-width: 0; }
   .workspace .field-control { min-width: 0; }
   .workspace .field input { width: 100%; min-width: 0; }
   .workspace .mobile-estimate { position: sticky; top: 12px; }
+  .workspace .mobile-input-active .mobile-estimate { position: relative; top: auto; }
   .workspace .result-metrics { gap: 10px; }
   .workspace .metric-value { font-size: 20px; }
-  /* Never flip sticky -> relative on input focus: this shifted Reset's
-     hitbox during blur and could swallow a click while the form was invalid. */
+}
+@media (max-width: 360px) {
+  .workspace .form-grid { gap: 15px 9px; }
+  .workspace .field label { font-size: 12px; }
+  .workspace .quote-settings { align-items: flex-start; }
+}
+
+/* Keep the summary in the same layout mode while editing. Switching sticky
+   to relative during focus/blur moved the reset button mid-click on phones. */
+@media (max-width: 620px) {
   .workspace .mobile-input-active .mobile-estimate {
     position: sticky;
     top: 12px;
@@ -142,12 +152,20 @@ body{background:#f5f7fb;color:var(--finish-ink)}
     box-shadow: none;
   }
 }
-@media (max-width: 360px) {
-  .workspace .form-grid { gap: 15px 9px; }
-  .workspace .field label { font-size: 12px; }
-  .workspace .quote-settings { align-items: flex-start; }
-}
 
 /* Accessible skip navigation; invisible until keyboard focus */
 .skip-link{position:fixed;z-index:10000;top:8px;left:8px;transform:translateY(-180%);background:#fff;color:#123e77;border:2px solid #1b61db;border-radius:8px;padding:12px 16px;font-size:15px;font-weight:700;box-shadow:0 8px 24px #102f4f33}
 .skip-link:focus-visible{transform:translateY(0);outline:3px solid #76a8ff;outline-offset:2px}
+
+/* GEO: readable, visible, text-first answers; no special AI-only rendering. */
+.geo-answer{border:1px solid #d9e6f6;background:#f9fbff;border-radius:14px;padding:18px 22px;margin:18px 0 24px;max-width:100%;color:#243d59}
+.geo-answer .geo-eyebrow{font-size:10px;font-weight:800;letter-spacing:.11em;color:#54729b;margin:0 0 7px}
+.geo-answer h2{font-size:clamp(18px,2vw,22px);font-weight:760;letter-spacing:-.015em;color:#16365d;margin:0 0 8px;line-height:1.3}
+.geo-answer p{font-size:14px;line-height:1.7;margin:0 0 8px}
+.geo-answer .geo-proof{color:#435d7a;border-top:1px solid #e0eaf7;padding-top:10px;margin-top:12px}
+.geo-answer .geo-source{margin:9px 0 0;color:#55718f;font-size:12px}
+.geo-answer a,.geo-method-article a{color:#175eae;text-decoration:underline;text-underline-offset:2px}
+.geo-method-article{max-width:840px}
+.geo-method-article .geo-answer{margin-top:20px}
+.geo-method-article table{margin:20px 0}
+@media(max-width:620px){.geo-answer{padding:15px 16px;margin:14px 0 20px}.geo-answer h2{font-size:18px}.geo-answer p{font-size:13px}.geo-method-article{overflow-wrap:anywhere}}

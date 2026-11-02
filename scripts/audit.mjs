@@ -1,7 +1,8 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
+function canonicalOriginFor(route,html){return html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]}
 const titles=new Set();
 for(const route of routes){
  const file=path.join(base,route.slice(1),'index.html');pass(fs.existsSync(file),'exists '+file);
@@ -10,6 +11,26 @@ for(const route of routes){
  pass(/<meta name="description" content="[^"]+"/.test(html),'meta description '+route);
  pass(/<link rel="canonical" href="https?:\/\//.test(html),'absolute canonical '+route);
  pass(/<script type="application\/ld\+json">/.test(html),'jsonld '+route);
+ const graph=JSON.parse(html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1]||'{}')['@graph'];
+ pass(Array.isArray(graph),'schema has @graph '+route);
+ const website=graph.find(x=>x['@type']==='WebSite');
+ const webpage=graph.find(x=>x['@type']==='WebPage');
+ pass(!!website && website['@id']===canonicalOriginFor('/',fs.readFileSync(path.join(base,'index.html'),'utf8'))+'#website','schema website ID '+route);
+ pass(!!webpage && webpage.url===canonicalOriginFor(route,html),'schema webpage canonical URL '+route);
+ pass(webpage?.isPartOf?.['@id']===website?.['@id'],'WebPage points to website entity '+route);
+ if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/'].includes(route)){
+  const application=graph.find(x=>x['@type']==='WebApplication');
+  pass(!!application && application.url===webpage.url && webpage.mainEntity?.['@id']===application['@id'],'WebApplication matches visible calculator '+route);
+ }
+ if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/'].includes(route)){
+  pass(html.includes('class="geo-answer"'),'readable answer block '+route);
+  pass(html.includes('href="/calculation-methodology/"'),'visible methodology link '+route);
+ }
+ if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/'].includes(route)){
+  const breadcrumb=graph.find(x=>x['@type']==='BreadcrumbList');
+  pass(!!breadcrumb && breadcrumb.itemListElement?.length===2,'breadcrumb markup backed by visible navigation '+route);
+ }
+
  const schema=html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];pass(!!JSON.parse(schema),'parse jsonld '+route);
  for(const a of html.matchAll(/href="(\/[^"?#]*)[^"]*"/g)){
   const dest=a[1];if(dest.startsWith('/assets/'))continue;
@@ -19,8 +40,15 @@ for(const route of routes){
 }
 pass(fs.existsSync(path.join(base,'404.html')),'real 404 page');
 pass(fs.existsSync(path.join(base,'sitemap.xml')),'sitemap');
+for(const route of ['/filament-cost-calculator/','/3d-printing-cost-per-hour/']){const html=fs.readFileSync(path.join(base,route.slice(1),'index.html'),'utf8');pass(html.includes('data-seo-calculator='),'operable specialized calculator '+route);pass(html.includes('Calculation formula'),'visible formula '+route)}
+const methods=fs.readFileSync(path.join(base,'calculation-methodology/index.html'),'utf8');
+for(const phrase of ['Whole-plate failure','one-attempt cost','Required order gross','source code','not complete net business income']){
+ pass(methods.toLowerCase().includes(phrase.toLowerCase()),'method page explains '+phrase);
+}
+pass(!methods.includes('"@type":"Organization"'),'no fabricated organization entity');
 pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
-pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'additional tool calculations');
+pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
+pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'specialized calculator library');
 const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8'));
 pass(map.keywords.length===131,'131 source keywords');
 for(const group of ['P0','P1','P2','EXCLUDE'])pass(map.keywords.some(k=>k.priority===group),'group '+group);
@@ -40,11 +68,12 @@ if(homepage.includes('<meta name="robots" content="index,follow">')){
  pass(robotText.includes('Sitemap: '+canonicalOrigin+'/sitemap.xml'),'published robots sitemap matches canonical');
  pass(!/Disallow:\s*\/\s*$/m.test(robotText),'published robots allows crawling');
  pass(sitemapText.includes('<loc>'+canonicalOrigin+'/</loc>'),'published sitemap home matches canonical');
- pass(!fs.readFileSync(path.join(base,'_headers'),'utf8').split('/assets/*')[0].includes('X-Robots-Tag: noindex'),'published default has no blanket noindex');
+ pass(!fs.readFileSync(path.join(base,'_headers'),'utf8').split('/assets/*')[0].includes('X-Robots-Tag: noindex'),'published default headers have no blanket noindex');
+ for(const route of routes)pass(sitemapText.includes('<loc>'+canonicalOrigin+route+'</loc>'),'published sitemap includes '+route);
 }else{
  pass(homepage.includes('<meta name="robots" content="noindex,nofollow">'),'preview noindex in HTML');
- pass(!/Disallow:\s*\/\s*$/m.test(robotText),'staging bots may read noindex');
- pass(!sitemapText.includes('<loc>'),'staging has empty sitemap');
- pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging noindex response');
+ pass(!/Disallow:\s*\/\s*$/m.test(robotText),'staging allows crawler to discover noindex');
+ pass(!/<loc>/.test(sitemapText),'staging sitemap is empty');
+ pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging sends noindex HTTP header');
 }
 console.log('PASS',count,'static build assertions');
