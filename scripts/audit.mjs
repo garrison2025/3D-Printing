@@ -39,9 +39,12 @@ pass(!contactHtml.includes('Pre-launch note:'),'no public placeholder support co
 if(homepage.includes('<meta name="robots" content="index,follow">')){
  pass(robotText.includes('Sitemap: '+canonicalOrigin+'/sitemap.xml'),'published robots sitemap matches canonical');
  pass(!/Disallow:\s*\/\s*$/m.test(robotText),'published robots allows crawling');
- pass(sitemapText.includes('<loc>'+canonicalOrigin+'/</loc>'),'published sitemap home matches canonical');\n pass(!fs.readFileSync(path.join(base,'_headers'),'utf8').split('/assets/*')[0].includes('X-Robots-Tag: noindex'),'published default has no blanket noindex');
+ pass(sitemapText.includes('<loc>'+canonicalOrigin+'/</loc>'),'published sitemap home matches canonical');
+ pass(!fs.readFileSync(path.join(base,'_headers'),'utf8').split('/assets/*')[0].includes('X-Robots-Tag: noindex'),'published default has no blanket noindex');
 }else{
  pass(homepage.includes('<meta name="robots" content="noindex,nofollow">'),'preview noindex in HTML');
- pass(!/Disallow:\s*\/\s*$/m.test(robotText),'staging bots may read noindex');\n pass(!sitemapText.includes('<loc>'),'staging has empty sitemap');\n pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging noindex response');
+ pass(!/Disallow:\s*\/\s*$/m.test(robotText),'staging bots may read noindex');
+ pass(!sitemapText.includes('<loc>'),'staging has empty sitemap');
+ pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging noindex response');
 }
 console.log('PASS',count,'static build assertions');
