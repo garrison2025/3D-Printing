@@ -11,6 +11,7 @@ if(form){
  let mode='cost', lastValid=null, valueMotion=null;
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
+ const moneyPerGram=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—';
  const allFields=[...form.querySelectorAll('input[name]')];
  const scenarioButtons=[...document.querySelectorAll('[data-scenario]')];
  let exampleSelection='';
@@ -42,7 +43,7 @@ if(form){
   `Included transaction fees: ${money(r.platformFees)}`,
   `Estimated order profit before income tax: ${money(r.netProfit)}`,
   `Margin on customer revenue: ${pct(r.actualMargin)}`,
-  `Filament per gram: ${money(r.costPerGram)} (display rounded)`,
+  `Filament per gram: ${moneyPerGram(r.costPerGram)} (4-decimal unit price)`,
   'Assumption: failed print attempts consume an entire plate cost. Business overhead and taxes not automatically included.'
  ].join('\n')}
  function renderPrint(r){const lines=[['Expected successful item cost',money(r.costPerUnit)],['Items per order',r.inputs.unitsPerOrder],['Item selling price',money(r.recommendedPrice)],['Customer-paid shipping',money(r.inputs.shippingChargedPerOrder)],['Order gross revenue',money(r.orderGross)],['Production and order expenses',money(r.orderExpenses)],['Included fees',money(r.platformFees)],['Estimated pre-income-tax profit',money(r.netProfit)],['Margin after included expenses',pct(r.actualMargin)]];
@@ -54,7 +55,7 @@ if(form){
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
   else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
-  else {focusLabel='FILAMENT COST PER GRAM';focusVal=money(r.costPerGram);focusContext=`Based on ${money(r.inputs.spoolPrice)} per ${r.inputs.spoolGrams} g net spool`;aLabel='Material per print plate';aVal=money(r.materialPerPlate);bLabel='Full cost per item';bVal=money(r.costPerUnit);}
+  else {focusLabel='FILAMENT COST PER GRAM';focusVal=moneyPerGram(r.costPerGram);focusContext=`Based on ${money(r.inputs.spoolPrice)} per ${r.inputs.spoolGrams} g net spool`;aLabel='Material per print plate';aVal=money(r.materialPerPlate);bLabel='Full cost per item';bVal=money(r.costPerUnit);}
   for(const [id,text] of Object.entries({'mobile-estimate-label':focusLabel.replaceAll(' / ',' ').toLowerCase(),'mobile-estimate-value':focusVal,'mobile-estimate-side-label':aLabel,'mobile-estimate-side-value':aVal,'result-focus-label':focusLabel,'result-focus-value':focusVal,'result-focus-context':focusContext,'metric-a-label':aLabel,'metric-a':aVal,'metric-b-label':bLabel,'metric-b':bVal,'order-gross':money(r.orderGross),'platform-fees':money(r.platformFees),'machine-hourly':money(r.machineHourly),'achieved-margin':pct(r.actualMargin)}))showValue(id,text);
   const ul=$('breakdown');ul.replaceChildren();const bar=$('cost-bar');const spans=[...bar.children];
   const total=r.costBreakdown.reduce((n,item)=>n+item.value,0);
@@ -89,8 +90,12 @@ if(form){
  });
  $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Opened your browser print dialog. Choose “Save as PDF” if available.');});
  const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));
+ // Hash anchors select an existing interaction mode, not a competing SEO route.
+ function modeFromHash(){if(location.hash==='#pricing')setMode('pricing');else if(location.hash==='#filament-mode')setMode('filament');}
+ window.addEventListener('hashchange',modeFromHash);
  try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored});}catch{}
  render();
+ modeFromHash();
 }
 
 // Optional reveal effects below the tool; raw HTML stays visible without JavaScript.
