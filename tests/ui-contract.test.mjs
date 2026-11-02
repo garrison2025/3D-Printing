@@ -13,10 +13,20 @@ test('result assumptions and working edit-fees action are wired',()=>{
  assert.match(app,/showValue\('quote-assumptions'/);
  assert.match(app,/\$\('edit-price-inputs'\)\?\.addEventListener/);
 });
-test('mobile input focus removes floating summary obstruction',()=>{
+test('mobile input focus avoids floating summary click obstruction',()=>{
  assert.match(app,/mobile-input-active/);
- assert.match(css,/\.mobile-input-active \.mobile-estimate\{position:relative/);
+ assert.match(css,/\.workspace \.mobile-input-active \.mobile-estimate \{/);
+ assert.match(css,/visibility: hidden/);
+ assert.match(css,/pointer-events: none/);
 });
+
+test('mobile and tablet force a one-column calculator workspace',()=>{
+ assert.match(css,/@media \(max-width: 930px\)/);
+ assert.match(css,/\.workspace \.workspace-grid \{/);
+ assert.match(css,/grid-template-columns: minmax\(0, 1fr\)/);
+ assert.match(css,/\.workspace \.workspace-grid > \.form-panel/);
+});
+
 test('number transitions avoid synchronous forced layout',()=>{
  assert.doesNotMatch(app,/offsetWidth/);
  assert.match(app,/valueMotion\?\.cancel\(\)/);

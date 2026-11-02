@@ -100,3 +100,50 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 }
 @media(prefers-reduced-motion:reduce){.inline-edit-pricing{transition:none!important}.result-number,.mobile-estimate-value{animation:none!important}}
 @media print{.quote-settings{display:none!important}}
+
+/* V4: A later unscoped desktop grid in polish.css overrides the earlier
+   site.css mobile breakpoint. Force a usable one-column workspace at <=930px. */
+@media (max-width: 930px) {
+  .workspace .workspace-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+  .workspace .workspace-grid > .form-panel,
+  .workspace .workspace-grid > .result-panel {
+    grid-column: 1;
+    min-width: 0;
+    width: 100%;
+  }
+  .workspace .workspace-grid > .form-panel { grid-row: 1; }
+  .workspace .workspace-grid > .result-panel { grid-row: 2; }
+  .scenario-options { min-width: 0; }
+}
+@media (max-width: 620px) {
+  .workspace-head { margin-top: 17px; }
+  .workspace .workspace-grid { gap: 18px; }
+  .form-panel .scenario-options { width: 100%; }
+  .form-panel .scenario-button { min-width: 0; white-space: normal; }
+  .workspace .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace .field,
+  .workspace .field-control { min-width: 0; }
+  .workspace .field input { width: 100%; min-width: 0; }
+  .workspace .mobile-estimate { position: sticky; top: 12px; }
+  .workspace .result-metrics { gap: 10px; }
+  .workspace .metric-value { font-size: 20px; }
+  /* Never flip sticky -> relative on input focus: this shifted Reset's
+     hitbox during blur and could swallow a click while the form was invalid. */
+  .workspace .mobile-input-active .mobile-estimate {
+    position: sticky;
+    top: 12px;
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: none;
+  }
+}
+@media (max-width: 360px) {
+  .workspace .form-grid { gap: 15px 9px; }
+  .workspace .field label { font-size: 12px; }
+  .workspace .quote-settings { align-items: flex-start; }
+}
