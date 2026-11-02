@@ -62,6 +62,16 @@ try{
  check(r.response.status===404,'unknown route returns real HTTP 404');
  check(r.content.includes('<meta name="robots" content="noindex,nofollow">'),'404 page is noindex');
 }catch(err){check(false,'404 fetch failed: '+err.message)}
+try{
+ const r=await request('/build-manifest.json');
+ check(r.response.status===200,'deployment manifest is accessible');
+ const info=JSON.parse(r.content);
+ check(info.canonicalOrigin===origin,'deployment manifest origin matches canonical');
+ check(info.indexable===!staging,'deployment indexability matches '+mode);
+ const expected=(process.env.EXPECTED_COMMIT||'').trim();
+ if(expected)check(info.commit===expected,'deployed SHA '+String(info.commit).slice(0,9)+' matches requested '+expected.slice(0,9));
+}catch(err){check(false,'build-manifest verification failed: '+err.message)}
+
 const passed=checks.filter(c=>c.ok).length;
 const report=['# '+mode+' HTTP/SEO audit', 'Target: '+origin, 'Passed: '+passed+'/'+checks.length,'',...checks.map(c=>(c.ok?'PASS':'FAIL')+' — '+c.desc),''].join('\n');
 console.log(report);

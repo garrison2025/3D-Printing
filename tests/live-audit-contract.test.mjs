@@ -16,3 +16,11 @@ test('live audit confirms methodology and schema are visible',()=>{
  assert.match(source,/has real WebPage schema/);
  assert.match(source,/parseable JSON-LD/);
 });
+
+test('deployment manifest enforces actual Cloudflare commit parity',()=>{
+ const build=fs.readFileSync(new URL('../scripts/build.mjs',import.meta.url),'utf8');
+ assert.match(build,/CF_PAGES_COMMIT_SHA/);
+ assert.match(build,/build-manifest\.json/);
+ assert.match(source,/EXPECTED_COMMIT/);
+ assert.match(source,/deployment manifest origin matches canonical/);
+});

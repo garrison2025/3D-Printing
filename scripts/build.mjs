@@ -105,6 +105,13 @@ fs.writeFileSync(path.join(dst,'_headers'),`/*\n  X-Content-Type-Options: nosnif
 fs.writeFileSync(path.join(dst,'robots.txt'),live?'User-agent: *\nAllow: /\nSitemap: '+site+'/sitemap.xml\n':'User-agent: *\nAllow: /\n');
 const pages=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/'];
 fs.writeFileSync(path.join(dst,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${live?pages.map(p=>`  <url><loc>${canonical(p)}</loc></url>`).join('\n'):''}\n</urlset>\n`);
+// Expose a small public build manifest for deployment verification, not tracking.
+const deploymentCommit=(process.env.CF_PAGES_COMMIT_SHA||process.env.GITHUB_SHA||'local').trim();
+fs.writeFileSync(path.join(dst,'build-manifest.json'),JSON.stringify({
+  commit: deploymentCommit, canonicalOrigin:site, indexable:live,
+  kind: live?'production':'staging'
+},null,2)+'\n');
+
 // Cloudflare Pages static 404 fallback: genuine 404 file.
 fs.writeFileSync(path.join(dst,'404.html'),layout({route:'/404/',title:'Page not found | PrintCost Studio',description:'Page not found',main:'<div class="container editorial"><h1>Page not found</h1><p>The link may have moved. Return to the <a href="/">3D print cost calculator</a>.</p></div>'}));
 fs.writeFileSync(path.join(root,'docs/SEO-GEO-PROJECT-BRIEF.md'),`# SEO / GEO project brief\n\nMarket: US English. Status: PRE-LAUNCH until domain purchase and owner enables indexing. Key task: estimate FDM print costs and pre-income-tax selling prices. Monetization hypothesis: advertising after actual traffic, NOT verified. Source: user Semrush US exports on 2026-11-02, documented in src/content/keyword-intent-map.json.\n\nCanonical map:\n- /: P0 cost calculator + pricing mode + filament mode, one composite search intent.\n- /filament-cost-calculator/: material only, per-gram/per-plate/per-item calculation; source filament calculator 260 US vol/KD12, 3d filament calculator 170/KD9 and filament cost calculator 320/KD28.\n- /3d-printing-cost-per-hour/: machine/electricity/maintenance/labor hourly rate; source 3d printing cost per hour 50 US vol/KD2.\n- /how-much-does-3d-printing-cost/: informative cost questions and reproducible numerical example.\n- /how-to-price-3d-prints/: seller how-to, order fees, margin vs markup.\n- /calculation-methodology/: trustworthy source-of-truth for formulas and limitations; explanatory support page, not an extra search-variant landing page.

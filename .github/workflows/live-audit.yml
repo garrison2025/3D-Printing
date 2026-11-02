@@ -15,17 +15,34 @@ on:
         options:
           - staging
           - production
+  workflow_run:
+    workflows: ["Code, math and SEO quality"]
+    types: [completed]
 permissions:
   contents: read
 jobs:
   smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check deployed HTTP routes, robots, canonical and indexability
+      - name: Verify deployed commit and staging SEO without third-party APIs
         env:
-          SITE_URL: ${{ inputs.site_url }}
-        run: node scripts/live-audit.mjs "$SITE_URL" "${{ inputs.mode }}"
+          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+          MODE: ${{ inputs.mode || 'staging' }}
+          EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            echo "Cloudflare deploy readiness attempt $attempt"
+            if node scripts/live-audit.mjs "$SITE_URL" "$MODE"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 6 ]; then sleep 30; fi
+          done
+          echo "Live deployment did not pass the release gate."
+          exit 1
