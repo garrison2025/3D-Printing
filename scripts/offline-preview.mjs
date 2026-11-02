@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+const root=new URL('../',import.meta.url);
+const read=(file)=>fs.readFileSync(new URL(file,root),'utf8');
+let html=read('dist/index.html');
+const css=read('dist/assets/site.css');
+const engine=read('dist/assets/calculations.mjs').replaceAll('export const ','const ').replaceAll('export function ','function ');
+const app=read('dist/assets/app.mjs').replace("import {DEFAULTS,calculate} from './calculations.mjs';",'');
+html=html.replace('<link rel="stylesheet" href="/assets/site.css">',`<style>${css}</style>`);
+html=html.replace('<script type="module" src="/assets/app.mjs"></script>',`<script>${engine}\n${app}</script>`);
+html=html.replaceAll('href="/favicon.svg"','href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%23162944%22/%3E%3C/svg%3E"');
+// Direct-file preview is one-page only. Root-relative guide links cannot work without the local server.
+html=html.replace(/href="\/(how-much-does-3d-printing-cost|how-to-price-3d-prints|about|privacy|contact)\/"/g,(_,slug)=>`href="./dist/${slug}/index.html"`);
+html=html.replaceAll('href="/#calculator"','href="#calculator"').replaceAll('href="/#how-it-works"','href="#how-it-works"').replaceAll('href="/"','href="#main-content"');
+html=html.replace('</head>','<style>.offline-note{padding:9px 20px;background:#eaf3ff;border-bottom:1px solid #c8def8;font-size:12px;color:#345e91;text-align:center}</style></head>');
+html=html.replace('<body>','<body><div class="offline-note">Offline single-file preview • This is not a published website. To view all pages with correct links, run npm run preview.</div>');
+fs.writeFileSync(new URL('preview-offline.html',root),html);
+console.log('Generated preview-offline.html (single-page file preview)');

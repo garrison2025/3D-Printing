@@ -1,0 +1,70 @@
+import {DEFAULTS,calculate} from './calculations.mjs';
+const form=document.querySelector('#cost-form');
+if(form){
+ const $=(id)=>document.getElementById(id);
+ const storageKey='printcost.studio.settings.v1';
+ let mode='cost', lastValid=null;
+ const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
+ const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
+ const allFields=[...form.querySelectorAll('input[name]')];
+ const names=Object.keys(DEFAULTS);
+ const stateFromInputs=()=>{
+  const result={};
+  for(const name of names){const el=form.elements.namedItem(name);const raw=el.value.trim();result[name]=raw!==''?Number(raw)*(el.dataset.percent==='true'?0.01:1):NaN;}
+  return result;
+ };
+ const showValue=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+ const setFieldErrors=(errors={})=>{
+  for(const el of allFields){const name=el.name, err=errors[name]||'';el.setAttribute('aria-invalid',String(Boolean(err)));showValue('error-'+name,err);}
+ };
+ function saveInput(){try{localStorage.setItem(storageKey,JSON.stringify(stateFromInputs()));showValue('saved-message','● Saved on this device');}catch{showValue('saved-message','Cannot save in this browser');}}
+ function inputValuesSet(obj){for(const name of names){const el=form.elements.namedItem(name),v=obj?.[name];if(typeof v==='number' && Number.isFinite(v))el.value=String(el.dataset.percent==='true'?Number((v*100).toFixed(5)):v);}}
+ function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
+  if(mode==='pricing')$('pricing-details').open=true;
+  if(mode==='filament')$('advanced-details').open=false;
+  render();
+ }
+ function exportSummary(r){return [
+  '3D Printing Cost & Pricing — Local Estimate',
+  `Expected cost per successful item: ${money(r.costPerUnit)}`,
+  `Recommended item price: ${money(r.recommendedPrice)}`,
+  `Items per order: ${r.inputs.unitsPerOrder}`,
+  `Expected total order revenue: ${money(r.orderGross)}`,
+  `Included transaction fees: ${money(r.platformFees)}`,
+  `Estimated order profit before income tax: ${money(r.netProfit)}`,
+  `Margin on customer revenue: ${pct(r.actualMargin)}`,
+  `Filament per gram: ${money(r.costPerGram)} (display rounded)`,
+  'Assumption: failed print attempts consume an entire plate cost. Business overhead and taxes not automatically included.'
+ ].join('\n')}
+ function renderPrint(r){const lines=[['Expected successful item cost',money(r.costPerUnit)],['Items per order',r.inputs.unitsPerOrder],['Item selling price',money(r.recommendedPrice)],['Customer-paid shipping',money(r.inputs.shippingChargedPerOrder)],['Order gross revenue',money(r.orderGross)],['Production and order expenses',money(r.orderExpenses)],['Included fees',money(r.platformFees)],['Estimated pre-income-tax profit',money(r.netProfit)],['Margin after included expenses',pct(r.actualMargin)]];
+  const tbl=$('print-table');tbl.replaceChildren();for(const [label,value] of lines){const row=document.createElement('tr');for(const s of [label,String(value)]){const td=document.createElement('td');td.textContent=s;row.append(td);}tbl.append(row);}
+ }
+ function render(){const inputs=stateFromInputs(),r=calculate(inputs);
+  if(!r.ok){setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
+  setFieldErrors({});showValue('result-alert','');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
+  let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
+  if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
+  else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
+  else {focusLabel='FILAMENT COST PER GRAM';focusVal=money(r.costPerGram);focusContext=`Based on ${money(r.inputs.spoolPrice)} per ${r.inputs.spoolGrams} g net spool`;aLabel='Material per print plate';aVal=money(r.materialPerPlate);bLabel='Full cost per item';bVal=money(r.costPerUnit);}
+  for(const [id,text] of Object.entries({'result-focus-label':focusLabel,'result-focus-value':focusVal,'result-focus-context':focusContext,'metric-a-label':aLabel,'metric-a':aVal,'metric-b-label':bLabel,'metric-b':bVal,'order-gross':money(r.orderGross),'platform-fees':money(r.platformFees),'machine-hourly':money(r.machineHourly),'achieved-margin':pct(r.actualMargin)}))showValue(id,text);
+  const ul=$('breakdown');ul.replaceChildren();const bar=$('cost-bar');const spans=[...bar.children];
+  const total=r.costBreakdown.reduce((n,item)=>n+item.value,0);
+  r.costBreakdown.forEach((item,i)=>{spans[i].style.width=total>0?`${100*item.value/total}%`:'0%';const li=document.createElement('li');const name=document.createElement('span');name.className='name';const sw=document.createElement('i');sw.className='swatch';sw.style.background=['#65b9ff','#7991ff','#9de1cd','#e5b679','#d0a4e5'][i];name.append(sw,document.createTextNode(item.name));const value=document.createElement('b');value.textContent=money(item.value);li.append(name,value);ul.append(li);});
+  renderPrint(r);
+ }
+ function announce(msg){showValue('action-status',msg);}
+ form.addEventListener('input',(evt)=>{if(!evt.target.matches('input'))return;render();saveInput();});
+ form.addEventListener('submit',e=>e.preventDefault());
+ document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
+ $('reset-button').addEventListener('click',()=>{inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message','Example values restored');});
+ $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
+   const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
+ });
+ $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['recommendedPrice',r.recommendedPrice,'USD/item'],['orderGross',r.orderGross,'USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['platformFees',r.platformFees,'USD/order'],['netProfit',r.netProfit,'USD/order'],['actualMargin',r.actualMargin??'undefined','fraction']];
+   const csv=rows.map(cells=>cells.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='printcost-studio-estimate.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('CSV exported using current input values.');
+ });
+ $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Opened your browser print dialog. Choose “Save as PDF” if available.');});
+ const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));
+ try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored});}catch{}
+ render();
+}

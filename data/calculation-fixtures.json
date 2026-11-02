@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "1.0",
+  "date": "2026-11-02",
+  "rounding": "Full-precision intermediate math; 2-decimal monetary display; tests compare numeric values to 1e-6",
+  "cases": [
+    {
+      "name": "Baseline single-print sample",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 100,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 1,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 0.05,
+        "finishPerUnit": 0.5,
+        "feeRate": 0.08,
+        "feeFixed": 0.3,
+        "margin": 0.3
+      },
+      "expected": {
+        "materialPerPlate": 2.5,
+        "energyPerPlate": 0.1728,
+        "machinePerPlate": 0.8,
+        "prepPerPlate": 2.5,
+        "costPerUnit": 6.78715789,
+        "recommendedPrice": 11.43089983,
+        "platformFees": 1.21447199,
+        "netProfit": 3.42926995,
+        "actualMargin": 0.3
+      }
+    },
+    {
+      "name": "No failed prints, no fee",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 100,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 1,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 0,
+        "finishPerUnit": 0,
+        "feeRate": 0,
+        "feeFixed": 0,
+        "margin": 0
+      },
+      "expected": {
+        "materialPerPlate": 2.5,
+        "energyPerPlate": 0.1728,
+        "machinePerPlate": 0.8,
+        "prepPerPlate": 2.5,
+        "costPerUnit": 5.9728,
+        "recommendedPrice": 5.9728,
+        "platformFees": 0.0,
+        "netProfit": 0.0,
+        "actualMargin": 0.0
+      }
+    },
+    {
+      "name": "Two units per plate, higher failure rate",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 100,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 2,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 0.1,
+        "finishPerUnit": 0.5,
+        "feeRate": 0.05,
+        "feeFixed": 0.3,
+        "margin": 0.25
+      },
+      "expected": {
+        "materialPerPlate": 2.5,
+        "energyPerPlate": 0.1728,
+        "machinePerPlate": 0.8,
+        "prepPerPlate": 2.5,
+        "costPerUnit": 3.81822222,
+        "recommendedPrice": 5.8831746,
+        "platformFees": 0.59415873,
+        "netProfit": 1.47079365,
+        "actualMargin": 0.25
+      }
+    },
+    {
+      "name": "Zero material but nonzero machine cost",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 0,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 1,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 0.05,
+        "finishPerUnit": 0.5,
+        "feeRate": 0.08,
+        "feeFixed": 0.3,
+        "margin": 0.3
+      },
+      "expected": {
+        "materialPerPlate": 0.0,
+        "energyPerPlate": 0.1728,
+        "machinePerPlate": 0.8,
+        "prepPerPlate": 2.5,
+        "costPerUnit": 4.15557895,
+        "recommendedPrice": 7.18641766,
+        "platformFees": 0.87491341,
+        "netProfit": 2.1559253,
+        "actualMargin": 0.3
+      }
+    },
+    {
+      "name": "Invalid percentage denominator",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 100,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 1,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 0.05,
+        "finishPerUnit": 0.5,
+        "feeRate": 0.75,
+        "feeFixed": 0.3,
+        "margin": 0.3
+      },
+      "expected": {
+        "error": "INVALID_INPUT"
+      }
+    },
+    {
+      "name": "Invalid failure probability",
+      "inputs": {
+        "spoolPrice": 25,
+        "spoolGrams": 1000,
+        "usedGrams": 100,
+        "hours": 8,
+        "watts": 120,
+        "energyRate": 0.18,
+        "machineCost": 400,
+        "lifeHours": 4000,
+        "unitsPerPlate": 1,
+        "prepMinutes": 10,
+        "laborRate": 15,
+        "failRate": 1,
+        "finishPerUnit": 0.5,
+        "feeRate": 0.08,
+        "feeFixed": 0.3,
+        "margin": 0.3
+      },
+      "expected": {
+        "error": "INVALID_INPUT"
+      }
+    }
+  ]
+}

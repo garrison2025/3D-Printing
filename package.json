@@ -1,0 +1,14 @@
+{
+  "name":"printcost-studio",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "description":"Static, browser-local 3D printing cost and price calculator",
+  "scripts":{
+    "build":"node scripts/build.mjs && node scripts/offline-preview.mjs",
+    "test":"node --test tests/*.test.mjs",
+    "preview":"python3 -m http.server 4173 --directory dist"
+  },
+  "engines":{"node":">=20"},
+  "dependencies":{}
+}

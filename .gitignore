@@ -1,0 +1,6 @@
+dist/
+preview-offline.html
+node_modules/
+.env
+.env.*
+.DS_Store
