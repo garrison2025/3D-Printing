@@ -8,3 +8,9 @@ test('live browser QA follows HTTP deploy verification and uploads screenshots',
 assert.ok(workflow.indexOf('node scripts/live-audit.mjs')<workflow.indexOf('node scripts/browser-qa.mjs'));
 assert.match(workflow,/upload-artifact@v4/);
 });
+test('desktop quick-start layout has three equal columns',()=>{
+ const css=fs.readFileSync(new URL('../src/assets/finish.css',import.meta.url),'utf8');
+ assert.match(css,/scenario-options \{/);
+ assert.match(css,/grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+ assert.match(script,/desktop example scenarios are not on one row/);
+});

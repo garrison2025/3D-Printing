@@ -13,10 +13,14 @@ page.on('pageerror',e=>errors.push(e.message));
 async function run(name,fn){try{await fn();results.push({name,ok:true});console.log('PASS '+name)}catch(e){results.push({name,ok:false,error:e.message});console.error('FAIL '+name+': '+e.message)}}
 async function visit(route){await page.goto(new URL(route,origin).href,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForTimeout(150)}
 async function noOverflow(){const a=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth,form:document.querySelector('#cost-form')?.getBoundingClientRect().width}));assert.ok(a.scroll<=a.w+2,'horizontal overflow '+a.scroll+' > '+a.w);if(a.form!=null)assert.ok(a.form>Math.min(280,a.w*.68),'form width '+a.form)}
-async function shot(name){await page.screenshot({path:'qa-screenshots/'+name+'.png',fullPage:true,animations:'disabled'})}
+async function shot(name){await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,left:0,behavior:'instant'})});await page.waitForTimeout(120);await page.screenshot({path:'qa-screenshots/'+name+'.png',fullPage:true,animations:'disabled'})}
 try{
  for(const width of [360,390,768,1024,1440])await run('Homepage '+width+'px responsive',async()=>{
   await page.setViewportSize({width,height:width>=1000?900:844});await visit('/');await noOverflow();
+  if(width>=1000){
+   const top=await page.locator('[data-scenario]').evaluateAll(buttons=>buttons.map(el=>Math.round(el.getBoundingClientRect().top)));
+   assert.ok(Math.max(...top)-Math.min(...top)<=4,'desktop example scenarios are not on one row: '+top.join(','));
+  }
   await page.waitForFunction(()=>document.querySelector('#result-focus-value')?.textContent?.startsWith('$'));
   if(width===390||width===1440)await shot('home-'+width);
  });
