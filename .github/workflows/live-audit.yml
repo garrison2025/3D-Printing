@@ -3,10 +3,18 @@ on:
   workflow_dispatch:
     inputs:
       site_url:
-        description: Public production origin to audit (HTTPS)
+        description: Public HTTPS preview now; owned production domain later
         required: true
         default: https://3d-printing-1r7.pages.dev
         type: string
+      mode:
+        description: Check prelaunch noindex or approved production indexing
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
 permissions:
   contents: read
 jobs:
@@ -20,4 +28,4 @@ jobs:
       - name: Check deployed HTTP routes, robots, canonical and indexability
         env:
           SITE_URL: ${{ inputs.site_url }}
-        run: node scripts/live-audit.mjs "$SITE_URL"
+        run: node scripts/live-audit.mjs "$SITE_URL" "${{ inputs.mode }}"
