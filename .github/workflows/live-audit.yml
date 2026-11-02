@@ -1,0 +1,23 @@
+name: Audit live Cloudflare Pages
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: Public production origin to audit (HTTPS)
+        required: true
+        default: https://3d-printing-1r7.pages.dev
+        type: string
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check deployed HTTP routes, robots, canonical and indexability
+        env:
+          SITE_URL: ${{ inputs.site_url }}
+        run: node scripts/live-audit.mjs "$SITE_URL"
