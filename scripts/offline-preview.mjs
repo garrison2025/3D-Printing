@@ -2,10 +2,10 @@ import fs from 'node:fs';
 const root=new URL('../',import.meta.url);
 const read=(file)=>fs.readFileSync(new URL(file,root),'utf8');
 let html=read('dist/index.html');
-const css=read('dist/assets/site.css')+'\n'+read('dist/assets/polish.css');
+const css=read('dist/assets/site.css')+'\n'+read('dist/assets/polish.css')+'\n'+read('dist/assets/refinement.css');
 const engine=read('dist/assets/calculations.mjs').replaceAll('export const ','const ').replaceAll('export function ','function ');
 const app=read('dist/assets/app.mjs').replace("import {DEFAULTS,calculate} from './calculations.mjs';",'');
-html=html.replace('<link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/polish.css">',`<style>${css}</style>`);
+html=html.replace('<link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/polish.css"><link rel="stylesheet" href="/assets/refinement.css">',`<style>${css}</style>`);
 html=html.replace('<script type="module" src="/assets/app.mjs"></script>',`<script>${engine}\n${app}</script>`);
 html=html.replaceAll('href="/favicon.svg"','href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%23162944%22/%3E%3C/svg%3E"');
 // Direct-file preview is one-page only. Root-relative guide links cannot work without the local server.
