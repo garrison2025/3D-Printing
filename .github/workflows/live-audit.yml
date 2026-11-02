@@ -46,3 +46,18 @@ jobs:
           done
           echo "Live deployment did not pass the release gate."
           exit 1
+      - name: Install CI-only Chrome controller
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1
+      - name: Browser QA on real Cloudflare preview
+        env:
+          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+        run: node scripts/browser-qa.mjs "$SITE_URL"
+      - name: Publish screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printcost-browser-qa
+          path: qa-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
+
