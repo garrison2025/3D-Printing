@@ -3,8 +3,9 @@ const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origi
 const mode=process.argv[3]||'staging';
 if(!['staging','production'].includes(mode))throw Error('Mode must be staging or production');
 const staging=mode==='staging';
+if(!staging && new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Refusing production indexing audit on a temporary pages.dev domain. Use staging mode.');
 if(!origin.startsWith('https://'))throw Error('Live audit needs a public HTTPS URL');
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/'];
 const checks=[];
 const check=(ok,desc)=>checks.push({ok:Boolean(ok),desc});
 async function request(path){
@@ -25,6 +26,15 @@ for(const route of routes){
   const m=r.content.match(/<link rel="canonical" href="([^"]+)"/i);
   check(m?.[1]===origin+route,route+' canonical points to production URL');
   if(route==='/')check(r.content.includes('id="cost-form"'), 'home page includes calculator');
+  const graphMatch=r.content.match(/<script type="application\/ld\+json">([^<]+)<\/script>/i);
+  try{
+   const graph=JSON.parse(graphMatch?.[1]||'{}')['@graph'];
+   check(Array.isArray(graph)&&graph.some(x=>x['@type']==='WebPage'&&x.url===origin+route),route+' has real WebPage schema');
+  }catch{check(false,route+' has parseable JSON-LD')}
+  if(route==='/calculation-methodology/'){
+   check(r.content.includes('expected successful-plate cost'),'methodology shows actual failure model');
+   check(r.content.includes('github.com/garrison2025/3D-Printing/blob/main/src/lib/calculations.mjs'),'methodology links to source');
+  }
   if(route==='/contact/'){
    check(r.content.includes('github.com/garrison2025/3D-Printing/issues/new'),'real support link published');
    check(!r.content.includes('Pre-launch note:'),'no prelaunch placeholder');
