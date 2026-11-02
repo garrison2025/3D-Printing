@@ -1,0 +1,76 @@
+/* PrintCost Studio — second-pass UX refinement. Purposeful, GPU-friendly motion. */
+:root{--ref-accent:#1f61e8;--ref-outline:#b9d1fa;--ref-shadow:0 16px 50px rgba(19,43,79,.09)}
+body{background-color:#f6f8fd}
+.site-header{z-index:30}
+.nav-inner{min-height:inherit}
+.nav-links a{font-weight:700;letter-spacing:-.1px}
+:where(.nav-links a,.nav-cta,.brand,.mode-button,.scenario-button,.result-button,.text-action,.primary-link,.related-link,.faq summary):focus-visible{outline:3px solid #68a0ff;outline-offset:3px}
+.field:focus-within label{color:#1455cf}
+.field:focus-within .field-control{filter:drop-shadow(0 4px 8px rgba(29,90,183,.06))}
+.field:focus-within .field-hint{color:#526983}
+.field input[aria-invalid=true]{border-color:#e47171;background:#fff9f9;box-shadow:0 0 0 3px rgba(217,67,82,.08)}
+.form-panel{overflow:visible}
+.panel-top{border-radius:18px 18px 0 0}
+.form-panel .scenario-bar{margin:2px 27px 16px;padding:14px 15px;border:1px solid #dee8f8;border-radius:13px;background:#f6f9ff;display:flex;flex-wrap:wrap;gap:9px 12px;align-items:center}
+.scenario-label{font-size:10px;font-weight:900;letter-spacing:.1em;color:#6380a6;white-space:nowrap}
+.scenario-options{display:flex;flex:1;flex-wrap:wrap;gap:6px}
+.scenario-button{appearance:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;min-height:36px;border-radius:8px;border:1px solid #d7e3f6;background:white;color:#375673;font-size:11px;font-weight:750;line-height:1.2;transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease,background .17s ease,color .17s ease}
+.scenario-button:hover{transform:translateY(-2px);border-color:#92b2ed;box-shadow:0 5px 12px #193c7113;color:#154ec3}
+.scenario-button[aria-pressed=true]{color:#fff;background:#1d57d3;border-color:#1d57d3;box-shadow:0 4px 11px #1d57d328}
+.scenario-glyph{font-size:15px;font-weight:800;line-height:.8}
+.scenario-note{color:#7a8faa;font-size:10px;line-height:1.4;margin-left:auto}
+.mode-button{position:relative;font-size:12px;font-weight:770}
+.mode-button[aria-pressed=true]{transform:translateY(-1px);box-shadow:0 8px 18px #245deb26}
+.panel{box-shadow:var(--ref-shadow)}
+.result-panel{isolation:isolate;box-shadow:0 20px 55px rgba(14,33,64,.18)}
+.result-kicker{font-weight:790}
+.result-number{font-variant-numeric:tabular-nums;transition:filter .18s ease}
+.result-panel:has(.result-alert:not(:empty)) .result-number{opacity:.65}
+.cost-insight{display:flex;align-items:flex-start;gap:10px;margin:15px 0 4px;padding:12px 13px;background:#ffffff0b;border:1px solid #bdd2f323;border-radius:10px;font-size:11px;line-height:1.62;color:#dbe9fa}
+.insight-symbol{display:grid;place-items:center;flex:0 0 20px;height:20px;border-radius:6px;background:#8ac6ff22;color:#95d1ff;font-size:15px;line-height:1}
+.cost-bar span{transition:width .35s cubic-bezier(.2,.7,.2,1)}
+.result-button.primary{color:#163e70;font-weight:790}
+.result-button:active:not(:disabled),.scenario-button:active,.mode-button:active{transform:translateY(0) scale(.985)}
+.result-button:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
+.info-strip{position:relative}
+.info-card{position:relative;overflow:hidden}
+.info-card:before{content:"";position:absolute;height:3px;top:0;left:0;right:0;background:#dfe8f6;transition:background .25s ease}
+.info-card:hover:before{background:linear-gradient(90deg,#2466e9,#71aeff)}
+.info-card .icon-box{box-shadow:inset 0 0 0 1px #cbdcf877}
+.long-section{scroll-margin-top:90px}
+.faq details summary{list-style:none;display:flex;justify-content:space-between;gap:18px;align-items:center}
+.faq details summary::-webkit-details-marker{display:none}
+.faq details summary:after{content:'+';display:grid;place-items:center;flex:0 0 26px;height:26px;color:#1d5aca;background:#edf3ff;border-radius:8px;font-size:19px;font-weight:400;transition:transform .2s ease,background .2s ease}
+.faq details[open] summary:after{transform:rotate(45deg);background:#dce9ff}
+/* Below-the-fold only: leave raw HTML visible unless JS enables progressive scroll reveals. */
+.motion-ready .info-card,.motion-ready .long-section{opacity:0;transform:translateY(17px);transition:opacity .48s ease,transform .48s cubic-bezier(.2,.65,.25,1)}
+.motion-ready .info-card.in-view,.motion-ready .long-section.in-view{opacity:1;transform:translateY(0)}
+.motion-ready .info-card:nth-child(2){transition-delay:.07s}
+.motion-ready .info-card:nth-child(3){transition-delay:.14s}
+@media (min-width:931px){.workspace-grid{grid-template-columns:minmax(0,1.16fr) minmax(342px,.84fr)}.hero{padding-top:39px}.hero h1{font-size:clamp(42px,4.7vw,61px)}.result-panel{top:88px}}
+@media (min-width:621px) and (max-width:1030px){.scenario-options{flex-basis:100%}}
+@media(max-width:620px){
+ .hero{padding-top:25px}
+ .hero h1{font-size:clamp(34px,9vw,44px);line-height:1.1}
+ .form-panel .scenario-bar{margin:2px 16px 12px;padding:11px 12px;gap:8px}
+ .scenario-label{font-size:9px}
+ .scenario-options{order:2;flex-basis:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ .scenario-button{font-size:10px;line-height:1.3;padding:9px 5px;min-height:44px;flex-direction:column;gap:5px}
+ .scenario-glyph{font-size:14px}
+ .scenario-note{font-size:9px}
+ .mode-bar{gap:5px}
+ .mode-button{font-size:11px;min-height:44px;padding:9px 4px}
+ .mobile-estimate{position:sticky;top:68px;z-index:14;box-shadow:0 12px 25px rgba(25,70,142,.13);margin-bottom:8px;transition:box-shadow .22s ease,background .22s ease;scroll-margin-top:100px}
+ .mobile-estimate:focus-within{box-shadow:0 13px 27px rgba(25,70,142,.19)}
+ .mobile-estimate-value{letter-spacing:-.8px}
+ .field label{font-size:12px}
+ .field-hint{font-size:11px}
+ .form-title{font-size:14px}
+ .result-panel{scroll-margin-top:78px}
+ .cost-insight{font-size:11px}
+ .faq summary{font-size:13px}
+ .site-footer{margin-top:55px}
+}
+@media(max-width:375px){.scenario-button{font-size:9px}.scenario-note{max-width:135px;text-align:right}}
+@media(prefers-reduced-motion:reduce){.motion-ready .info-card,.motion-ready .long-section{opacity:1!important;transform:none!important;transition:none!important}.scenario-button,.cost-bar span,.faq details summary:after{transition:none!important}}
+@media print{.scenario-bar,.cost-insight{display:none!important}}

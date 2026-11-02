@@ -2,11 +2,20 @@ import {DEFAULTS,calculate} from './calculations.mjs';
 const form=document.querySelector('#cost-form');
 if(form){
  const $=(id)=>document.getElementById(id);
+ const exampleScenarios={
+  one:{...DEFAULTS},
+  batch:{...DEFAULTS,usedGrams:180,hours:12,unitsPerPlate:4,unitsPerOrder:8,prepMinutes:12,finishPerUnit:0.35,packagingPerOrder:2,shippingCostPerOrder:6,shippingChargedPerOrder:6},
+  seller:{...DEFAULTS,usedGrams:90,hours:6,unitsPerOrder:3,feeRate:0.11,margin:0.35,packagingPerOrder:1.5,shippingCostPerOrder:5,shippingChargedPerOrder:5}
+ };
  const storageKey='printcost.studio.settings.v1';
  let mode='cost', lastValid=null;
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
  const allFields=[...form.querySelectorAll('input[name]')];
+ const scenarioButtons=[...document.querySelectorAll('[data-scenario]')];
+ let exampleSelection='';
+ function scenarioSet(name){exampleSelection=name;scenarioButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.scenario===name)));}
+
  const names=Object.keys(DEFAULTS);
  const stateFromInputs=()=>{
   const result={};
@@ -40,7 +49,7 @@ if(form){
   const tbl=$('print-table');tbl.replaceChildren();for(const [label,value] of lines){const row=document.createElement('tr');for(const s of [label,String(value)]){const td=document.createElement('td');td.textContent=s;row.append(td);}tbl.append(row);}
  }
  function render(){const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
+  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin'])showValue(id,'—');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
   setFieldErrors({});showValue('result-alert','');$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
@@ -50,6 +59,9 @@ if(form){
   const ul=$('breakdown');ul.replaceChildren();const bar=$('cost-bar');const spans=[...bar.children];
   const total=r.costBreakdown.reduce((n,item)=>n+item.value,0);
   r.costBreakdown.forEach((item,i)=>{spans[i].style.width=total>0?`${100*item.value/total}%`:'0%';const li=document.createElement('li');const name=document.createElement('span');name.className='name';const sw=document.createElement('i');sw.className='swatch';sw.style.background=['#65b9ff','#7991ff','#9de1cd','#e5b679','#d0a4e5'][i];name.append(sw,document.createTextNode(item.name));const value=document.createElement('b');value.textContent=money(item.value);li.append(name,value);ul.append(li);});
+  const driver=r.costBreakdown.reduce((winner,item)=>item.value>winner.value?item:winner,r.costBreakdown[0]);
+  const driverHints={'Material':'filament grams and spool price','Electricity':'power draw and electricity rate','Machine wear':'printer lifetime and machine cost','Preparation labor':'setup minutes and hourly rate','Finishing / per-item packing':'finishing and supplies per item'};
+  showValue('cost-insight-text',`Top cost driver: ${driver.name} (${money(driver.value)} per item). Review ${driverHints[driver.name]}.`);
   renderPrint(r);
   const panel=$('live-results');
   if(panel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.activeElement?.matches('input[name]')){
@@ -57,10 +69,15 @@ if(form){
   }
  }
  function announce(msg){showValue('action-status',msg);}
- form.addEventListener('input',(evt)=>{if(!evt.target.matches('input'))return;render();saveInput();});
+ form.addEventListener('input',(evt)=>{if(!evt.target.matches('input'))return;scenarioSet('');render();saveInput();});
+ scenarioButtons.forEach(button=>button.addEventListener('click',()=>{
+  const key=button.dataset.scenario,values=exampleScenarios[key];if(!values)return;
+  inputValuesSet(values);scenarioSet(key);render();saveInput();
+  announce(`Loaded ${button.textContent.trim()} example. You can change any value.`);
+ }));
  form.addEventListener('submit',e=>e.preventDefault());
  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
- $('reset-button').addEventListener('click',()=>{inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message','Example values restored');});
+ $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message','Example values restored');});
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
    const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
  });
@@ -71,4 +88,15 @@ if(form){
  const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));
  try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored});}catch{}
  render();
+}
+
+// Optional reveal effects below the tool; raw HTML stays visible without JavaScript.
+if('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+ const sections=[...document.querySelectorAll('.info-card, .long-section')];
+ if(sections.length){
+  document.documentElement.classList.add('motion-ready');
+  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('in-view');observer.unobserve(entry.target)}}},{threshold:0.08,rootMargin:'0px 0px 36px 0px'});
+  sections.forEach(section=>observer.observe(section));
+  window.addEventListener('pagehide',()=>{observer.disconnect();document.documentElement.classList.remove('motion-ready')},{once:true});
+ }
 }
