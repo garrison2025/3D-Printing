@@ -10,4 +10,6 @@
 
 A new genuine Excel resource page addresses two source P2 download/spreadsheet searches. Metrics are unchanged (US 70/KD18 and US 50/KD21); public SERP review was conducted 2026-11-03, without treating rankings as guaranteed.
 
-Still intentionally deferred: multi-model order quote, STL slicing, resin mode, market-rate APIs, final domain/indexing, advertising and external analytics. Do not invent separate SEO landing pages to target those terms.
+A separate, non-indexable mixed-part quote panel on the homepage handles distinct models through manual cost-per-part and quantity entries, shared order fees and a cent-safe order subtotal. It is not a slicer and deliberately does not allocate prices per SKU. Mixed-order CSV is separate from the single-model Excel sheet.
+
+Still intentionally deferred: STL slicing, resin mode, market-rate APIs, final domain/indexing, advertising and external analytics. Do not invent separate SEO landing pages to target those terms.

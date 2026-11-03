@@ -60,6 +60,22 @@ try{
   assert.match(data,/r="B26"[^>]*><x:v>0.25<\/x:v>/);
   assert.match(data,/r="B27"[^>]*><x:v>4<\/x:v>/);
  });
+ await run('Different model types produce a separate cent-safe mixed order',async()=>{
+  await visit('/');await page.locator('#mixed-quote>details>summary').click();
+  const model=page.locator('#mixed-lines .mixed-line').first();
+  await model.locator('input').nth(0).fill('Model A');
+  await model.locator('input').nth(1).fill('5');
+  await model.locator('input').nth(2).fill('2');
+  const second=page.locator('#mixed-lines .mixed-line').nth(1);
+  await second.locator('input').nth(0).fill('Model B');
+  await second.locator('input').nth(1).fill('12');
+  await second.locator('input').nth(2).fill('1');
+  await page.waitForFunction(()=>document.querySelector('#mixed-results')?.textContent?.includes('Customer order total:'));
+  const pending=page.waitForEvent('download');await page.locator('#mixed-export').click();
+  const file=await pending;
+  assert.equal(file.suggestedFilename(),'printcost-mixed-order.csv');
+  const csv=fs.readFileSync(await file.path(),'utf8');assert.ok(csv.includes('Model A')&&csv.includes('Model B'));
+ });
  await run('Invalid input prevents export',async()=>{await page.locator('input[name="usedGrams"]').fill('-1');await page.waitForFunction(()=>document.querySelector('#export-csv')?.disabled===true)});
  await run('Reset recovers defaults',async()=>{await page.locator('#reset-button').click();assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');assert.equal(await page.locator('#export-csv').isEnabled(),true)});
  await run('Pricing deep-link',async()=>{await visit('/#pricing');await page.waitForFunction(()=>document.querySelector('[data-mode="pricing"]')?.getAttribute('aria-pressed')==='true')});

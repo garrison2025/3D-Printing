@@ -6,8 +6,10 @@ const css=read('dist/assets/site-bundle.css');
 const engine=read('dist/assets/calculations.mjs').replaceAll('export const ','const ').replaceAll('export function ','function ');
 const cash=read('dist/assets/quote-precision.mjs').replaceAll('export function ','function ');
 const app=read('dist/assets/app.mjs').replace("import {DEFAULTS,calculate} from './calculations.mjs';",'').replace("import {practicalUsdQuote} from './quote-precision.mjs';",'');
+const mixed=read('dist/assets/mixed-order.mjs').replace("import {DEFAULTS,calculate,calculateMixedOrder} from './calculations.mjs';",'');
 html=html.replace('<link rel="stylesheet" href="/assets/site-bundle.css">',`<style>${css}</style>`);
 html=html.replace('<script type="module" src="/assets/app.mjs"></script>',`<script>${engine}\n${cash}\n${app}</script>`);
+html=html.replace('<script type="module" src="/assets/mixed-order.mjs"></script>',`<script>${mixed}</script>`);
 html=html.replaceAll('href="/favicon.svg"','href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%23162944%22/%3E%3C/svg%3E"');
 // Direct-file preview is one-page only. Root-relative guide links cannot work without the local server.
 html=html.replace(/href="\/(how-much-does-3d-printing-cost|how-to-price-3d-prints|about|privacy|contact)\/"/g,(_,slug)=>`href="./dist/${slug}/index.html"`);

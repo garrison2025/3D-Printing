@@ -48,6 +48,7 @@ for(const phrase of ['Whole-plate failure','one-attempt cost','Required order gr
 pass(!methods.includes('"@type":"Organization"'),'no fabricated organization entity');
 pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
 pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
+pass(homepage.includes('id="mixed-quote"')&&fs.existsSync(path.join(base,'assets/mixed-order.mjs')),'real mixed order interface and module');
 pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'specialized calculator library');
 const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8'));
 pass(map.keywords.length===131,'131 source keywords');
