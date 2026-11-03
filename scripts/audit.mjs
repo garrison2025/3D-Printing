@@ -23,6 +23,10 @@ for(const route of routes){
  pass(html.includes('<meta property="og:image" content="'+new URL(canonical).origin+'/og-card.png">'),'social preview image uses owned canonical domain '+route);
  pass(html.includes('<meta name="twitter:card" content="summary_large_image">'),'twitter card metadata '+route);
  pass(!!webpage && webpage.url===canonicalOriginFor(route,html),'schema webpage canonical URL '+route);
+ const publisher=graph.find(x=>x['@type']==='Organization'&&x.name==='PrintCost Studio');
+ pass(!!publisher && publisher.url===new URL(canonical).origin+'/' && !publisher.sameAs,'brand publisher has owner URL without invented social identities '+route);
+ pass(website?.publisher?.['@id']===publisher?.['@id']&&webpage?.publisher?.['@id']===publisher?.['@id'],'site and page link to the disclosed publishing brand '+route);
+
  pass(webpage?.isPartOf?.['@id']===website?.['@id'],'WebPage points to website entity '+route);
  if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/'].includes(route)){
   const application=graph.find(x=>x['@type']==='WebApplication');
