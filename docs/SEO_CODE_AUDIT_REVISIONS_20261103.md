@@ -38,3 +38,15 @@ The detailed JSON artifact is retained for 14 days in GitHub Actions. Warnings (
 ## Exact cents consistency in the pricing guide
 
 An independent arithmetic check found a two-cent-column display inconsistency in the seller guide, not in the calculator's underlying pricing function. For a full-precision successful-item cost of `$6.7871578947`, checkout `$11.44`, 8% fees and a fixed `$0.30`, displayed payment fees round to `$1.22` and profit to `$3.44`. The guide previously showed `$1.21` / `$3.43`, which were wrong for that input. Both display cells are corrected and now covered by a separate independent math test. A separate calculator that starts from an explicitly rounded user-entered cost `$6.79` legitimately displays `$3.43` profit under the same fee assumptions; this distinction is documented in the guide.
+
+## Full independent standard audit findings triage (2026-11-03)
+
+The actual 12-file `standard-audit.json` report from GitHub Actions run 41600779371 has **0 errors, 7 warnings, 1 informational finding**. Reviewed each item:
+
+- 4 `BROKEN_INTERNAL_LINK` warnings are all legitimate links to the physically present `/assets/3d-print-cost-calculator-template.xlsx`. The general-purpose auditor treats them as missing HTML routes; it does not recognize linked downloadable assets in this phase.
+- 3 warnings concern `/404.html`: nonself canonical, intentional `noindex`, and an intentionally orphaned error page.
+- 1 `SITEMAP_PAGE_NOT_LISTED` information concerns the same 404, which must not appear in sitemap.
+
+No actionable new landing-page errors were found. CI now runs `seo-standard-triage.py` against the standard's JSON report. Only those specific cases are considered acceptable after verifying the xlsx really exists and 404 really remains noindex and absent from sitemap. Any new unexpected warning, information item, or error causes CI failure and investigation, rather than hiding genuine issues behind the 7 known messages.
+
+This is a project-specific interpretation of an independent scanner, not a change to the pinned standard script.
