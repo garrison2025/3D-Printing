@@ -15,6 +15,33 @@ if(form){
  try{rememberInputs=localStorage.getItem(rememberKey)!=='off';if(!rememberInputs)localStorage.removeItem(storageKey)}catch{}
  if(rememberToggle)rememberToggle.checked=rememberInputs;
  let mode='cost', lastValid=null, valueMotion=null;
+ const modeBar=$('pricing');
+ let modeIndicator=null,indicatorFrame=0;
+ const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ // Measure selected-tab geometry only when mode or viewport changes, never on every keystroke.
+ function updateModeIndicator(){
+  if(!modeBar)return;
+  const selected=modeBar.querySelector('.mode-button[aria-pressed="true"]');
+  if(!selected)return;
+  if(!modeIndicator){
+   modeIndicator=document.createElement('span');
+   modeIndicator.className='mode-indicator';
+   modeIndicator.setAttribute('aria-hidden','true');
+   modeBar.prepend(modeIndicator);
+  }
+  const parent=modeBar.getBoundingClientRect(),rect=selected.getBoundingClientRect();
+  modeIndicator.style.width=rect.width+'px';
+  modeIndicator.style.height=rect.height+'px';
+  modeIndicator.style.transform='translate3d('+(rect.left-parent.left)+'px,'+(rect.top-parent.top)+'px,0)';
+  modeBar.classList.add('has-indicator');
+ }
+ function scheduleModeIndicator(){
+  if(!modeBar||!('requestAnimationFrame' in window))return;
+  cancelAnimationFrame(indicatorFrame);
+  indicatorFrame=requestAnimationFrame(updateModeIndicator);
+ }
+ window.addEventListener('resize',scheduleModeIndicator,{passive:true});
+
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
   const theoreticalMoney=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—';
@@ -43,7 +70,8 @@ if(form){
  function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
   if(mode==='pricing')$('pricing-details').open=true;
   if(mode==='filament')$('advanced-details').open=false;
-  render();
+  scheduleModeIndicator();
+  render('mode');
  }
  function exportSummary(r){const actual=practicalUsdQuote(r);return [
   '3D Printing Cost & Pricing — Local Estimate',
@@ -85,7 +113,7 @@ if(form){
    target.append(tr);
   }
  }
- function render(){const inputs=stateFromInputs(),r=calculate(inputs);
+ function render(reason='init'){const previousFocus=$('result-focus-value')?.textContent;const inputs=stateFromInputs(),r=calculate(inputs);
   if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit','maintenancePerHour'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder','designCostPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('cash-quote-note','Correct inputs to calculate a checkout price.');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
   setFieldErrors({});showValue('result-alert','');
   const cashQuote=practicalUsdQuote(r);
@@ -99,21 +127,45 @@ if(form){
   else if(mode==='pricing'){focusLabel='ACTUAL CHECKOUT SELLING PRICE / ITEM';focusVal=money(cashQuote?.unitPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(cashQuote?.actualMargin)} achieved margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(cashQuote?.netProfit);}
   else {focusLabel='FILAMENT COST PER GRAM';focusVal=moneyPerGram(r.costPerGram);focusContext=`Based on ${money(r.inputs.spoolPrice)} per ${r.inputs.spoolGrams} g net spool`;aLabel='Material per print plate';aVal=money(r.materialPerPlate);bLabel='Full cost per item';bVal=money(r.costPerUnit);}
   for(const [id,text] of Object.entries({'mobile-estimate-label':focusLabel.replaceAll(' / ',' ').toLowerCase(),'mobile-estimate-value':focusVal,'mobile-estimate-side-label':aLabel,'mobile-estimate-side-value':aVal,'result-focus-label':focusLabel,'result-focus-value':focusVal,'result-focus-context':focusContext,'metric-a-label':aLabel,'metric-a':aVal,'metric-b-label':bLabel,'metric-b':bVal,'order-gross':money(cashQuote?.orderGross),'platform-fees':money(cashQuote?.platformFees),'machine-hourly':money(r.machineHourly),'achieved-margin':pct(cashQuote?.actualMargin),'effective-markup':pct(cashQuote&&r.costPerUnit>0?cashQuote.netProfit/r.inputs.unitsPerOrder/r.costPerUnit:null)}))showValue(id,text);
-  const ul=$('breakdown');ul.replaceChildren();const bar=$('cost-bar');const spans=[...bar.children];
+  const ul=$('breakdown'),bar=$('cost-bar'),spans=[...bar.children];
   const total=r.costBreakdown.reduce((n,item)=>n+item.value,0);
-  r.costBreakdown.forEach((item,i)=>{spans[i].style.width=total>0?`${100*item.value/total}%`:'0%';const li=document.createElement('li');const name=document.createElement('span');name.className='name';const sw=document.createElement('i');sw.className='swatch';sw.style.background=['#65b9ff','#7991ff','#70b59c','#9de1cd','#e5b679','#d0a4e5'][i];name.append(sw,document.createTextNode(item.name));const value=document.createElement('b');value.textContent=money(item.value);li.append(name,value);ul.append(li);});
   const driver=r.costBreakdown.reduce((winner,item)=>item.value>winner.value?item:winner,r.costBreakdown[0]);
+  // Reuse visual nodes: replacing the whole list on each keypress prevents smooth transitions.
+  if(ul.children.length!==r.costBreakdown.length){
+   ul.replaceChildren();
+   for(const item of r.costBreakdown){
+    const li=document.createElement('li'),name=document.createElement('span'),sw=document.createElement('i'),value=document.createElement('b');
+    name.className='name';sw.className='swatch';name.append(sw,document.createTextNode(item.name));li.append(name,value);ul.append(li);
+   }
+  }
+  r.costBreakdown.forEach((item,i)=>{
+   const percent=total>0?100*item.value/total:0;
+   spans[i].style.width=percent+'%';
+   spans[i].classList.toggle('is-leading',item.name===driver.name&&item.value>0);
+   const li=ul.children[i];
+   li.classList.toggle('is-top-driver',item.name===driver.name&&item.value>0);
+   li.querySelector('.name').lastChild.textContent=item.name;
+   li.querySelector('.swatch').style.background=['#65b9ff','#7991ff','#70b59c','#9de1cd','#e5b679','#d0a4e5'][i];
+   li.querySelector('b').textContent=money(item.value);
+  });
   const driverHints={'Material':'filament grams and spool price','Electricity':'power draw and electricity rate','Machine wear':'printer lifetime and purchase price','Maintenance reserve':'maintenance reserve per machine hour','Preparation labor':'setup minutes and hourly rate','Finishing / per-item packing':'finishing and supplies per item'};
   showValue('cost-insight-text',`Top cost driver: ${driver.name} (${money(driver.value)} per item). Review ${driverHints[driver.name]}.`);
   renderPrint(r);
   renderBatch(inputs);
   const value=$('result-focus-value');
-  if(value && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.activeElement?.matches('input[name]') && typeof value.animate==='function'){
-   valueMotion?.cancel();valueMotion=value.animate([{opacity:.67,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:190,easing:'ease-out'});
+  if(reason!=='init' && previousFocus!==focusVal && !reducedMotion() && typeof value?.animate==='function'){
+   valueMotion?.cancel();
+   valueMotion=value.animate([{opacity:.68,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'});
+   if(reason==='mode'||reason==='scenario'){
+    for(const id of ['result-focus-label','result-focus-context','metric-a','metric-b','mobile-estimate-value']){
+     const el=$(id);
+     if(el&&typeof el.animate==='function')el.animate([{opacity:.78,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:185,easing:'ease-out'});
+    }
+   }
   }
  }
  function announce(msg){showValue('action-status',msg);}
- form.addEventListener('input',(evt)=>{if(!evt.target.matches('input[name]'))return;scenarioSet('');render();saveInput();});
+ form.addEventListener('input',(evt)=>{if(!evt.target.matches('input[name]'))return;scenarioSet('');render('input');saveInput();});
  rememberToggle?.addEventListener('change',()=>{
   rememberInputs=rememberToggle.checked;
   try{
@@ -123,7 +175,7 @@ if(form){
  });
  scenarioButtons.forEach(button=>button.addEventListener('click',()=>{
   const key=button.dataset.scenario,values=exampleScenarios[key];if(!values)return;
-  inputValuesSet(values);scenarioSet(key);render();saveInput();
+  inputValuesSet(values);scenarioSet(key);render('scenario');saveInput();
   announce(`Loaded ${button.textContent.trim()} example. You can change any value.`);
  }));
  form.addEventListener('submit',e=>e.preventDefault());
@@ -176,6 +228,7 @@ if(form){
  // Hash anchors select an existing interaction mode, not a competing SEO route.
  function modeFromHash(){if(location.hash==='#pricing'||location.hash==='#batch-quote'){setMode('pricing');if(location.hash==='#batch-quote')$('batch-quote').open=true;}else if(location.hash==='#filament-mode')setMode('filament');}
  window.addEventListener('hashchange',modeFromHash);
+ scheduleModeIndicator();
  if(rememberInputs){try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored})}catch{}}
  else showValue('saved-message','Saving off · this tab only');
  render();
