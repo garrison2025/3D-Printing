@@ -40,7 +40,7 @@ No generated near-duplicate landing pages. Search-intent assignments for 131 exa
 
 ## Product details
 
-The form supports: spool price/net weight, slicer material usage, print time, items per plate, electricity, printer useful-life allocation (optionally purchase plus planned lifetime repair budget), active preparation labor, conservative whole-plate failures, per-unit finishing, units per order, packaging and user-entered fixed order overhead, shipping expense, customer-paid shipping, fixed per-order fees, percentage fees and target margin.
+The form supports: spool price/net weight, slicer material usage, print time, items per plate, electricity, printer useful-life allocation, optional maintenance reserve per print hour, active preparation labor, conservative whole-plate failures, per-unit finishing, units per order, packaging and a separate optional design/one-time overhead per order, shipping expense, customer-paid shipping, fixed per-order fees, percentage fees and target margin.
 
 Result: cost per successful item, suggested item selling price, full order gross, included order fees, estimated pre-income-tax order profit, filament cost per gram, hourly machine wear and transparent cost breakdown. Copy summary, CSV export, print/PDF and localStorage remember/reset are wired.
 

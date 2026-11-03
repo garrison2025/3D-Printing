@@ -11,6 +11,7 @@ test('methodology gives reproducible, bounded examples and traceable code',()=>{
  const html=methodologyPage();
  for(const term of ['5.9728','6.7871579','11.4308998','0.1216','full-plate','margin','successful-item cost','src/lib/calculations.mjs','src/lib/seo-calculations.mjs']) assert.ok(html.toLowerCase().includes(term.toLowerCase()),term);
  assert.ok(!/not independently checked|industry average price/i.test(html));
+ for(const term of ['Maintenance reserve per plate','design/one-time overhead per order','once per customer order'])assert.ok(html.includes(term),term);
 });
 test('no special machine-only payload or fabricated SEO proof',()=>{
  const html=methodologyPage();
