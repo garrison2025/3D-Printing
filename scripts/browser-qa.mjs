@@ -37,6 +37,15 @@ try{
   assert.equal(d.suggestedFilename(),'printcost-order-size-comparison.csv');
   const csv=fs.readFileSync(await d.path(),'utf8');assert.ok(csv.includes('Quantity')&&csv.includes('25'));
  });
+ await run('Editable Excel workbook downloads as genuine XLSX',async()=>{
+  const pending=page.waitForEvent('download');
+  await page.locator('a.xlsx-download').click();
+  const downloaded=await pending;
+  assert.equal(downloaded.suggestedFilename(),'3d-print-cost-calculator-template.xlsx');
+  const bin=fs.readFileSync(await downloaded.path());
+  assert.equal(bin.subarray(0,4).toString('binary'),'PK\x03\x04');
+  assert.ok(bin.length>5000,'Excel workbook unexpectedly small');
+ });
  await run('Invalid input prevents export',async()=>{await page.locator('input[name="usedGrams"]').fill('-1');await page.waitForFunction(()=>document.querySelector('#export-csv')?.disabled===true)});
  await run('Reset recovers defaults',async()=>{await page.locator('#reset-button').click();assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');assert.equal(await page.locator('#export-csv').isEnabled(),true)});
  await run('Pricing deep-link',async()=>{await visit('/#pricing');await page.waitForFunction(()=>document.querySelector('[data-mode="pricing"]')?.getAttribute('aria-pressed')==='true')});

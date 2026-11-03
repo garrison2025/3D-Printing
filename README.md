@@ -53,3 +53,9 @@ No STL/G-code accuracy claims, no invented testimonials, no paid subscriptions, 
 - `docs/BUILD-STATUS.md` and `docs/GEO_RELEASE_EVIDENCE_20261102.md`: actual checks versus unverified live SEO and AI search results.
 
 **The site is deliberately not public for search indexing** until the final domain is purchased and approved. GitHub Issues is a public support route, but owner/contact/legal details and real-domain verification remain release gates. No AI-search citation or GSC results have been claimed.
+
+### Editable Excel calculator template
+
+A downloadable genuine `.xlsx` workbook is generated from the audited template in `src/downloads/3d-print-cost-calculator-template.xlsx` and copied to `/assets/3d-print-cost-calculator-template.xlsx` during `npm run build`. It includes **Cost Calculator** (20 editable inputs and 18 formula results), **Batch Quotes** (quantities 1/5/10/25 and current quantity), and **Read Me**. Defaults reproduce the main website formula, including whole-plate failure probability, per-order fees, margin, shipping and zero-floor behavior. Unlike an exported CSV, changing input cells automatically recalculates results in Excel.
+
+This optional static download contains **sample inputs**, not the user's current browser calculation. It does not upload orders or use a paid API. This serves the deferred Excel/spreadsheet research intent without generating a duplicate SEO landing page. Staging remains `noindex`.
