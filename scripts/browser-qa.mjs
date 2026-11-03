@@ -93,6 +93,19 @@ try{
      assert.equal(content.subarray(0,4).toString(),'PK\\x03\\x04'.replaceAll('\\x03','\x03').replaceAll('\\x04','\x04'));
    }
  });
+ await run('Current-input Excel downloads real formulas with edited grams',async()=>{
+  await visit('/');
+  await page.locator('input[name="usedGrams"]').fill('145');
+  const pending=page.waitForEvent('download');
+  await page.locator('#download-current-xlsx').click();
+  const file=await pending;
+  assert.equal(file.suggestedFilename(),'printcost-studio-current-estimate.xlsx');
+  const bytes=fs.readFileSync(await file.path()),content=bytes.toString('utf8');
+  assert.equal(bytes.subarray(0,2).toString(),'PK');
+  assert.match(content,/<x:c r="B8"[^>]*><x:v>145<\/x:v><\/x:c>/);
+  assert.match(content,/<x:f>IFERROR\(G11\/\(1-B17\),0\)<\/x:f>/);
+  assert.match(content,/forceFullCalc="1"/);
+ });
  await run('No JavaScript crashes',async()=>assert.deepEqual(errors,[]));
 }finally{await context.close();await browser.close()}
 const passed=results.filter(x=>x.ok).length;

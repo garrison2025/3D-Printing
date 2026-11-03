@@ -68,8 +68,8 @@ if(form){
   }
  }
  function render(){const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;lastValid=null;return;}
-  setFieldErrors({});showValue('result-alert','');showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;lastValid=r;
+  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
+  setFieldErrors({});showValue('result-alert','');showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;if($('download-current-xlsx'))$('download-current-xlsx').disabled=false;lastValid=r;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
   else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
@@ -119,6 +119,25 @@ if(form){
   el.href=url;el.download='printcost-order-size-comparison.csv';
   document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   announce('Order size comparison exported as CSV.');
+ });
+ $('download-current-xlsx')?.addEventListener('click',async()=>{
+  if(!lastValid)return;
+  const button=$('download-current-xlsx');button.disabled=true;
+  try{
+   const response=await fetch('/assets/3d-print-cost-calculator-template.xlsx');
+   if(!response.ok)throw Error('Example workbook unavailable');
+   const {personalizeWorkbook,workbookMime}=await import('./xlsx-personalize.mjs');
+   const result=await personalizeWorkbook(await response.arrayBuffer(),lastValid.inputs,calculate);
+   const blob=new Blob([result],{type:workbookMime});
+   const url=URL.createObjectURL(blob),link=document.createElement('a');
+   link.href=url;link.download='printcost-studio-current-estimate.xlsx';
+   document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+   announce('Excel workbook saved with your current inputs. Blue cells can be edited.');
+  }catch(err){
+   console.error('Excel export failed:',err);
+   announce('Could not personalize Excel. Use the example template link below instead.');
+  }finally{button.disabled=!lastValid}
  });
  $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Opened your browser print dialog. Choose “Save as PDF” if available.');});
  const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));

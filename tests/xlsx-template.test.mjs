@@ -43,3 +43,20 @@ test('cost and price guides link the actual editable Excel template with truthfu
  const qa=fs.readFileSync(new URL('../scripts/browser-qa.mjs',import.meta.url),'utf8');
  assert.match(qa,/Both pricing and cost guides offer a working editable spreadsheet/);
 });
+
+test('client-side Excel export preserves editable formulas and includes changed inputs',async()=>{
+ const {calculate,DEFAULTS}=await import('../src/lib/calculations.mjs');
+ const {personalizeWorkbook}=await import('../src/assets/xlsx-personalize.mjs');
+ const personalized=await personalizeWorkbook(data,{...DEFAULTS,usedGrams:145,unitsPerOrder:9,shippingCostPerOrder:4},calculate);
+ const content=Buffer.from(personalized).toString('utf8');
+ assert.match(content,/<x:c r="B8"[^>]*><x:v>145<\/x:v><\/x:c>/);
+ assert.match(content,/<x:c r="B22"[^>]*><x:v>9<\/x:v><\/x:c>/);
+ assert.match(content,/<x:c r="A9"[^>]*><x:v>9<\/x:v><\/x:c>/);
+ assert.match(content,/<x:f>IFERROR\(G11\/\(1-B17\),0\)<\/x:f>/);
+ assert.match(content,/forceFullCalc="1"/);
+});
+test('client-side Excel export rejects impossible profit assumptions',async()=>{
+ const {calculate,DEFAULTS}=await import('../src/lib/calculations.mjs');
+ const {personalizeWorkbook}=await import('../src/assets/xlsx-personalize.mjs');
+ await assert.rejects(personalizeWorkbook(data,{...DEFAULTS,feeRate:0.8,margin:0.3},calculate),/invalid inputs/i);
+});
