@@ -89,3 +89,21 @@ test('V2 animations favor user feedback and preserve visible content at rest',()
  assert.match(css,/animation:none!important/);
  assert.doesNotMatch(css,/\.motion-ready \.long-section\.in-view\{opacity:0/);
 });
+
+test('V2.1 mode switching respects user-controlled details and unified mobile focus',()=>{
+ const ref=fs.readFileSync(new URL('../src/assets/refinement.css',import.meta.url),'utf8');
+ assert.doesNotMatch(app,/if\(mode==='pricing'\)\$\('pricing-details'\)\.open=true/);
+ assert.doesNotMatch(app,/if\(mode==='filament'\)\$\('advanced-details'\)\.open=false/);
+ assert.match(app,/requestAnimationFrame\(\(\)=>/);
+ assert.match(app,/form\.contains\(document\.activeElement\)/);
+ assert.doesNotMatch(ref,/\.motion-ready \.info-card,\.motion-ready \.long-section\{opacity:0/);
+ assert.match(css,/\.workspace \.mobile-input-active \.mobile-estimate/);
+ assert.match(css,/position:sticky;top:12px;visibility:hidden;pointer-events:none/);
+});
+test('V2.1 statuses and reduced-motion controls are accessible and package-free',()=>{
+ assert.match(app,/function announce\(msg,tone='info'\)/);
+ assert.match(css,/\.toast\[data-tone="success"\]/);
+ assert.match(css,/\.toast\[data-tone="error"\]/);
+ assert.match(css,/\*,\*::before,\*::after\{animation:none!important;transition:none!important/);
+ assert.match(css,/\.nav-cta:hover,\.text-action:hover/);
+});

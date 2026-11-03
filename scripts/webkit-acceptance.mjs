@@ -59,6 +59,27 @@ await check('iPhone WebKit V2 slider and reduced-motion accessibility',async()=>
  assert.ok(disabled.split(',').every(x=>parseFloat(x)===0));
  await page.emulateMedia({reducedMotion:'no-preference'});
 });
+await check('WebKit V2.1 preserves settings and mobile input geometry',async()=>{
+ await visit('/');await page.locator('#reset-button').click();
+ const advanced=page.locator('#advanced-details'),pricing=page.locator('#pricing-details');
+ await page.locator('[data-mode="pricing"]').click();
+ assert.equal(await pricing.getAttribute('open'),null);
+ await advanced.locator('summary').click();
+ await page.locator('[data-mode="filament"]').click();
+ assert.notEqual(await advanced.getAttribute('open'),null);
+ await page.locator('#edit-price-inputs').click();
+ assert.notEqual(await pricing.getAttribute('open'),null);
+ const height=await page.locator('#cost-form').evaluate(el=>el.getBoundingClientRect().height);
+ await page.locator('input[name="usedGrams"]').focus();
+ const focus=await page.locator('#mobile-estimate').evaluate(el=>({
+  position:getComputedStyle(el).position,visibility:getComputedStyle(el).visibility,pointer:getComputedStyle(el).pointerEvents
+ }));
+ assert.equal(focus.position,'sticky');assert.equal(focus.visibility,'hidden');assert.equal(focus.pointer,'none');
+ const height2=await page.locator('#cost-form').evaluate(el=>el.getBoundingClientRect().height);
+ assert.ok(Math.abs(height-height2)<2,'iPhone focus changed calculator layout');
+ await page.locator('#reset-button').click();
+ await visit('/');
+});
 await check('iPhone WebKit batch CSV download is real and contains calculated amounts',async()=>{
  await page.locator('#batch-quote > summary').click();
  const pending=page.waitForEvent('download');

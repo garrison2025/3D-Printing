@@ -47,6 +47,77 @@ try{
   assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
   await page.locator('#reset-button').click();
  });
+ await run('V2.1 mode changes preserve manual advanced-setting accordion choices',async()=>{
+  await visit('/');
+  const advanced=page.locator('#advanced-details'),pricing=page.locator('#pricing-details');
+  assert.equal(await advanced.getAttribute('open'),null);
+  assert.equal(await pricing.getAttribute('open'),null);
+  await page.locator('[data-mode="pricing"]').click();
+  assert.equal(await pricing.getAttribute('open'),null,'mode selection unexpectedly expands pricing');
+  await advanced.locator('summary').click();
+  assert.notEqual(await advanced.getAttribute('open'),null);
+  await page.locator('[data-mode="filament"]').click();
+  assert.notEqual(await advanced.getAttribute('open'),null,'filament mode unexpectedly collapses manual advanced inputs');
+  await page.locator('#edit-price-inputs').click();
+  assert.notEqual(await pricing.getAttribute('open'),null,'explicit Edit fees must open pricing');
+  await page.locator('[data-mode="cost"]').click();
+  assert.notEqual(await pricing.getAttribute('open'),null,'returning to cost should preserve user's open section');
+  await visit('/');
+ });
+ await run('V2.1 mobile input focus retains stable sticky summary geometry and no click obstruction',async()=>{
+  await page.setViewportSize({width:390,height:844});await visit('/');
+  const first=await page.evaluate(()=>({
+   height:document.querySelector('#cost-form').getBoundingClientRect().height,
+   position:getComputedStyle(document.querySelector('#mobile-estimate')).position
+  }));
+  await page.locator('input[name="usedGrams"]').focus();
+  const second=await page.evaluate(()=>({
+   height:document.querySelector('#cost-form').getBoundingClientRect().height,
+   position:getComputedStyle(document.querySelector('#mobile-estimate')).position,
+   visibility:getComputedStyle(document.querySelector('#mobile-estimate')).visibility,
+   pointer:getComputedStyle(document.querySelector('#mobile-estimate')).pointerEvents
+  }));
+  assert.equal(first.position,'sticky');assert.equal(second.position,'sticky');
+  assert.equal(second.visibility,'hidden');assert.equal(second.pointer,'none');
+  assert.ok(Math.abs(first.height-second.height)<2,'focus changed form height '+JSON.stringify({first,second}));
+  await page.locator('input[name="spoolPrice"]').focus();
+  await page.waitForTimeout(65);
+  assert.equal(await page.locator('#cost-form').evaluate(el=>el.classList.contains('mobile-input-active')),true);
+  await page.locator('[data-mode="cost"]').focus();
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#mobile-estimate')).visibility==='visible');
+  await page.locator('#reset-button').click();
+  assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');
+ });
+ await run('V2.1 reduced-motion prevents hover movement and smooth scrolling',async()=>{
+  await visit('/');await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('[data-scenario="batch"]').hover();
+  const styles=await page.evaluate(()=>({
+   hoverTransform:getComputedStyle(document.querySelector('[data-scenario="batch"]')).transform,
+   hoverDuration:getComputedStyle(document.querySelector('[data-scenario="batch"]')).transitionDuration,
+   scrolling:getComputedStyle(document.documentElement).scrollBehavior
+  }));
+  assert.equal(styles.hoverTransform,'none');
+  assert.ok(styles.hoverDuration.split(',').every(x=>parseFloat(x)===0),'hover transition still animates');
+  assert.equal(styles.scrolling,'auto');
+  await page.emulateMedia({reducedMotion:'no-preference'});await visit('/');
+ });
+ await run('V2.1 action status gives success and error feedback without popups',async()=>{
+  await visit('/');await page.locator('#reset-button').click();
+  const dl=page.waitForEvent('download');
+  await page.locator('#export-csv').click();await dl;
+  assert.equal(await page.locator('#action-status').getAttribute('data-tone'),'success');
+  assert.match(await page.locator('#action-status').innerText(),/CSV download started/);
+  await page.route('**/assets/3d-print-cost-calculator-template.xlsx',route=>route.fulfill({
+   status:200,contentType:'application/octet-stream',body:'not-a-workbook'
+  }));
+  await page.locator('#download-current-xlsx').click();
+  await page.waitForFunction(()=>document.querySelector('#action-status')?.dataset.tone==='error');
+  assert.match(await page.locator('#action-status').innerText(),/Could not personalize Excel/);
+  await page.unroute('**/assets/3d-print-cost-calculator-template.xlsx');
+  await page.locator('#reset-button').click();
+  assert.equal(await page.locator('#action-status').getAttribute('data-tone'),'success');
+  await visit('/');
+ });
  await run('V2 mode slider aligns with the selected button on both mobile and desktop',async()=>{
   for(const width of [390,1280]){
    await page.setViewportSize({width,height:width>900?900:844});
