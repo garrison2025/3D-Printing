@@ -262,3 +262,6 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .xlsx-current-button:focus-visible{outline:3px solid #76aaff;outline-offset:3px}
 .xlsx-current-button:disabled{opacity:.55;cursor:not-allowed}
 @media(prefers-reduced-motion:reduce){.xlsx-current-button{transition:none}}
+
+/* Whole-cent quote, separate from exact theoretical calculator and XLSX totals */
+.cash-quote-note{margin:12px 0 15px;padding:11px 13px;background:#f0f7ff;border:1px solid #bfd7f1;border-left:3px solid #1b60ad;border-radius:9px;color:#233f5d;font-size:12px;font-weight:650;line-height:1.6}

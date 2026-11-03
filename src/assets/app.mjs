@@ -1,4 +1,5 @@
 import {DEFAULTS,calculate} from './calculations.mjs';
+import {practicalUsdQuote} from './quote-precision.mjs';
 const form=document.querySelector('#cost-form');
 if(form){
  const $=(id)=>document.getElementById(id);
@@ -37,7 +38,9 @@ if(form){
  function exportSummary(r){return [
   '3D Printing Cost & Pricing — Local Estimate',
   `Expected cost per successful item: ${money(r.costPerUnit)}`,
-  `Recommended item price: ${money(r.recommendedPrice)}`,
+  `Recommended item price (theoretical model): ${money(r.recommendedPrice)}`,
+  `Minimum checkout price in cents per item: ${money(practicalUsdQuote(r)?.unitPrice)}`,
+  `Margin if charging that whole-cent amount: ${pct(practicalUsdQuote(r)?.actualMargin)}`,
   `Items per order: ${r.inputs.unitsPerOrder}`,
   `Expected total order revenue: ${money(r.orderGross)}`,
   `Included transaction fees: ${money(r.platformFees)}`,
@@ -68,8 +71,14 @@ if(form){
   }
  }
  function render(){const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
-  setFieldErrors({});showValue('result-alert','');showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;if($('download-current-xlsx'))$('download-current-xlsx').disabled=false;lastValid=r;
+  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('cash-quote-note','Correct inputs to calculate a checkout price.');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
+  setFieldErrors({});showValue('result-alert','');
+  const cashQuote=practicalUsdQuote(r);
+  showValue('cash-quote-note',cashQuote?
+    'Minimum whole-cent checkout price: '+money(cashQuote.unitPrice)+' per item. Margin at that actual charge: '+
+    pct(cashQuote.actualMargin)+'. The model and Excel sheet use full-precision theoretical values.':
+    'A safe whole-cent checkout quote is unavailable for this numeric range.');
+  showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=false;if($('download-current-xlsx'))$('download-current-xlsx').disabled=false;lastValid=r;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;
   if(mode==='cost') {focusLabel='EXPECTED COST PER ITEM';focusVal=money(r.costPerUnit);focusContext='Expected cost of one successful finished item';aLabel='Suggested item price';aVal=money(r.recommendedPrice);bLabel='Profit / item, before income tax*';bVal=money(r.profitPerUnit);}
   else if(mode==='pricing'){focusLabel='RECOMMENDED SELLING PRICE / ITEM';focusVal=money(r.recommendedPrice);focusContext=`For ${r.inputs.unitsPerOrder} item(s) per order and ${pct(r.actualMargin)} target margin`;aLabel='Unit production cost';aVal=money(r.costPerUnit);bLabel='Profit / order, before income tax*';bVal=money(r.netProfit);}
@@ -104,14 +113,14 @@ if(form){
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
    const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
  });
- $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['recommendedPrice',r.recommendedPrice,'USD/item'],['orderGross',r.orderGross,'USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['platformFees',r.platformFees,'USD/order'],['netProfit',r.netProfit,'USD/order'],['actualMargin',r.actualMargin??'undefined','fraction'],['profitOverProductionCost',r.markupOnProductionCost??'undefined','fraction']];
+ $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['recommendedPrice',r.recommendedPrice,'USD/item'],['orderGross',r.orderGross,'USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['platformFees',r.platformFees,'USD/order'],['netProfit',r.netProfit,'USD/order'],['actualMargin',r.actualMargin??'undefined','fraction'],['profitOverProductionCost',r.markupOnProductionCost??'undefined','fraction'],['minimumWholeCentPrice',practicalUsdQuote(r)?.unitPrice??'undefined','USD/item'],['marginAtWholeCentCharge',practicalUsdQuote(r)?.actualMargin??'undefined','fraction']];
    const csv=rows.map(cells=>cells.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='printcost-studio-estimate.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('CSV exported using current input values.');
  });
  $('export-batch-csv')?.addEventListener('click',()=>{
   if(!lastValid)return;
-  const rows=[['Quantity','Unit price USD','Order revenue USD','Order costs USD','Platform fees USD','Pre-tax profit USD','Achieved margin']];
+  const rows=[['Quantity','Theoretical unit price USD','Theoretical order revenue USD','Order costs USD','Platform fees USD','Theoretical pre-tax profit USD','Model margin','Minimum checkout price USD','Margin at checkout price']];
   for(const {quantity,estimate} of quoteScenarios(lastValid.inputs)){
-   if(estimate.ok)rows.push([quantity,estimate.recommendedPrice,estimate.orderGross,estimate.orderExpenses,estimate.platformFees,estimate.netProfit,estimate.actualMargin??'']);
+   if(estimate.ok)rows.push([quantity,estimate.recommendedPrice,estimate.orderGross,estimate.orderExpenses,estimate.platformFees,estimate.netProfit,estimate.actualMargin??'',practicalUsdQuote(estimate)?.unitPrice??'',practicalUsdQuote(estimate)?.actualMargin??'']);
   }
   const csv=rows.map(cells=>cells.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');
   const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});

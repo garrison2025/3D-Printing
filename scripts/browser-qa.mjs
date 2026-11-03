@@ -106,6 +106,12 @@ try{
   assert.match(content,/<x:f>IFERROR\(G11\/\(1-B17\),0\)<\/x:f>/);
   assert.match(content,/forceFullCalc="1"/);
  });
+ await run('Quote rounding shows a cent-safe checkout amount',async()=>{
+   await visit('/#pricing');
+   assert.match(await page.locator('#cash-quote-note').innerText(),/\$11\.44/);
+   await page.locator('input[name="usedGrams"]').fill('145');
+   await page.waitForFunction(()=>document.querySelector('#cash-quote-note')?.textContent?.includes('checkout price'));
+ });
  await run('No JavaScript crashes',async()=>assert.deepEqual(errors,[]));
 }finally{await context.close();await browser.close()}
 const passed=results.filter(x=>x.ok).length;
