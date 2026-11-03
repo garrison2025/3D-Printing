@@ -81,6 +81,18 @@ try{
   }
   if(violations.length)throw new Error(violations.join(' | '));
  });
+ await run('Both pricing and cost guides offer a working editable spreadsheet',async()=>{
+   for(const route of ['/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/']){
+     await visit(route);
+     const link=page.locator('a[href="/assets/3d-print-cost-calculator-template.xlsx"]');
+     assert.equal(await link.count(),1,'Missing workbook link from '+route);
+     const download=page.waitForEvent('download');
+     await link.click();const file=await download;
+     assert.equal(file.suggestedFilename(),'3d-print-cost-calculator-template.xlsx');
+     const content=fs.readFileSync(await file.path());
+     assert.equal(content.subarray(0,4).toString(),'PK\\x03\\x04'.replaceAll('\\x03','\x03').replaceAll('\\x04','\x04'));
+   }
+ });
  await run('No JavaScript crashes',async()=>assert.deepEqual(errors,[]));
 }finally{await context.close();await browser.close()}
 const passed=results.filter(x=>x.ok).length;
