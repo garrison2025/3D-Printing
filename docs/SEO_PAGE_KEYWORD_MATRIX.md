@@ -19,8 +19,10 @@ The 87 approved P0/P1 strings sum across the rows above as **mapping counts only
 - `/3d-print-cost-calculator-excel/`: real editable workbook landing page. Two P2 spreadsheet-related terms are mapped here; this does not make them validated P0/P1 opportunities.
 - `/calculation-methodology/`: formulas, exclusions and source-code links for credibility and answer retrieval; no invented search volume.
 - `/about/`, `/privacy/`, `/contact/`: real supporting content; no mass-produced SEO copy.
-- Remaining P2 terms and all EXCLUDE terms are not a mandate to publish new pages. Purchasing-price or model-download intents are outside this calculator's scope.
-- `/es/` is a research-only possible future locale. Do not deploy translations without locale-level keyword and SERP evidence.
+- All 7 source-list P2 terms are mapped to actual existing functionality: main cost app, known-cost quote, real editable Excel workbook, production cost guide, two-scenario cost comparison and a working Spanish quote page. The 37 EXCLUDE terms remain intentionally unaddressed.
+- `/es/calculadora-precios-impresion-3d/`: actual Spanish-language known-cost quotation tool, with reciprocal EN/ES hreflang. It is **not** a generic Spanish translation of all English cost pages and is not evidence of new regional search demand.
+- `/calculation-methodology/#cost-comparison-tool`: working two-scenario FDM cost comparison. No duplicate doorway page was generated for that P2 synonym.
+- `/filament-cost-calculator/`: historical, specifically dated official-store PLA/PETG 1 kg pricing examples checked 2026-11-04, not a live price API or average market price.
 
 ## Important concrete query evidence (US monthly search estimates / KD)
 - `3d print cost calculator` **2,400 / 18** → `/`
@@ -44,3 +46,11 @@ Numbers above are preserved, not refreshed. The decisive post-launch evidence mu
 5. Preserve Pages preview `noindex` headers and redirect the `pages.dev` alias after the official domain is stable.
 
 **2026-11-03 P2 completion:** Seven P2 terms now have real canonical destinations: price-calculator intent → `/3d-print-pricing-calculator/`; calculator-app intent → `/`; two spreadsheet intents → `/3d-print-cost-calculator-excel/`; printing-cost information → `/how-much-does-3d-printing-cost/`; side-by-side printing-cost comparison → the live comparator at `/calculation-methodology/#cost-comparison-tool`; Spanish price intent → `/es/calculadora-precios-impresion-3d/` with a working quote engine and bidirectional hreflang. See `docs/KEYWORD_DEPLOYMENT_TRACEABILITY.md` for all 131 exact mappings. The original P0/P1 count remains 87; mapped P2 increases the total mapped search intents to 94.
+
+## Search-intent upgrades — 2026-11-04
+
+1. **Seller estimates vs print-service price quotes:** The pricing calculator explicitly does not parse a model or source binding offers from providers. It supports local CSV estimates and print-to-PDF with the same verified formula, including disclaimers.
+2. **Material-purchase search intent:** PLA Basic, PLA+ and PETG examples cite eSUN official US shop product catalog prices as an observed dated snapshot, not live universal rates.
+3. **Bambu Studio:** The homepage now explains where to get actual sliced material and total print time, and how to avoid double counting flushing, support and prime-tower waste.
+4. **Cost guide comparison:** Three hypothetical print cases are generated from the same public FDM engine and state every assumption. Users can then compare two actual input scenarios in the existing method page.
+5. **Audit boundary:** Keyword-to-route mapping and truthful intent content are not Google Search Console impressions, index inclusion, rankings or customer conversion evidence. Those require owner Search Console data.
