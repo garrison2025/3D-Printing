@@ -11,9 +11,9 @@ test('pricing guide presents theoretical and minimum chargeable prices separatel
  assert.match(build,/\$11\.4309/);
  assert.match(build,/\$11\.44/);
 });
-test('pricing guide CTA opens the real selling-price mode',()=>{
+test('pricing guide CTA opens the dedicated selling-price calculator',()=>{
  assert.match(build,/Open selling-price calculator/);
- assert.match(build,/route==='\/how-to-price-3d-prints\/'\?'\/#pricing'/);
+ assert.match(build,/route==='\/how-to-price-3d-prints\/'\?'\/3d-print-pricing-calculator\/'/);
 });
 test('filament formula accurately describes the installed dual-material calculation',()=>{
  assert.match(seo,/If using a second filament/);
