@@ -162,6 +162,47 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
   assert.ok(sizes.button>=40,width+'px too small button');
  }
 });
+await check('Spanish P2 pricing and two-scenario FDM cost comparison really calculate in the browser',async()=>{
+ await visit('/es/calculadora-precios-impresion-3d/');
+ assert.equal(await page.locator('html').getAttribute('lang'),'es');
+ assert.equal(await page.locator('link[hreflang="en"]').getAttribute('href'),officialOrigin+'/3d-print-pricing-calculator/');
+ await page.waitForFunction(()=>document.querySelector('[data-es-output="unitPrice"]')?.textContent?.includes('11,44'));
+ await page.locator('#es-quantity').fill('10');
+ await page.waitForFunction(()=>document.querySelector('[data-es-output="unitPrice"]')?.textContent?.includes('11,00'));
+ await page.locator('#es-currency').selectOption('USD');
+ await page.waitForFunction(()=>document.querySelector('[data-es-output="unitPrice"]')?.textContent?.includes('
+ await page.setViewportSize({width:1280,height:900});
+ const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
+ for(const p of routes){
+  await visit(p);
+  assert.ok(await page.locator('h1').count()===1,p+' heading');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),robotsValue,p+' index safety');
+ }
+ await visit('/3d-print-cost-calculator-excel/');
+ assert.match(await page.locator('body').innerText(),/22 editable inputs/);
+ const a=page.locator('a[href="/assets/3d-print-cost-calculator-template.xlsx"]');assert.equal(await a.count(),1);
+ const template=await page.request.get(origin+'/assets/3d-print-cost-calculator-template.xlsx');
+ assert.equal(template.status(),200);assert.equal((await template.body()).subarray(0,2).toString(),'PK');
+ const unexpected=[...new Set(network.filter(url=>classifyNetworkRequest(url,origin)==='unknown-external'))];
+ assert.deepEqual(unexpected,[],'Unexpected undisclosed remote requests');
+ const known=network.filter(url=>classifyNetworkRequest(url,origin)==='cloudflare-web-analytics');
+ if(known.length)console.log('NOTE — Cloudflare official Web Analytics beacon observed and disclosed in the privacy policy');
+ assert.deepEqual(crashes,[],'Uncaught browser exception');
+});
+await context.close();await browser.close();
+const summary='# Independent real-site acceptance: '+passed.length+'/'+(passed.length+failed.length)+' passed\n'+passed.map(x=>'PASS '+x).join('\n')+(failed.length?'\n'+failed.map(x=>'FAIL '+x).join('\n'):'');
+console.log(summary);
+if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary+'\n');
+if(failed.length)process.exitCode=1;
+));
+ await page.locator('#es-marginPercent').fill('99');
+ await page.waitForFunction(()=>document.getElementById('es-quote-error')?.hidden===false);
+ await visit('/calculation-methodology/');
+ await page.waitForFunction(()=>document.getElementById('comparison-cost-a')?.textContent?.includes('6.2752'));
+ await page.waitForFunction(()=>document.getElementById('comparison-cost-b')?.textContent?.includes('6.7872'));
+ await page.locator('#compare-B-Hours').fill('4');
+ await page.waitForFunction(()=>document.getElementById('comparison-delta')?.textContent?.includes('$0.00'));
+});
 await check('Published routes, download link, disclosed Cloudflare analytics and no unknown external requests',async()=>{
  await page.setViewportSize({width:1280,height:900});
  const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
