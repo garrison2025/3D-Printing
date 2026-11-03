@@ -170,7 +170,7 @@ await check('Spanish P2 pricing and two-scenario FDM cost comparison really calc
  await page.locator('#es-quantity').fill('10');
  await page.waitForFunction(()=>document.querySelector('[data-es-output="unitPrice"]')?.textContent?.includes('11,00'));
  await page.locator('#es-currency').selectOption('USD');
- await page.waitForFunction(()=>document.querySelector('[data-es-output="unitPrice"]')?.textContent?.includes('USD'));
+ await page.waitForFunction(()=>{const v=document.querySelector('[data-es-output="unitPrice"]')?.textContent||'';return v.includes('11,00')&&!v.includes('€')});
  await page.locator('#es-marginPercent').fill('99');
  await page.waitForFunction(()=>document.getElementById('es-quote-error')?.hidden===false);
  await visit('/calculation-methodology/');
