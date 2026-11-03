@@ -2,6 +2,10 @@
 
 A complete **zero-dependency, static** English-language 3D printing cost and pricing website, implemented from the owner's November 2, 2026 V1.1 plan. All calculation logic runs in the browser; no database, login, payment, paid APIs, or hosted runtime is needed.
 
+**Official calculators:** [FDM production cost](https://3dprintcostcalculator.org/) · [Known-cost selling price](https://3dprintcostcalculator.org/3d-print-pricing-calculator/) · [Filament per gram](https://3dprintcostcalculator.org/filament-cost-calculator/) · [Machine hour](https://3dprintcostcalculator.org/3d-printing-cost-per-hour/) · [Free Excel template](https://3dprintcostcalculator.org/3d-print-cost-calculator-excel/).
+
+**Reproducible methodology and attribution:** [Inputs, formulas, assumptions and how to cite](https://3dprintcostcalculator.org/calculation-methodology/). PrintCost Studio is the first-party publishing brand, not a claim of independent laboratory validation or manufacturer affiliation.
+
 ## Run it
 
 Requires Node.js 20+ only; **no npm install required**.
