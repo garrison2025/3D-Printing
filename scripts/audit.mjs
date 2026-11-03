@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
 function canonicalOriginFor(route,html){return html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]}
 const titles=new Set();
@@ -26,7 +26,7 @@ for(const route of routes){
   pass(html.includes('class="geo-answer"'),'readable answer block '+route);
   pass(html.includes('href="/calculation-methodology/"'),'visible methodology link '+route);
  }
- if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/'].includes(route)){
+ if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
   const breadcrumb=graph.find(x=>x['@type']==='BreadcrumbList');
   pass(!!breadcrumb && breadcrumb.itemListElement?.length===2,'breadcrumb markup backed by visible navigation '+route);
  }

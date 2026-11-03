@@ -34,6 +34,7 @@ The current `pages.dev` hostname is **preview-only and noindex**. The build defa
 - `/filament-cost-calculator/` — real per-gram/material cost tool
 - `/3d-printing-cost-per-hour/` — real per-hour electricity and machine allocation tool
 - `/calculation-methodology/` — transparent formula reference, assumptions and inspectable source links
+- `/3d-print-cost-calculator-excel/` — distinct editable offline XLSX download and usage guide (two source P2 intents)
 - `/about/`, `/privacy/`, `/contact/` — site support and truthful policies
 
 No generated near-duplicate landing pages. Search-intent assignments for 131 exact US keyword strings, including source metrics and competitor ranking fields, are in `src/content/keyword-intent-map.json` and described in `docs/RESEARCH-HANDOFF.md`.

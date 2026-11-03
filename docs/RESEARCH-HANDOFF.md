@@ -8,6 +8,6 @@ Research source: user supplied `01_FULL_BUILD_SPEC(2).md`, 2026-11-02 Semrush US
 
 Keyword map: `src/content/keyword-intent-map.json`: P0, P1, P2, EXCLUDE with Volume, KD, CPC, competitor rank, estimated traffic, intent mapping. 131 nonidentical keyword strings, not 131 pages.
 
-Approved canonical routes: `/`, `/how-much-does-3d-printing-cost/`, `/how-to-price-3d-prints/`. Other routes support trust only. Mode variations are UI states, not indexable duplicate pages.
+Approved primary search intents: `/`, `/how-much-does-3d-printing-cost/`, `/how-to-price-3d-prints/`, the material-only and hourly calculators, and one genuinely downloadable Excel resource page added on 2026-11-03 after separate SERP checks. Other routes support trust/methodology. Mode variations are UI states, not indexable duplicate pages.
 
 Unknowns: Google indexing, live organic clicks, ad RPM, publisher identity, final production domain, live GSC performance. These are not inferred.

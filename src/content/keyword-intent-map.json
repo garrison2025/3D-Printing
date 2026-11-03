@@ -1460,9 +1460,10 @@
       "traffic_3dpcc": null,
       "traffic_printpal": null,
       "traffic_force": 9,
-      "destination": "/ (export feature)",
+      "destination": "/3d-print-cost-calculator-excel/",
       "aio": "否",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Independent real XLSX download and how-to page; P2 volume/KD unchanged (2026-11-02 source)"
     },
     {
       "keyword": "3d printer printing cost",
@@ -1492,9 +1493,10 @@
       "traffic_3dpcc": null,
       "traffic_printpal": null,
       "traffic_force": 1,
-      "destination": "/ (export feature)",
+      "destination": "/3d-print-cost-calculator-excel/",
       "aio": "是",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Independent real XLSX download and how-to page; P2 volume/KD unchanged (2026-11-02 source)"
     },
     {
       "keyword": "3d printing cost comparison",

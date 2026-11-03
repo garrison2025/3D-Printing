@@ -5,7 +5,7 @@ if(!['staging','production'].includes(mode))throw Error('Mode must be staging or
 const staging=mode==='staging';
 if(!staging && new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Refusing production indexing audit on a temporary pages.dev domain. Use staging mode.');
 if(!origin.startsWith('https://'))throw Error('Live audit needs a public HTTPS URL');
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
 const checks=[];
 const check=(ok,desc)=>checks.push({ok:Boolean(ok),desc});
 async function request(path){

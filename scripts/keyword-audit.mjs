@@ -7,7 +7,8 @@ const validRoutes=new Map([
  ['/filament-cost-calculator/',{kind:'filament',marker:'data-seo-calculator="filament"'}],
  ['/3d-printing-cost-per-hour/',{kind:'hourly',marker:'data-seo-calculator="hourly"'}],
  ['/how-much-does-3d-printing-cost/',{kind:'cost-guide',marker:'Worked'}],
- ['/how-to-price-3d-prints/',{kind:'pricing-guide',marker:'margin'}]
+ ['/how-to-price-3d-prints/',{kind:'pricing-guide',marker:'margin'}],
+ ['/3d-print-cost-calculator-excel/',{kind:'excel-template',marker:'download="3d-print-cost-calculator-template.xlsx"'}]
 ]);
 const counts={P0:0,P1:0,P2:0,EXCLUDE:0};
 const errors=[];
@@ -44,12 +45,15 @@ for(const row of rows){
 }
 
 // Route verification is not search-intent validation. Require genuine, visible task evidence.
+const excelTerms=rows.filter(x=>['3d printing cost calculator excel','3d printing pricing spreadsheet'].includes(x.keyword));
+assert(excelTerms.length===2&&excelTerms.every(x=>x.destination==='/3d-print-cost-calculator-excel/'),'Two source P2 spreadsheet terms must map to live downloadable resource');
 const intentProof={
  '/': ['id="cost-form"','id="pricing"','EXPECTED COST PER ITEM','Required order gross'],
  '/filament-cost-calculator/': ['data-seo-calculator="filament"','Material cost per gram','second filament','Material cost per item'],
  '/3d-printing-cost-per-hour/': ['data-seo-calculator="hourly"','Maintenance','Machine allocation per hour','electricity'],
  '/how-much-does-3d-printing-cost/': ['Worked example','slicer','Electricity','failed'],
- '/how-to-price-3d-prints/': ['Margin','Markup','Fixed','checkout']
+ '/how-to-price-3d-prints/': ['Margin','Markup','Fixed','checkout'],
+ '/3d-print-cost-calculator-excel/': ['download="3d-print-cost-calculator-template.xlsx"','Batch Quotes','22 editable inputs','whole-cent checkout']
 };
 for(const [route,markers] of Object.entries(intentProof)){
  const html=fs.readFileSync(path.join('dist',route.slice(1),'index.html'),'utf8').toLowerCase();

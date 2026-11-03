@@ -8,4 +8,6 @@
 - Keyword checks now require real, visible formula/tool/guide evidence on each of the five distinct intent pages. This does not establish SERP rankings.
 - Source/CI syntax validation added. Live device/browser, accessibility, Lighthouse and deployed Git SHA are required release evidence.
 
+A new genuine Excel resource page addresses two source P2 download/spreadsheet searches. Metrics are unchanged (US 70/KD18 and US 50/KD21); public SERP review was conducted 2026-11-03, without treating rankings as guaranteed.
+
 Still intentionally deferred: multi-model order quote, STL slicing, resin mode, market-rate APIs, final domain/indexing, advertising and external analytics. Do not invent separate SEO landing pages to target those terms.
