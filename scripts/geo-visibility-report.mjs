@@ -18,11 +18,11 @@ export function visibilityReport(raw){
   if(!STATES.includes(status))errors.push('unknown status');
   const checked=status!=='not_checked';
   if(checked){
-   if(!validDate(r.observed_date))errors.push('missing/invalid observation date');
+   if(!validDate(r.observeddate))errors.push('missing/invalid observation date');
    if(!r.evidence?.trim())errors.push('missing screenshot or response permalink');
-   if(status==='cited'&&!canonicalUrl(r.cited_url))errors.push('linked citation must be the real owned domain');
-  }else if(r.cited_url?.trim())errors.push('unmeasured row cannot have cited URL');
-  const key=[r.platform,r.query?.toLowerCase().trim(),r.observed_date||'pending'].join('|');
+   if(status==='cited'&&!canonicalUrl(r.citedurl))errors.push('linked citation must be the real owned domain');
+  }else if(r.citedurl?.trim())errors.push('unmeasured row cannot have cited URL');
+  const key=[r.platform,r.query?.toLowerCase().trim(),r.observeddate||'pending'].join('|');
   if(keys.has(key))errors.push('duplicate surface/query/date');
   keys.add(key);
   if(errors.length){invalid.push({line:i+2,errors});return}
