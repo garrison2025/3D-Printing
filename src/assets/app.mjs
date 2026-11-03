@@ -174,3 +174,4 @@ if('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-moti
   sections.forEach(section=>observer.observe(section));
   window.addEventListener('pagehide',()=>{observer.disconnect();document.documentElement.classList.remove('motion-ready')},{once:true});
  }
+}
