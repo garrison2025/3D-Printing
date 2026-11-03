@@ -65,3 +65,14 @@ test('320px header does not demand three redundant navigation links',()=>{
  assert.match(css,/@media \(max-width:350px\)/);
  assert.match(css,/\.site-header \.nav-links > a\[href="\/"\]\{display:none\}/);
 });
+
+test('privacy-saving toggle is live, clearable, documented and in first-paint HTML',()=>{
+ assert.ok(build.includes('id="remember-inputs"'));
+ assert.ok(build.includes('id="metric-b">$3.44'));
+ assert.ok(build.includes('id="platform-fees">$1.22'));
+ assert.ok(build.includes('printcost.studio.remember.v1'));
+ assert.match(app,/rememberToggle\?\.addEventListener\('change'/);
+ assert.match(app,/localStorage\.removeItem\(storageKey\)/);
+ assert.match(app,/if\(rememberInputs\)\{try\{const stored=/);
+ assert.match(css,/\.remember-control/);
+});

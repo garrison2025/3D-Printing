@@ -26,6 +26,27 @@ try{
   if(width===390||width===1440)await shot('home-'+width);
  });
  await page.setViewportSize({width:390,height:844});await visit('/');
+ await run('Save-inputs preference disables persistence, clears saved inputs and restores opt-in',async()=>{
+  await visit('/');await page.locator('#reset-button').click();
+  const toggle=page.locator('#remember-inputs');assert.equal(await toggle.isChecked(),true);
+  await page.locator('input[name="usedGrams"]').fill('188');
+  assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('printcost.studio.settings.v1'))).usedGrams,188);
+  await toggle.uncheck();
+  assert.equal(await page.evaluate(()=>localStorage.getItem('printcost.studio.settings.v1')),null);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('printcost.studio.remember.v1')),'off');
+  assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'188');
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#remember-inputs').isChecked(),false);
+  assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');
+  await page.locator('input[name="usedGrams"]').fill('211');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('printcost.studio.settings.v1')),null);
+  await page.locator('#remember-inputs').check();
+  assert.equal(await page.evaluate(()=>localStorage.getItem('printcost.studio.remember.v1')),null);
+  assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('printcost.studio.settings.v1'))).usedGrams,211);
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
+  await page.locator('#reset-button').click();
+ });
  await run('Real-time calculation',async()=>{const before=await page.locator('#result-focus-value').innerText();await page.locator('input[name="usedGrams"]').fill('145');await page.waitForFunction(x=>document.querySelector('#result-focus-value')?.textContent!==x,before)});
  await run('Selling-price mode',async()=>{await page.locator('[data-mode="pricing"]').click();assert.equal(await page.locator('[data-mode="pricing"]').getAttribute('aria-pressed'),'true')});
  await run('Batch quote rows',async()=>{

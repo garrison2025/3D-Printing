@@ -1,21 +1,23 @@
-# Release evidence and honest execution status
+# Verified build and release gates — PrintCost Studio
 
-Date: 2026-11-02. Source: owner-supplied `OWNER_SPEC_V1.1.md`.
+Updated: 2026-11-03. **PREVIEW ONLY**: `https://3d-printing-1r7.pages.dev/` remains deliberately `noindex,nofollow` until the owner purchases and explicitly approves a production domain. Canonical and sitemap follow staging rules.
 
-| Gate | Status | Evidence |
-|---|---|---|
-| Business and keyword intake | PASS for implementation scope | Owner explicitly asked to implement the attached V1.1 plan; 131 keywords converted from appendix 13.1-13.4 and stored in JSON |
-| Calculation tests | PASS | `npm test` 10/10; no external services |
-| Static build | PASS | `npm run build`: 6 routes, JS/CSS, favicon, OG, sitemap, robots, 404 |
-| Static crawl integrity | PASS | `node scripts/audit.mjs`: 144 assertions passed |
-| Browser end-to-end interaction | NOT RUN | Playwright/Chromium blocked by administrator when navigating localhost or local files in this environment |
-| Responsive visual QA | NOT RUN | Browser navigation blocked; CSS breakpoints are authored but not screenshot-verified |
-| Performance (Lighthouse) | NOT RUN | Cannot truthfully claim CWV scores without a browser test |
-| Accessibility full audit | NOT RUN | Structural checks are static only; interactive testing needed |
-| Final production canonical | BLOCKED | Real published domain/Cloudflare Pages project not provided |
-| Official contact channel | BLOCKED | Owner has not supplied a public contact method; contact page is explicitly marked pre-launch |
-| External analytics, AdSense & live SEO | NOT CONFIGURED | No traffic/monetization claims or tracking SDK present |
+The older 2026-11-02 log covering just six routes and reporting Browser QA as NOT RUN described an intermediate revision. It is no longer current. Current site has **10 genuine routes**, including a filament tool, hourly cost tool, calculation methodology and useful Excel resource page. 131 Semrush source keywords (P0 25, P1 62, P2 7, EXCLUDE 37) remain research evidence rather than a traffic claim.
 
-**Formula assumptions:** a failed print consumes the full same attempt cost, fixed fee is per order, customer-paid shipping contributes to order revenue while carrier expense adds to cost; margin is after expenses included in the form but before income tax. Not all operating costs are included.
+| Gate | Last verified full release evidence |
+|---|---|
+| Unit/math, deterministic build, keyword and link audits | PASS — GitHub Actions 41570545329 |
+| Cloudflare deployment SHA, HTTP headers, canonical, robots, sitemap and real 404 | PASS — 96/96 checks, GitHub Actions 41570574159 |
+| Independent Chrome quote/fees, CSV, PDF, XLSX, mixed order, mobile viewports | PASS — 9/9 cases, GitHub Actions 41570574159 |
+| Chromium accessibility and no JS crashes | PASS — automated WCAG A/AA, GitHub Actions 41570574159 |
+| Real Excel XML structure on both served workbook and personalized export | PASS — 10 internal OOXML components parsed, GitHub Actions 41570574159 |
+| LibreOffice Calc open, edit, calculateAll, save and impossible-input rejection | PASS — genuine UNO app test, GitHub Actions 41570574159. **Not** a Microsoft Excel Desktop test |
+| iPhone-size Safari engine approximation | PASS — WebKit 8/8, GitHub Actions 41570574159. **Not** a physical iPhone test |
+| PNG sharing file and metadata | PASS — 1200×630 image at /og-card.png, published Open Graph and X metadata. Platform-side scraped preview not verified |
+| Mobile/desktop Lighthouse | PASS — Perf/A11Y/Best Practices 100/100 laboratory scores, not real-user CrUX/CWV |
+| Production hostname, Search Console, indexing and ads | NOT CONFIGURED — waiting on owner's formal domain |
+| Later local-saving preference and first-paint corrections | Implemented after the above snapshot; check current CI/live run before claiming a new green release gate |
 
-**Source stack note:** Astro was recommended in the owner's plan, but registry access is blocked in this runtime. Delivered zero-dependency static generator instead; no dependencies to install and deployable dist output. Replatforming is optional.
+Links: https://github.com/garrison2025/3D-Printing/actions/runs/41570574159 .
+
+Runtime is browser-only for calculations; no authentication, paid API, server-uploaded print files, or persistent application backend. Hosting still receives normal HTTP metadata. Revenue, site traffic and Google rankings have **not** been established. No fake freshness or automated SEO page generation.

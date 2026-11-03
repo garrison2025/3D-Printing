@@ -32,6 +32,17 @@ await check('iPhone touch text input changes quote, then reset restores values',
  await page.locator('#reset-button').click();
  assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');
 });
+await check('iPhone WebKit can turn local input saving off and on',async()=>{
+ await visit('/');await page.locator('#reset-button').click();
+ await page.locator('input[name="usedGrams"]').fill('189');
+ await page.locator('#remember-inputs').uncheck();
+ assert.equal(await page.evaluate(()=>localStorage.getItem('printcost.studio.settings.v1')),null);
+ await page.reload({waitUntil:'domcontentloaded'});
+ assert.equal(await page.locator('#remember-inputs').isChecked(),false);
+ assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');
+ await page.locator('#remember-inputs').check();
+ await page.locator('#reset-button').click();
+});
 await check('iPhone WebKit batch CSV download is real and contains calculated amounts',async()=>{
  await page.locator('#batch-quote > summary').click();
  const pending=page.waitForEvent('download');
