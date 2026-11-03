@@ -9,7 +9,9 @@ const validRoutes=new Map([
  ['/3d-printing-cost-per-hour/',{kind:'hourly',marker:'data-seo-calculator="hourly"'}],
  ['/how-much-does-3d-printing-cost/',{kind:'cost-guide',marker:'Worked'}],
  ['/how-to-price-3d-prints/',{kind:'pricing-guide',marker:'margin'}],
- ['/3d-print-cost-calculator-excel/',{kind:'excel-template',marker:'download="3d-print-cost-calculator-template.xlsx"'}]
+ ['/3d-print-cost-calculator-excel/',{kind:'excel-template',marker:'download="3d-print-cost-calculator-template.xlsx"'}],
+ ['/calculation-methodology/',{kind:'comparison',marker:'data-cost-comparison'}],
+ ['/es/calculadora-precios-impresion-3d/',{kind:'spanish-pricing',marker:'data-es-price-calculator'}]
 ]);
 const counts={P0:0,P1:0,P2:0,EXCLUDE:0};
 const errors=[];
@@ -19,12 +21,12 @@ const unique=new Set(rows.map(r=>r.keyword.toLowerCase().trim()));
 assert(unique.size===rows.length,'Duplicate keyword strings');
 const homepage=fs.readFileSync('dist/index.html','utf8');
 const app=fs.readFileSync('src/assets/app.mjs','utf8');
-let active=0;
+let active=0,p2Active=0;
 for(const row of rows){
  counts[row.priority]??=0;counts[row.priority]++;
  assert(Boolean(row.source),'Missing evidence source: '+row.keyword);
- if(!['P0','P1'].includes(row.priority))continue;
- active++;
+ if(!['P0','P1','P2'].includes(row.priority))continue;
+ if(row.priority==='P2')p2Active++;else active++;
  assert(Number.isFinite(row.us_volume),'No supplied volume for '+row.keyword);
  assert(Number.isFinite(row.kd),'No supplied keyword difficulty for '+row.keyword);
  const pricing=row.destination==='/3d-print-pricing-calculator/';
@@ -64,7 +66,10 @@ for(const [route,markers] of Object.entries(intentProof)){
 
 for(const [tier,count] of Object.entries({P0:25,P1:62,P2:7,EXCLUDE:37}))
  assert(counts[tier]===count,'Priority '+tier+': '+counts[tier]+' vs '+count);
-assert(active===87,'Expected 87 approved active keyword mappings');
+assert(active===87,'Expected 87 approved P0/P1 keyword mappings');
+assert(p2Active===7,'All 7 P2 terms must have approved functional page destinations');
+assert(rows.find(x=>x.keyword==='3d printing cost comparison')?.destination==='/calculation-methodology/','Comparison keyword targets interactive tool');
+assert(rows.find(x=>x.keyword==='calculadora precios impresion 3d')?.destination==='/es/calculadora-precios-impresion-3d/','Spanish keyword targets localized calculator');
 assert(rows.find(r=>r.keyword==='cost of pla per gram')?.destination==='/filament-cost-calculator/','PLA per-gram intent should go to dedicated tool');
 const pricingMapped=rows.filter(r=>r.destination==='/3d-print-pricing-calculator/'&&['P0','P1'].includes(r.priority));
 assert(pricingMapped.length===20,'Exactly 20 price/quote intents map to dedicated calculator');
@@ -74,7 +79,7 @@ assert(app.includes("location.hash==='#pricing'"),'Original homepage pricing dee
 const report=[
  '# Keyword implementation audit',
  'Imported: '+rows.length+' unique Semrush US query strings. Active mapped intent: '+active+' P0/P1 terms.',
- 'P0 '+counts.P0+'; P1 '+counts.P1+'; P2 '+counts.P2+' deferred; '+counts.EXCLUDE+' excluded.',
+ 'P0 '+counts.P0+'; P1 '+counts.P1+'; P2 '+counts.P2+' now verified on real useful pages; '+counts.EXCLUDE+' excluded.',
  'Each active term is mapped to an EXISTING useful page or pricing mode. This does NOT prove that Google will rank it.',
  'Failures: '+errors.length,
  ...errors.map(e=>'- '+e)

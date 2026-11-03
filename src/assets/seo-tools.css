@@ -38,3 +38,20 @@
 .seo-tool-form>p,.seo-tool-advanced>p,.seo-row span,
 .seo-tool-article .intro,.seo-explanation p {color:#3d526b!important}
 .seo-tool-output .seo-row strong{color:#123a6d}
+
+/* Comparison calculator and Spanish known-cost form, no background animation. */
+.cost-compare-panel{max-width:1080px;margin:28px auto;padding:20px 0}
+.cost-compare-panel h2{font-size:clamp(23px,3vw,31px)}
+.cost-compare-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:20px 0}
+.cost-compare-group{min-width:0;border:1px solid #d4e0ee;border-radius:14px;padding:18px;background:#f7faff}
+.cost-compare-group legend{padding:0 9px;color:#174775;font-size:16px;font-weight:800}
+.cost-compare-group .seo-tool-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cost-compare-results{margin:18px 0;padding:12px 18px;border:1px solid #d1dfef;border-radius:12px;background:#f2f7ff}
+.cost-compare-results .seo-row{display:flex;gap:18px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #dbe7f4}
+.cost-compare-results .seo-row:last-child{border-bottom:0}
+.cost-compare-results strong{color:#173f6e;font-variant-numeric:tabular-nums}
+#comparison-error:not([hidden]),#es-quote-error:not([hidden]){color:#9b1935;background:#fff1f3;padding:12px;margin:10px 0;border:1px solid #e4a7b5;border-radius:9px}
+.seo-tool-control select{font:inherit;font-size:16px;color:#173454;background:#fff;width:100%;border:0;padding:12px;min-height:46px;outline:none}
+.seo-tool-control select:focus-visible{outline:2px solid #216fc8;outline-offset:-3px}
+@media(max-width:900px){.cost-compare-columns{grid-template-columns:1fr}}
+@media(max-width:560px){.cost-compare-group{padding:13px}.cost-compare-group .seo-tool-fields{grid-template-columns:1fr}.cost-compare-results .seo-row{align-items:start;flex-direction:column;gap:3px}}

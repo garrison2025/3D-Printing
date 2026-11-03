@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
 function canonicalOriginFor(route,html){return html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]}
 const titles=new Set();
@@ -28,7 +28,7 @@ for(const route of routes){
  pass(website?.publisher?.['@id']===publisher?.['@id']&&webpage?.publisher?.['@id']===publisher?.['@id'],'site and page link to the disclosed publishing brand '+route);
 
  pass(webpage?.isPartOf?.['@id']===website?.['@id'],'WebPage points to website entity '+route);
- if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/'].includes(route)){
+ if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/es/calculadora-precios-impresion-3d/'].includes(route)){
   const application=graph.find(x=>x['@type']==='WebApplication');
   pass(!!application && application.url===webpage.url && webpage.mainEntity?.['@id']===application['@id'],'WebApplication matches visible calculator '+route);
   pass(application?.isAccessibleForFree===true&&application?.offers?.price===0,'free tool offer reflects browser-only calculator '+route);
@@ -38,7 +38,7 @@ for(const route of routes){
   pass(html.includes('class="geo-answer"'),'readable answer block '+route);
   pass(html.includes('href="/calculation-methodology/"'),'visible methodology link '+route);
  }
- if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
+ if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/'].includes(route)){
   const breadcrumb=graph.find(x=>x['@type']==='BreadcrumbList');
   pass(!!breadcrumb && breadcrumb.itemListElement?.length===2,'breadcrumb markup backed by visible navigation '+route);
   const entries=breadcrumb?.itemListElement||[];
@@ -66,6 +66,17 @@ pass(methods.includes('"@type":"Organization"')&&methods.includes('"name":"Print
 pass(!methods.includes('"sameAs"')&&!methods.includes('"aggregateRating"'),'no invented verified profiles or user ratings');
 pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
 pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
+pass(fs.existsSync(path.join(base,'assets/precios-es.mjs')),'Spanish functional pricing script shipped');
+pass(fs.existsSync(path.join(base,'assets/cost-comparison.mjs'))&&fs.existsSync(path.join(base,'assets/cost-comparison-engine.mjs')),'interactive comparative cost engine shipped');
+const es=fs.readFileSync(path.join(base,'es/calculadora-precios-impresion-3d/index.html'),'utf8');
+const en=fs.readFileSync(path.join(base,'3d-print-pricing-calculator/index.html'),'utf8');
+const official=canonicalOriginFor('/',fs.readFileSync(path.join(base,'index.html'),'utf8')).replace(/\/$/,'');
+for(const html of [es,en]){
+ pass(html.includes('hreflang="es" href="'+official+'/es/calculadora-precios-impresion-3d/"'),'reciprocal Spanish hreflang');
+ pass(html.includes('hreflang="en" href="'+official+'/3d-print-pricing-calculator/"'),'reciprocal English hreflang');
+}
+pass(es.includes('<html lang="es">')&&es.includes('data-es-price-calculator'),'Spanish page translated and has operational calculator');
+pass(methods.includes('data-cost-comparison'),'interactive comparison is visible on methodology');
 pass(fs.existsSync(path.join(base,'index.html'))&&fs.readFileSync(path.join(base,'index.html'),'utf8').includes('id="mixed-quote"')&&fs.existsSync(path.join(base,'assets/mixed-order.mjs')),'real mixed order interface and module');
 pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'specialized calculator library');
 const quotePage=fs.readFileSync(path.join(base,'3d-print-pricing-calculator/index.html'),'utf8');

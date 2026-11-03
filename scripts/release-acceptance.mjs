@@ -164,7 +164,7 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
 });
 await check('Published routes, download link, disclosed Cloudflare analytics and no unknown external requests',async()=>{
  await page.setViewportSize({width:1280,height:900});
- const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
+ const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
  for(const p of routes){
   await visit(p);
   assert.ok(await page.locator('h1').count()===1,p+' heading');

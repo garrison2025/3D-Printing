@@ -8,7 +8,7 @@ const previewAlias=staging&&new URL(origin).hostname.endsWith('.pages.dev');
 const allowedCanonicalOrigins=previewAlias?[origin,'https://3dprintcostcalculator.org']:[origin];
 if(!staging && new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Refusing production indexing audit on a temporary pages.dev domain. Use staging mode.');
 if(!origin.startsWith('https://'))throw Error('Live audit needs a public HTTPS URL');
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
 const checks=[];
 const check=(ok,desc)=>checks.push({ok:Boolean(ok),desc});
 async function request(path){

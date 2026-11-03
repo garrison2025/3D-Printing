@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 // Offline-only GSC Pages export review. No APIs or private data uploads.
 const origin='https://3dprintcostcalculator.org';
-const canon=['/','/3d-print-pricing-calculator/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
+const canon=['/','/3d-print-pricing-calculator/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/es/calculadora-precios-impresion-3d/','/about/','/privacy/','/terms/','/contact/'];
 export function parseCsv(s){
  const rows=[];let cols=[],cell='',quote=false;
  s=String(s).replace(/^\uFEFF/,'');

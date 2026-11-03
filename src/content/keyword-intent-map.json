@@ -1428,9 +1428,10 @@
       "traffic_3dpcc": 4,
       "traffic_printpal": 12,
       "traffic_force": 3,
-      "destination": "/",
+      "destination": "/3d-print-pricing-calculator/",
       "aio": "否",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Dedicated real known-cost pricing tool"
     },
     {
       "keyword": "3d print cost calculator app",
@@ -1477,9 +1478,10 @@
       "traffic_3dpcc": 1,
       "traffic_printpal": null,
       "traffic_force": null,
-      "destination": "—",
+      "destination": "/how-much-does-3d-printing-cost/",
       "aio": "否",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Full per-print FDM guide, including printer operating cost"
     },
     {
       "keyword": "3d printing pricing spreadsheet",
@@ -1510,9 +1512,10 @@
       "traffic_3dpcc": null,
       "traffic_printpal": null,
       "traffic_force": 0,
-      "destination": "—",
+      "destination": "/calculation-methodology/",
       "aio": "否",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Functional side-by-side comparison on the methodology page"
     },
     {
       "keyword": "calculadora precios impresion 3d",
@@ -1526,9 +1529,10 @@
       "traffic_3dpcc": null,
       "traffic_printpal": null,
       "traffic_force": 0,
-      "destination": "/es/ (future)",
+      "destination": "/es/calculadora-precios-impresion-3d/",
       "aio": "否",
-      "source": "User Semrush Organic Positions exports, US database, 2026-11-02"
+      "source": "User Semrush Organic Positions exports, US database, 2026-11-02",
+      "deployment_note": "Working Spanish quote calculator with reciprocal hreflang"
     },
     {
       "keyword": "printing calculator",

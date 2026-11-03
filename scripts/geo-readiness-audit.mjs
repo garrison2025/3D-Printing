@@ -11,7 +11,7 @@ const sitemap=fs.readFileSync(path.join(root,'sitemap.xml'),'utf8');
 check(manifest.indexable===true&&manifest.canonicalOrigin===origin,'production build is owner-domain indexable');
 check(/User-agent:\s*\*/.test(robots)&&/Allow:\s*\//.test(robots)&&!/^Disallow:\s*\/\s*$/m.test(robots),'robots allows generic search crawlers');
 check(robots.includes('Sitemap: '+origin+'/sitemap.xml'),'robots announces canonical sitemap');
-check((sitemap.match(/<loc>/g)||[]).length===12,'sitemap includes all 12 canonical pages');
+check((sitemap.match(/<loc>/g)||[]).length===13,'sitemap includes all 13 canonical pages');
 for(const id of ['reproducible-scenarios','scenario-failure','scenario-order','scenario-hours','scenario-margin'])
  check(method.includes('id="'+id+'"'),'methodology has source-driven comparison anchor '+id);
 check(home.includes('/calculation-methodology/#reproducible-scenarios'),'homepage links comparison evidence');
