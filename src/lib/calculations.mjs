@@ -80,3 +80,48 @@ export function calculate(input){
   if(!Object.values(result).filter(v=>typeof v==='number').every(Number.isFinite))return {ok:false,errors:{_global:'The result exceeds the supported numeric range. Use smaller inputs.'}};
   return result;
 }
+
+/** Quote unlike items as ONE order subtotal. It deliberately does not invent per-SKU selling prices.
+ * Costs are supplied per finished item, e.g. from separate slicer jobs or this site's main calculator.
+ */
+export function calculateMixedOrder(input={}){
+ const errors={};
+ const items=input.items;
+ if(!Array.isArray(items)||items.length<1||items.length>25)
+  return {ok:false,errors:{items:'Enter 1 to 25 different parts.'}};
+ const vars=['feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder','designCostPerOrder'];
+ const x={};for(const name of vars){
+  const value=input[name]??0;
+  if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e10)errors[name]='Enter a valid nonnegative amount.';
+  x[name]=value;
+ }
+ if(Number.isFinite(x.feeRate)&&x.feeRate>=1)errors.feeRate='Percentage fee must be below 100%.';
+ if(Number.isFinite(x.margin)&&x.margin>=1)errors.margin='Margin must be below 100%.';
+ if(Number.isFinite(x.feeRate)&&Number.isFinite(x.margin)&&x.feeRate+x.margin>=1)errors.margin='Fee plus margin must be below 100%.';
+ let totalParts=0,partsCost=0;
+ for(const [i,item] of items.entries()){
+  const count=item?.quantity,unitCost=item?.unitCost;
+  if(!Number.isSafeInteger(count)||count<1||count>100000)errors['quantity'+i]='Quantity must be a positive whole number.';
+  if(typeof unitCost!=='number'||!Number.isFinite(unitCost)||unitCost<0||unitCost>1e10)errors['cost'+i]='Unit cost must be a valid nonnegative amount.';
+  if(!errors['quantity'+i]&&!errors['cost'+i]){totalParts+=count;partsCost+=unitCost*count;}
+ }
+ if(Object.keys(errors).length)return {ok:false,errors};
+ const orderExpenses=partsCost+x.packagingPerOrder+x.shippingCostPerOrder+x.designCostPerOrder;
+ const requiredGross=(orderExpenses+x.feeFixed)/(1-x.feeRate-x.margin);
+ const theoreticalItemSubtotal=Math.max(0,requiredGross-x.shippingChargedPerOrder);
+ const rawCents=theoreticalItemSubtotal*100;
+ if(!Number.isFinite(rawCents)||!Number.isSafeInteger(Math.ceil(rawCents))||totalParts>1000000)
+  return {ok:false,errors:{_global:'This mixed quote is outside the supported numeric range.'}};
+ let cents=Math.max(0,Math.ceil(rawCents-1e-9));
+ let itemSubtotal=cents/100,orderGross=itemSubtotal+x.shippingChargedPerOrder;
+ if(orderGross+Math.abs(requiredGross)*1e-13<requiredGross){
+  cents++;itemSubtotal=cents/100;orderGross=itemSubtotal+x.shippingChargedPerOrder;
+ }
+ const fees=x.feeRate*orderGross+x.feeFixed,netProfit=orderGross-orderExpenses-fees;
+ if(![orderExpenses,requiredGross,itemSubtotal,orderGross,fees,netProfit].every(Number.isFinite))
+  return {ok:false,errors:{_global:'The order values are too large.'}};
+ return {ok:true,items:items.map(({name='',quantity,unitCost})=>({name:String(name).slice(0,80),quantity,unitCost,lineCost:unitCost*quantity})),
+  totalParts,partsCost,orderExpenses,requiredGross,theoreticalItemSubtotal,
+  itemSubtotal,shippingChargedPerOrder:x.shippingChargedPerOrder,orderGross,
+  fees,netProfit,actualMargin:orderGross>0?netProfit/orderGross:null};
+}
