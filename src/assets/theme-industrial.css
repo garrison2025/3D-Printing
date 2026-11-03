@@ -57,6 +57,7 @@ body{
 .brand-accent{color:var(--pc-primary)}
 .guide-breadcrumb{font-size:12px;color:var(--pc-subtle)}
 .breadcrumb-calculator,.filament-inline-link{color:var(--pc-primary);text-decoration:underline;text-underline-offset:2px}
+.guide-breadcrumb a.breadcrumb-calculator,.editorial .guide-breadcrumb a.breadcrumb-calculator{color:var(--pc-primary)!important}
 .breadcrumb-calculator:hover,.filament-inline-link:hover{color:var(--pc-primary-hover)}
 
 /* Brand, site shell, navigation and information architecture. */
@@ -109,6 +110,11 @@ body{
 .field input{background:#fff;border-color:var(--pc-line-strong);color:var(--pc-ink)}
 .field input:hover{border-color:#76A5A9;background:#fff}
 .field input:focus{background:#fff;border-color:var(--pc-primary);box-shadow:0 0 0 4px var(--pc-focus-ring)}
+.workspace .field input:focus,.workspace .field input:focus-visible{
+  border-color:var(--pc-primary)!important;
+  box-shadow:0 0 0 4px var(--pc-focus-ring)
+}
+
 .field input[aria-invalid=true]{border-color:#B33848;background:#FFF7F7;box-shadow:0 0 0 3px rgba(179,56,72,.11)}
 .details-section{border-top-color:var(--pc-line)}
 .details-section:hover,.details-section[open]{background:var(--pc-primary-tint)}
