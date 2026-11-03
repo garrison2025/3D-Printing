@@ -84,3 +84,10 @@
  .seo-tool-output{position:static!important}
  #quote-print-sheet{position:fixed!important;left:0!important;top:0!important}
 }
+
+/* Mobile containment for source-backed retail tables, without hiding their columns. */
+.seo-tool-article{max-width:100%;min-width:0;overflow-x:clip}
+.seo-tool-article .seo-explanation{min-width:0;max-width:100%;width:100%;overflow-wrap:anywhere}
+.seo-tool-article .table-scroll{display:block;width:100%;max-width:100%;min-width:0;contain:inline-size;overflow-x:auto}
+.seo-tool-article .table-scroll>.compare-table{min-width:570px}
+@media print{.seo-tool-article{overflow:visible!important}}
