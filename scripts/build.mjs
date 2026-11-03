@@ -25,7 +25,7 @@ function structuredData({route,title,description,url}){
   graph.push({'@type':'WebApplication','@id':appId,name:appNames[route],url,description,inLanguage:'en',applicationCategory:'UtilitiesApplication',operatingSystem:'Web browser',isAccessibleForFree:true,offers:{'@type':'Offer',price:0,priceCurrency:'USD'}});
   page.mainEntity={'@id':appId};
  }
- if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/'].includes(route)){
+ if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
   const crumbId=url+'#breadcrumb';
   graph.push({'@type':'BreadcrumbList','@id':crumbId,itemListElement:[
    {'@type':'ListItem',position:1,name:'3D Print Cost Calculator',item:site+'/'},
