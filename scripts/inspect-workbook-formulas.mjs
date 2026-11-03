@@ -18,3 +18,9 @@ for(const n of [25,26,27,28]){
  inspectRows.push({row:n,count,cells:[...row.matchAll(/<x:c r="([A-Z]+[0-9]+)"/g)].map(x=>x[1])});
 }
 console.log('WORKBOOK_INPUT_ROW_STRUCTURE '+JSON.stringify(inspectRows));
+console.log('SOURCE_WORKBOOK_STRUCTURE '+JSON.stringify({
+ dimension:sheet.match(/<x:dimension[^>]*\/>/)?.[0],
+ merges:[...sheet.matchAll(/<x:mergeCell ref="([^"]+)"/g)].map(x=>x[1]),
+ colWidths:sheet.match(/<x:cols>[\s\S]*?<\/x:cols>/)?.[0]?.slice(0,800),
+ sheetView:sheet.match(/<x:sheetView[^>]*>/)?.[0]
+}));
