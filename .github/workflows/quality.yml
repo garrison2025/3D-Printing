@@ -57,6 +57,34 @@ jobs:
         run: |
           SITE_URL=https://3dprintcostcalculator.org ENABLE_INDEXING=1 npm run build
           node scripts/audit.mjs
+      - name: Checkout pinned Website Starter Standard SEO auditor
+        uses: actions/checkout@v4
+        with:
+          repository: chenmu2024/Website-Starter-Standard
+          ref: e633805e57e18d4a11cc65966739de886f5a2b87
+          path: _site-standard
+          persist-credentials: false
+      - name: Independent static SEO audit under Website Starter Standard
+        run: |
+          mkdir -p qa-seo
+          python3 _site-standard/tools/seo_audit.py --site-dir dist --base-url https://3dprintcostcalculator.org --output qa-seo/standard-audit.json --fail-on error
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          audit=json.loads(Path('qa-seo/standard-audit.json').read_text())
+          print('Independent standard SEO check:',audit['pages_scanned'],'HTML files, findings:',audit['summary'])
+          for finding in audit['findings']:
+              if finding['severity']=='error':
+                  print('ERROR',finding)
+          PY
+      - name: Upload independent standards-based SEO audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printcost-standard-seo-audit
+          path: qa-seo/standard-audit.json
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Independently diagnose owned-domain HTTPS and indexing readiness (read-only)
         if: always()
         run: node scripts/domain-readiness.mjs

@@ -26,3 +26,11 @@ Inspected the real static generator (\`scripts/build.mjs\`, \`scripts/seo-pages.
 A regression test now compares all 11 routes found in the site builder's sitemap, static generated-HTML SEO audit, and real hosted-domain SEO audit. This prevents the common issue where a new useful page is generated but silently absent from the sitemap or from technical inspection. It also requires every imported P0/P1 keyword destination to be a real published route and locks in both Cloudflare preview-alias noindex host rules.
 
 The original 131 keyword records and estimated US search metrics are not changed. This test is a code consistency guarantee, not evidence of organic rankings or indexing.
+
+## Independent standard auditor now part of every quality run
+
+The project's original spec explicitly requires running `Website-Starter-Standard/tools/seo_audit.py`. CI now checks out **the public standard repository at pinned commit `e633805e57e18d4a11cc65966739de886f5a2b87`** and runs that unmodified script against the locally generated **production-indexable simulation** under the real owned origin.
+
+Command: `python3 _site-standard/tools/seo_audit.py --site-dir dist --base-url https://3dprintcostcalculator.org --output qa-seo/standard-audit.json --fail-on error`
+
+The detailed JSON artifact is retained for 14 days in GitHub Actions. Warnings (such as intentionally noindexed 404s or known download links that the generic scanner categorizes as HTML links) are reviewed rather than equated to Google's ranking rules; `error` findings fail the job. This step **does not** claim the Cloudflare production environment has indexing enabled, nor that Search Console has indexed the pages.
