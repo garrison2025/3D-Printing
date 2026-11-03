@@ -61,13 +61,14 @@ jobs:
         run: |
           if ! command -v libreoffice >/dev/null 2>&1; then
             sudo apt-get update -qq
-            sudo apt-get install -y -qq libreoffice-calc
+            sudo apt-get install -y -qq libreoffice-calc python3-uno
           fi
+          sudo apt-get install -y -qq python3-uno
           libreoffice --version
-          python3 scripts/libreoffice-acceptance.py
+          /usr/bin/python3 scripts/libreoffice-acceptance-uno.py
       - name: Install free Playwright WebKit browser engine for Safari-like checks
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
-        run: ./node_modules/.bin/playwright install --with-deps webkit
+        run: node node_modules/playwright-core/cli.js install --with-deps webkit
       - name: Safari-like WebKit checks in iPhone-sized browser (not physical iOS)
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
