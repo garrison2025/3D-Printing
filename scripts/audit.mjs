@@ -66,6 +66,9 @@ pass(notFound.includes('<meta name="robots" content="noindex,nofollow">'),'404 i
 pass(homepage.includes('class="skip-link" href="#main-content"'),'accessible skip-to-main link');
 pass(contactHtml.includes('https://github.com/garrison2025/3D-Printing/issues/new'),'real support link');
 pass(!contactHtml.includes('Pre-launch note:'),'no public placeholder support copy');
+pass(contactHtml.includes('mailto:contact@3dprintcostcalculator.org'),'owner email visible on contact page');
+pass(fs.readFileSync(path.join(base,'privacy/index.html'),'utf8').includes('mailto:contact@3dprintcostcalculator.org'),'privacy has owner contact email');
+pass(homepage.includes('mailto:contact@3dprintcostcalculator.org'),'owner email accessible from footer');
 if(homepage.includes('<meta name="robots" content="index,follow">')){
  pass(robotText.includes('Sitemap: '+canonicalOrigin+'/sitemap.xml'),'published robots sitemap matches canonical');
  pass(!/Disallow:\s*\/\s*$/m.test(robotText),'published robots allows crawling');

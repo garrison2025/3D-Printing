@@ -55,5 +55,5 @@ jobs:
           if-no-files-found: ignore
       - name: Custom-domain publication simulation (not deployed)
         run: |
-          SITE_URL=https://example.org ENABLE_INDEXING=1 npm run build
+          SITE_URL=https://3dprintcostcalculator.org ENABLE_INDEXING=1 npm run build
           node scripts/audit.mjs

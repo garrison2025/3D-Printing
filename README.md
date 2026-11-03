@@ -19,10 +19,10 @@ Open `http://localhost:4173/`. Windows alternative: `py -m http.server 4173 --di
 - Framework preset: **None (static site)**
 - Build command: `npm run build`
 - Build output directory: `dist`
-- Environment variable `SITE_URL`: **the actual final published origin**, e.g. `https://your-real-domain.example` (replace with your OWN verified domain). This variable controls canonical/OG/sitemap URLs.
+- Environment variable `SITE_URL`: `https://3dprintcostcalculator.org` for the verified production Pages branch. This variable controls canonical, JSON-LD, OG and sitemap URLs.
 - No database, API keys, secrets, backend functions, redirects, or additional runtime services.
 
-The current `pages.dev` hostname is **preview-only and noindex**. The build defaults to noindex in every environment. Future indexable publishing requires both `SITE_URL=https://your-verified-custom-domain` and `ENABLE_INDEXING=1` on the Cloudflare `main` deployment. Do not enable before the owner purchases and verifies the domain.
+The `pages.dev` hostname remains a **preview alias**. The site owner's domain is `https://3dprintcostcalculator.org` and the contact address is `contact@3dprintcostcalculator.org`. The owner has purchased the domain and linked it to Cloudflare, **but Cloudflare Pages custom-domain activation, TLS and MX/email delivery have not yet been independently verified**. The build stays noindex unless both `SITE_URL=https://3dprintcostcalculator.org` and `ENABLE_INDEXING=1` are explicitly configured. Noncanonical hostnames and Pages preview branches cannot pass this release gate. Follow `docs/DOMAIN_RELEASE_20261103.md` before changing `ENABLE_INDEXING` to `1`.
 
 **Deviation from recommended stack:** the owner spec recommends Astro, but npm registry access was unavailable in the execution environment. To provide an actually runnable, verified build rather than untested Astro source, this implementation uses a zero-dependency Node static generator. The output still has pre-rendered HTML, correct internal links, a client-only computation module, mobile CSS, and Cloudflare Pages compatibility. Replacing the build generator with Astro later is optional, not required for SEO.
 
@@ -53,7 +53,7 @@ No STL/G-code accuracy claims, no invented testimonials, no paid subscriptions, 
 - `node scripts/audit.mjs`: checks generated routes, unique titles/H1, canonicals, internal links, static FAQ/guide copy, structured data, sitemap and privacy controls.
 - `docs/BUILD-STATUS.md` and `docs/GEO_RELEASE_EVIDENCE_20261102.md`: actual checks versus unverified live SEO and AI search results.
 
-**The site is deliberately not public for search indexing** until the final domain is purchased and approved. GitHub Issues is a public support route, but owner/contact/legal details and real-domain verification remain release gates. No AI-search citation or GSC results have been claimed.
+**Site ownership is confirmed; search indexing stays gated until Cloudflare Pages custom-domain HTTPS and published metadata are independently verified.** GitHub Issues is a public support route, but owner/contact/legal details and real-domain verification remain release gates. No AI-search citation or GSC results have been claimed.
 
 ### Editable Excel calculator template
 

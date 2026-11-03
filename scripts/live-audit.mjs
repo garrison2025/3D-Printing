@@ -38,6 +38,7 @@ for(const route of routes){
   if(route==='/contact/'){
    check(r.content.includes('github.com/garrison2025/3D-Printing/issues/new'),'real support link published');
    check(!r.content.includes('Pre-launch note:'),'no prelaunch placeholder');
+   check(r.content.includes('mailto:contact@3dprintcostcalculator.org'),'new domain email appears on contact route');
   }
  }catch(err){check(false,route+' fetch failed: '+err.message)}
 }
