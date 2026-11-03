@@ -17,6 +17,6 @@ No thin pages for synonyms, unsupported STL slicing, resin mode, speculative bra
 
 ## Publication boundary
 
-Current preview: `https://3d-printing-1r7.pages.dev/`; page-level and HTTP `noindex,nofollow`; no staging sitemap URLs. The preview is **not** a production launch. Official owner-approved custom domain required before configuring `SITE_URL=https://<verified-domain>` and `ENABLE_INDEXING=1`, redeploying and checking canonical, host-specific preview noindex, robots and sitemap. Then verify domain in Google Search Console; SEO and actual GSC data cannot be assessed beforehand.
+**Live production (verified 2026-11-03):** [https://3dprintcostcalculator.org/](https://3dprintcostcalculator.org/) publishes 12 indexable canonical HTML pages and a 12-URL Sitemap. The temporary Pages alias remains separately HTTP noindex. Actual Google Search Console coverage, clicks, rankings and indexing must be checked in the owner's Search Console; the historical 131 keyword rows are competitor estimates, not site traffic.
 
 Web tool performs all calculations locally. User controls whether browser inputs are retained via an explicit opt-out; Reset clears remembered input values. Normal hosting requests still expose standard HTTP request metadata. Privacy and consent disclosures must be reviewed before any future advertising/analytics integrations. Browser and Lighthouse CI are lab tests; no measured field Web Vitals or revenue are claimed.
