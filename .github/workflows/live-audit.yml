@@ -83,6 +83,8 @@ jobs:
         run: |
           mkdir -p qa-lighthouse
           npx --no-install lighthouse "$SITE_URL/" --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-mobile.json
+          npx --no-install lighthouse "$SITE_URL/" --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-mobile-2.json
+          npx --no-install lighthouse "$SITE_URL/" --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-mobile-3.json
           npx --no-install lighthouse "$SITE_URL/" --quiet --preset=desktop --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-desktop.json
           node scripts/lighthouse-report.mjs
       - name: Upload Lighthouse evidence

@@ -16,3 +16,10 @@ test('fixed unit symbols and batch hints have accessible contrast overrides',()=
  assert.match(css,/\.field-control \.unit/);
  assert.match(css,/#batch-quote summary span \{color:#354b65!important\}/);
 });
+
+test('performance release gate uses three measured mobile Lighthouse samples, not one noisy score',()=>{
+ for(const f of ['home-mobile.json','home-mobile-2.json','home-mobile-3.json'])assert.ok(flow.includes(f));
+ assert.match(report,/Mobile median/);
+ assert.match(report,/mobileMedian>=95/);
+ assert.match(report,/PERFORMANCE RELEASE GATE FAILED/);
+});
