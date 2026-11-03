@@ -113,6 +113,8 @@ try{
    await page.locator('#reset-button').click();
    await page.locator('[data-mode="pricing"]').click();
    assert.match(await page.locator('#cash-quote-note').innerText(),/\$11\.44/);
+   assert.equal((await page.locator('#result-focus-value').innerText()).trim(),'$11.44');
+   assert.equal((await page.locator('#order-gross').innerText()).trim(),'$11.44');
    await page.locator('input[name="usedGrams"]').fill('145');
    await page.waitForFunction(()=>document.querySelector('#cash-quote-note')?.textContent?.includes('checkout price'));
  });
