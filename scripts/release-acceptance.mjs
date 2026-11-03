@@ -162,6 +162,32 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
   assert.ok(sizes.button>=40,width+'px too small button');
  }
 });
+await check('Real downloadable seller estimate, print sheet and source-backed keyword content',async()=>{
+ await visit('/3d-print-pricing-calculator/');
+ assert.equal(await page.locator('#quote-download-csv').isEnabled(),true);
+ await page.locator('#quote-project-reference').fill('Example customer job');
+ await page.locator('input[name="quantity"]').fill('10');
+ await page.waitForFunction(()=>document.getElementById('price-quote-unit')?.textContent==='$11.00');
+ const file=await download('#quote-download-csv');
+ assert.equal(file.filename,'3d-print-estimate.csv');
+ const csv=file.bytes.toString('utf8');
+ assert.match(csv,/"Example customer job"/);
+ assert.match(csv,/"Price per item","11"/);
+ assert.match(csv,/"Currency","USD"/);
+ assert.match(csv,/Not an invoice or a guaranteed print-service quotation/);
+ assert.equal(await page.locator('#quote-print-reference').textContent(),'Example customer job');
+ await page.emulateMedia({media:'print'});
+ assert.notEqual(await page.locator('#quote-print-sheet').evaluate(el=>getComputedStyle(el).display),'none');
+ await page.emulateMedia({media:'screen'});
+ await page.locator('input[name="marginPercent"]').fill('99');
+ await page.waitForFunction(()=>document.getElementById('quote-download-csv')?.disabled===true);
+ await visit('/filament-cost-calculator/');
+ assert.match(await page.locator('body').innerText(),/November 4, 2026/);
+ await visit('/how-much-does-3d-printing-cost/');
+ assert.match(await page.locator('body').innerText(),/Small single part/);
+ await visit('/');
+ assert.match(await page.locator('body').innerText(),/Bambu Studio/);
+});
 await check('Spanish P2 pricing and two-scenario FDM cost comparison really calculate in the browser',async()=>{
  await visit('/es/calculadora-precios-impresion-3d/');
  assert.equal(await page.locator('html').getAttribute('lang'),'es');
