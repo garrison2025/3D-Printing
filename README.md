@@ -6,6 +6,10 @@ A complete **zero-dependency, static** English-language 3D printing cost and pri
 
 **Reproducible methodology and attribution:** [Inputs, formulas, assumptions and how to cite](https://3dprintcostcalculator.org/calculation-methodology/). PrintCost Studio is the first-party publishing brand, not a claim of independent laboratory validation or manufacturer affiliation.
 
+**Original GEO-ready comparisons:** [Failure-rate sensitivity](https://3dprintcostcalculator.org/calculation-methodology/#scenario-failure) · [One vs ten item orders](https://3dprintcostcalculator.org/calculation-methodology/#scenario-order) · [Four vs eight print hours](https://3dprintcostcalculator.org/calculation-methodology/#scenario-hours) · [Margin vs markup](https://3dprintcostcalculator.org/calculation-methodology/#scenario-margin). All outcomes come from this repository's real formulas under explicitly hypothetical inputs, not a market survey.
+
+**AI search verification:** [Cloudflare AI Crawl Control and evidence-based visibility checklist](docs/GEO_AI_CRAWL_AND_VISIBILITY.md) · [25 unmeasured search prompts](data/geo-visibility-template.csv) · Run `node scripts/geo-visibility-report.mjs data/geo-visibility-template.csv` for a truthful offline report. No AI citation or crawl allow-list status is claimed without actual provider evidence.
+
 ## Run it
 
 Requires Node.js 20+ only; **no npm install required**.
