@@ -142,7 +142,7 @@ export async function hardenWorkbookTemplate(sourceBytes){
  '<x:c r="A26" t="str"><x:v>Maintenance reserve per hour USD</x:v></x:c>'+
  '<x:c r="B26" s="'+inputStyle+'" t="n"><x:v>0</x:v></x:c>'+
  '<x:c r="F26" s="10" t="str"><x:v>INPUT STATUS</x:v></x:c>'+
- '<x:c r="G26" t="str"><x:f>'+validation+'</x:f><x:v>VALID</x:v></x:c>'+
+ '<x:c r="G26" t="str"><x:f>'+validation.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'</x:f><x:v>VALID</x:v></x:c>'+
  '<x:c r="H26" t="str"><x:v>Invalid values make prices blank, never zero.</x:v></x:c>'+
  '</x:row><x:row r="27">'+
  '<x:c r="A27" t="str"><x:v>Design and order overhead USD</x:v></x:c>'+
