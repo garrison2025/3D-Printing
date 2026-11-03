@@ -33,9 +33,9 @@ test('number transitions avoid synchronous forced layout',()=>{
  assert.match(css,/prefers-reduced-motion:reduce/);
 });
 test('new style is included in normal and offline builds',()=>{
- assert.match(build,/assets\/finish\.css/);
+ assert.match(build,/assets\/site-bundle\.css/);
  assert.match(build,/src\/assets\/finish\.css/);
- assert.match(offline,/dist\/assets\/finish\.css/);
+ assert.match(offline,/dist\/assets\/site-bundle\.css/);
 });
 
 test('selling-price mode has responsive batch quote rows and CSV export',()=>{

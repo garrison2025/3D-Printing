@@ -42,6 +42,20 @@ for(const row of rows){
   assert(app.includes("location.hash==='#pricing'"),'Pricing deep link is not activated');
  }
 }
+
+// Route verification is not search-intent validation. Require genuine, visible task evidence.
+const intentProof={
+ '/': ['id="cost-form"','id="pricing"','Expected cost per successful item','Required order gross'],
+ '/filament-cost-calculator/': ['data-seo-calculator="filament"','Material cost per gram','second filament','Material cost per item'],
+ '/3d-printing-cost-per-hour/': ['data-seo-calculator="hourly"','Maintenance','Machine allocation per hour','electricity'],
+ '/how-much-does-3d-printing-cost/': ['Worked example','slicer','Electricity','failed'],
+ '/how-to-price-3d-prints/': ['Margin','Markup','Fixed','checkout']
+};
+for(const [route,markers] of Object.entries(intentProof)){
+ const html=fs.readFileSync(path.join('dist',route.slice(1),'index.html'),'utf8').toLowerCase();
+ for(const text of markers)assert(html.includes(text.toLowerCase()),'Missing real intent evidence on '+route+': '+text);
+}
+
 for(const [tier,count] of Object.entries({P0:25,P1:62,P2:7,EXCLUDE:37}))
  assert(counts[tier]===count,'Priority '+tier+': '+counts[tier]+' vs '+count);
 assert(active===87,'Expected 87 approved active keyword mappings');
