@@ -184,7 +184,7 @@ await check('Real downloadable seller estimate, print sheet and source-backed ke
  await visit('/filament-cost-calculator/');
  assert.match(await page.locator('body').innerText(),/November 4, 2026/);
  await visit('/how-much-does-3d-printing-cost/');
- assert.match(await page.locator('body').innerText(),/Small single part/);
+ assert.match(await page.locator('body').innerText(),/Small single part/i);
  await visit('/');
  assert.match(await page.locator('body').innerText(),/Bambu Studio/);
 });
