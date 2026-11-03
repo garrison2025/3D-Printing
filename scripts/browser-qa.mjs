@@ -53,7 +53,8 @@ try{
   assert.equal((await page.locator('#price-quote-total').innerText()).trim(),'$11.44');
   assert.equal((await page.locator('#price-quote-profit').innerText()).trim(),'$3.43');
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
-  assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),origin+'/3d-print-pricing-calculator/');
+  const manifest=await (await page.request.get(origin+'/build-manifest.json')).json();
+  assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),manifest.canonicalOrigin+'/3d-print-pricing-calculator/');
   const graph=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText())['@graph'];
   assert.ok(graph.some(x=>x['@type']==='WebApplication'&&x.url===origin+'/3d-print-pricing-calculator/'));
   await page.locator('[name="unitCost"]').fill('10');
