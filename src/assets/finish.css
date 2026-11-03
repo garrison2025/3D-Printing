@@ -241,3 +241,9 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .result-body .disclaimer {color:#3e526a!important}
 .geo-answer .geo-eyebrow,.geo-answer .geo-source,.geo-answer .geo-proof{color:#3d526e!important}
 @media(max-width:620px){.example-note,.scenario-note,.scenario-label{color:#354962!important}}
+
+/* WCAG remediation follow-up from full real browser axe results: the remaining
+   three failures were pale input unit labels and the batch comparison hint. */
+.form-panel .field-control .unit,
+.field-control .unit,
+#batch-quote summary span {color:#354b65!important}

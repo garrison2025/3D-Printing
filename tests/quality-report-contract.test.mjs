@@ -10,3 +10,9 @@ test('Lighthouse measures mobile/desktop and avoids staging SEO score conflation
  assert.match(flow,/home-mobile\.json/);assert.match(flow,/home-desktop\.json/);
  assert.match(flow,/lighthouse@13\.6\.0/);assert.match(report,/temporary preview has noindex/);
 });
+
+test('fixed unit symbols and batch hints have accessible contrast overrides',()=>{
+ const css=fs.readFileSync(new URL('../src/assets/finish.css',import.meta.url),'utf8');
+ assert.match(css,/\.field-control \.unit/);
+ assert.match(css,/#batch-quote summary span \{color:#354b65!important\}/);
+});
