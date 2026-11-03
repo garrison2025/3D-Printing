@@ -50,3 +50,7 @@ The actual 12-file `standard-audit.json` report from GitHub Actions run 41600779
 No actionable new landing-page errors were found. CI now runs `seo-standard-triage.py` against the standard's JSON report. Only those specific cases are considered acceptable after verifying the xlsx really exists and 404 really remains noindex and absent from sitemap. Any new unexpected warning, information item, or error causes CI failure and investigation, rather than hiding genuine issues behind the 7 known messages.
 
 This is a project-specific interpretation of an independent scanner, not a change to the pinned standard script.
+
+## iPhone WebKit live acceptance regression found while auditing quality
+
+GitHub Actions run 41601014290 reported one real WebKit iPhone-size UI check failure: the selected Pricing tab had moved but the decorative animated mode indicator retained the previous tab's position (approximately 107px difference). This was not an indexing error but harms mobile interaction clarity. Fix: on an explicit mode change, position the indicator synchronously immediately after updating `aria-pressed`, and also retain the requestAnimationFrame remeasurement for responsive layout shifts. This preserves existing animations and reduced-motion CSS; no interval timers, paid APIs or background work are introduced. Existing WebKit geometry/reduced-motion acceptance remains a hard gate.

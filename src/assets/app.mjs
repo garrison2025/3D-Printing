@@ -68,6 +68,10 @@ if(form){
  }
  function inputValuesSet(obj){for(const name of names){const el=form.elements.namedItem(name),v=obj?.[name];if(typeof v==='number' && Number.isFinite(v))el.value=String(el.dataset.percent==='true'?Number((v*100).toFixed(5)):v);}}
  function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
+  // A WebKit iPhone can defer a requested animation frame after a tap.
+  // Place the highlight immediately for the selected tab, then remeasure
+  // after the next paint to handle responsive layout changes. Only on mode changes.
+  updateModeIndicator();
   scheduleModeIndicator();
   render('mode');
  }
