@@ -22,6 +22,13 @@ test('shipping charged enters revenue; shipping cost enters expense',()=>{
 test('invalid rates, amounts and quantities blocked',()=>{
  for(const patch of [{margin:.95,feeRate:.1},{spoolGrams:0},{unitsPerPlate:0},{failRate:1},{hours:-1},{feeRate:.999,margin:.1}]) assert.equal(calculate({...DEFAULTS,...patch}).ok,false);
 });
+test('machine maintenance and once-per-order design cost are allocated correctly',()=>{
+ const a=calculate(DEFAULTS),b=calculate({...DEFAULTS,maintenancePerHour:0.25,designCostPerOrder:4});
+ assert.ok(a.ok&&b.ok);
+ assert.ok(Math.abs(b.maintenancePerPlate-2)<1e-9);
+ assert.ok(Math.abs((b.costPerUnit-a.costPerUnit)-2/0.95)<1e-9);
+ assert.ok(Math.abs((b.orderExpenses-a.orderExpenses)-(2/0.95+4))<1e-9);
+});
 test('zero cost and zero margin is safe',()=>{
  const r=calculate({...DEFAULTS,spoolPrice:0,usedGrams:0,hours:0,machineCost:0,prepMinutes:0,finishPerUnit:0,feeFixed:0,feeRate:0,margin:0});
  assert.equal(r.ok,true);assert.equal(r.recommendedPrice,0);assert.equal(r.actualMargin,null);

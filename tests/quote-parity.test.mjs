@@ -28,18 +28,19 @@ const cases=[
  ['very tight margin',{margin:.89,feeRate:.1,feeFixed:.04,unitsPerOrder:2}],
  ['shipping exceeds quote',{shippingChargedPerOrder:100,shippingCostPerOrder:2}],
  ['batch with packing',{unitsPerPlate:7,unitsPerOrder:103,packagingPerOrder:4,shippingCostPerOrder:12,shippingChargedPerOrder:11,margin:.22,feeRate:.13,failRate:.3}],
- ['all-zero cost',{spoolPrice:0,usedGrams:0,hours:0,machineCost:0,prepMinutes:0,finishPerUnit:0,feeRate:0,feeFixed:0,margin:0}]
+ ['all-zero cost',{spoolPrice:0,usedGrams:0,hours:0,machineCost:0,prepMinutes:0,finishPerUnit:0,feeRate:0,feeFixed:0,margin:0}],
+ ['maintenance and order CAD work',{maintenancePerHour:0.35,designCostPerOrder:18,unitsPerPlate:3,unitsPerOrder:7}]
 ];
 for(const [name,patch] of cases)test(name+': reconcile website, Excel and independent tools',async()=>{
  const inputs={...DEFAULTS,...patch},r=calculate(inputs);
  assert.equal(r.ok,true,JSON.stringify(r.errors));
  const f=filamentEstimate({spoolPrice:inputs.spoolPrice,spoolGrams:inputs.spoolGrams,usedGrams:inputs.usedGrams,itemsPerPlate:inputs.unitsPerPlate});
- const hourly=hourlyEstimate({printerPrice:inputs.machineCost,lifeHours:inputs.lifeHours,watts:inputs.watts,electricityRate:inputs.energyRate});
- near(f.perPlate,r.materialPerPlate,'filament');near(hourly.total,r.machineHourly+r.electricityHourly,'hourly');
+ const hourly=hourlyEstimate({printerPrice:inputs.machineCost,lifeHours:inputs.lifeHours,watts:inputs.watts,electricityRate:inputs.energyRate,maintenancePerHour:inputs.maintenancePerHour});
+ near(f.perPlate,r.materialPerPlate,'filament');near(hourly.total,r.machineHourly+r.electricityHourly+r.inputs.maintenancePerHour,'hourly');
  const bytes=await personalizeWorkbook(original,inputs,calculate);
  const main=getXml(bytes,'xl/worksheets/sheet1.xml'),batch=getXml(bytes,'xl/worksheets/sheet2.xml');
  const cash=practicalUsdQuote(r);
- for(const [cell,n] of Object.entries({G13:r.costPerUnit,G15:r.requiredOrderGross,G16:cash.unitPrice,G17:cash.orderGross,G18:cash.platformFees,G19:cash.netProfit,G20:cash.actualMargin??0}))
+ for(const [cell,n] of Object.entries({G11:r.attemptCost,G14:r.orderExpenses,G23:r.machineHourly+r.electricityHourly+r.inputs.maintenancePerHour,G13:r.costPerUnit,G15:r.requiredOrderGross,G16:cash.unitPrice,G17:cash.orderGross,G18:cash.platformFees,G19:cash.netProfit,G20:cash.actualMargin??0}))
   near(value(main,cell),n,'main '+cell);
  for(const [i,quantity] of [1,5,10,25,inputs.unitsPerOrder].entries()){
   const v=calculate({...inputs,unitsPerOrder:quantity}),row=i+5;

@@ -47,6 +47,19 @@ try{
   assert.equal(bin.subarray(0,4).toString('binary'),'PK\x03\x04');
   assert.ok(bin.length>5000,'Excel workbook unexpectedly small');
  });
+ await run('Maintenance and design costs affect real checkout and personalized workbook',async()=>{
+  await visit('/');
+  const old=await page.locator('#order-gross').innerText();
+  await page.locator('#advanced-details summary').click();
+  await page.locator('input[name="maintenancePerHour"]').fill('0.25');
+  await page.locator('#pricing-details summary').click();
+  await page.locator('input[name="designCostPerOrder"]').fill('4');
+  await page.waitForFunction(value=>document.querySelector('#order-gross')?.textContent!==value,old);
+  const dl=page.waitForEvent('download');await page.locator('#download-current-xlsx').click();
+  const data=fs.readFileSync(await (await dl).path()).toString('utf8');
+  assert.match(data,/r="B26"[^>]*><x:v>0.25<\/x:v>/);
+  assert.match(data,/r="B27"[^>]*><x:v>4<\/x:v>/);
+ });
  await run('Invalid input prevents export',async()=>{await page.locator('input[name="usedGrams"]').fill('-1');await page.waitForFunction(()=>document.querySelector('#export-csv')?.disabled===true)});
  await run('Reset recovers defaults',async()=>{await page.locator('#reset-button').click();assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'100');assert.equal(await page.locator('#export-csv').isEnabled(),true)});
  await run('Pricing deep-link',async()=>{await visit('/#pricing');await page.waitForFunction(()=>document.querySelector('[data-mode="pricing"]')?.getAttribute('aria-pressed')==='true')});

@@ -52,7 +52,7 @@ test('client-side Excel export preserves editable formulas and includes changed 
  assert.match(content,/<x:c r="B8"[^>]*><x:v>145<\/x:v><\/x:c>/);
  assert.match(content,/<x:c r="B22"[^>]*><x:v>9<\/x:v><\/x:c>/);
  assert.match(content,/<x:c r="A9"[^>]*><x:f>[^<]+<\/x:f><x:v>9<\/x:v><\/x:c>/);
- assert.match(content,/<x:f>IFERROR\(G11\/\(1-B17\),0\)<\/x:f>/);
+ assert.match(content,/<x:f>IF\(\$G\$26="VALID",IFERROR\(G11\/\(1-B17\),0\),""\)<\/x:f>/);
  assert.match(content,/forceFullCalc="1"/);
 });
 test('client-side Excel export rejects impossible profit assumptions',async()=>{
@@ -69,7 +69,10 @@ test('published workbook has editable offline input validation and no misleading
  const main=parts.get('xl/worksheets/sheet1.xml').toString();
  const batch=parts.get('xl/worksheets/sheet2.xml').toString();
  const book=parts.get('xl/workbook.xml').toString();
- assert.match(main,/r="G26"[^>]*><x:f>IF\(AND\(COUNT\(B6:B25\)=20/);
+ assert.match(main,/r="G26"[^>]*><x:f>IF\(AND\(COUNT\(B6:B27\)=22/);
+ assert.match(main,/r="B26"[^>]*><x:v>0<\/x:v>/);
+ assert.match(main,/r="B27"[^>]*><x:v>0<\/x:v>/);
+ assert.match(batch,/Cost Calculator'!\$B\$27/);
  assert.match(main,/INVALID INPUTS - review blue cells/);
  assert.match(main,/<x:f>IF\(\$G\$26="VALID",IFERROR\(G11\/\(1-B17\),0\),""\)<\/x:f>/);
  assert.match(batch,/<x:f>IF\('Cost Calculator'!\$G\$26="VALID"/);

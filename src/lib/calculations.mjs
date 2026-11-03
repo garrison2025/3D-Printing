@@ -6,12 +6,14 @@ export const DEFAULTS = Object.freeze({
   feeRate:0.08, feeFixed:0.3, margin:0.30,
   unitsPerOrder:1, shippingCostPerOrder:0, shippingChargedPerOrder:0,
   packagingPerOrder:0,
+  maintenancePerHour:0, designCostPerOrder:0,
 });
 
 const NONNEGATIVE = [
   'spoolPrice','usedGrams','hours','watts','energyRate','machineCost',
   'prepMinutes','laborRate','finishPerUnit','feeFixed',
-  'shippingCostPerOrder','shippingChargedPerOrder','packagingPerOrder'
+  'shippingCostPerOrder','shippingChargedPerOrder','packagingPerOrder',
+  'maintenancePerHour','designCostPerOrder'
 ];
 
 export function validateInputs(x) {
@@ -43,12 +45,13 @@ export function calculate(input){
   const energyPerPlate=x.hours*(x.watts/1000)*x.energyRate;
   const machinePerPlate=x.hours*(x.machineCost/x.lifeHours);
   const prepPerPlate=(x.prepMinutes/60)*x.laborRate;
-  const attemptCost=materialPerPlate+energyPerPlate+machinePerPlate+prepPerPlate;
+  const maintenancePerPlate=x.hours*x.maintenancePerHour;
+  const attemptCost=materialPerPlate+energyPerPlate+machinePerPlate+prepPerPlate+maintenancePerPlate;
   const expectedPlateCost=attemptCost/(1-x.failRate);
   const productionPerUnit=expectedPlateCost/x.unitsPerPlate;
   const costPerUnit=productionPerUnit+x.finishPerUnit;
   const orderProductionCost=costPerUnit*x.unitsPerOrder;
-  const orderExpenses=orderProductionCost+x.shippingCostPerOrder+x.packagingPerOrder;
+  const orderExpenses=orderProductionCost+x.shippingCostPerOrder+x.packagingPerOrder+x.designCostPerOrder;
   const requiredOrderGross=(orderExpenses+x.feeFixed)/(1-x.feeRate-x.margin);
   // Customer-paid shipping is part of total order revenue; it reduces item price but not required gross.
   const recommendedPrice=Math.max(0,(requiredOrderGross-x.shippingChargedPerOrder)/x.unitsPerOrder);
@@ -61,7 +64,7 @@ export function calculate(input){
   const machineHourly=x.machineCost/x.lifeHours;
   const electricityHourly=x.watts/1000*x.energyRate;
   const result={ok:true,inputs:x,materialPerPlate,energyPerPlate,machinePerPlate,prepPerPlate,attemptCost,
-    expectedPlateCost,productionPerUnit,costPerUnit,orderProductionCost,orderExpenses,requiredOrderGross,
+    expectedPlateCost,productionPerUnit,costPerUnit,maintenancePerPlate,orderProductionCost,orderExpenses,requiredOrderGross,
     recommendedPrice,orderGross,platformFees,netProfit,actualMargin,profitPerUnit,
     costPerGram,machineHourly,electricityHourly,
     markupOnProductionCost:costPerUnit>0?profitPerUnit/costPerUnit:null,
@@ -69,6 +72,7 @@ export function calculate(input){
       {name:'Material',value:materialPerPlate/(1-x.failRate)/x.unitsPerPlate},
       {name:'Electricity',value:energyPerPlate/(1-x.failRate)/x.unitsPerPlate},
       {name:'Machine wear',value:machinePerPlate/(1-x.failRate)/x.unitsPerPlate},
+      {name:'Maintenance reserve',value:maintenancePerPlate/(1-x.failRate)/x.unitsPerPlate},
       {name:'Preparation labor',value:prepPerPlate/(1-x.failRate)/x.unitsPerPlate},
       {name:'Finishing / per-item packing',value:x.finishPerUnit},
     ]
