@@ -53,6 +53,10 @@ jobs:
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/browser-qa.mjs "$SITE_URL"
+      - name: Independent customer checkout, Excel and print acceptance on live Cloudflare
+        env:
+          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+        run: node scripts/release-acceptance.mjs "$SITE_URL"
       - name: Measure mobile and desktop Lighthouse on Cloudflare
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
