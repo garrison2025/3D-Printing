@@ -38,7 +38,7 @@ test('actual site publishes the nonindexable template download from its own orig
 test('cost and price guides link the actual editable Excel template with truthful limitations',()=>{
  const build=fs.readFileSync(new URL('../scripts/build.mjs',import.meta.url),'utf8');
  assert.equal(build.split('href="/assets/3d-print-cost-calculator-template.xlsx"').length-1,3);
- assert.match(build,/8\. Common quoting mistakes/);
+ assert.match(build,/9\. Common quoting mistakes/);
  assert.match(build,/does not copy the current inputs from your browser/);
  const qa=fs.readFileSync(new URL('../scripts/browser-qa.mjs',import.meta.url),'utf8');
  assert.match(qa,/Both pricing and cost guides offer a working editable spreadsheet/);
