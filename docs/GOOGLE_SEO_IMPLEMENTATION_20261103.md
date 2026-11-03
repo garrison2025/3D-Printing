@@ -27,3 +27,9 @@
 - Canonical consistency: https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls
 - Software app structured data (no invented star ratings): https://developers.google.com/search/docs/appearance/structured-data/software-app
 - Title link hygiene: https://developers.google.com/search/docs/appearance/title-link
+
+## 2026-11-03 canonical correction
+- Independent CI hostname probe confirmed that the owner's apex resolves and responds with an HTTPS homepage; however its currently deployed HTML advertised a \`pages.dev\` canonical and remained noindex.
+- Cloudflare \`main\` now defaults \`SITE_URL\` to the owned HTTPS domain and rewrites the exact legacy \`pages.dev\` origin to the owner canonical, even if an old Cloudflare environment variable still names the alias.
+- The explicit \`ENABLE_INDEXING=1\` gate remains. A build whose original \`SITE_URL\` is still the temporary alias cannot become indexable even if the release flag is accidentally enabled. Set the full correct production variable before flipping the flag.
+- The preview deployment audit accepts the owner canonical while keeping the preview noindex; Cloudflare Bulk Redirects to the official domain are still recommended once production is indexable.

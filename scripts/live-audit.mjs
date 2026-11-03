@@ -3,6 +3,8 @@ const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origi
 const mode=process.argv[3]||'staging';
 if(!['staging','production'].includes(mode))throw Error('Mode must be staging or production');
 const staging=mode==='staging';
+const previewAlias=staging&&new URL(origin).hostname.endsWith('.pages.dev');
+const allowedCanonicalOrigins=previewAlias?[origin,'https://3dprintcostcalculator.org']:[origin];
 if(!staging && new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Refusing production indexing audit on a temporary pages.dev domain. Use staging mode.');
 if(!origin.startsWith('https://'))throw Error('Live audit needs a public HTTPS URL');
 const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
@@ -24,13 +26,13 @@ for(const route of routes){
   check(r.content.includes(staging?'content="noindex,nofollow"':'content="index,follow"'),route+' has correct indexability for '+mode);
   check(staging?/noindex/i.test(r.response.headers.get('x-robots-tag')||''):!/noindex/i.test(r.response.headers.get('x-robots-tag')||''),route+' header matches '+mode);
   const m=r.content.match(/<link rel="canonical" href="([^"]+)"/i);
-  check(m?.[1]===origin+route,route+' canonical points to production URL');
+  check(allowedCanonicalOrigins.some(x=>m?.[1]===x+route),route+' canonical points to an approved origin');
   if(route==='/')check(r.content.includes('id="cost-form"'), 'home page includes calculator');
   if(route==='/3d-print-pricing-calculator/')check(r.content.includes('data-pricing-calculator')&&r.content.includes('id="price-quote-results"'),'dedicated price tool has actual form and live results');
   const graphMatch=r.content.match(/<script type="application\/ld\+json">([^<]+)<\/script>/i);
   try{
    const graph=JSON.parse(graphMatch?.[1]||'{}')['@graph'];
-   check(Array.isArray(graph)&&graph.some(x=>x['@type']==='WebPage'&&x.url===origin+route),route+' has real WebPage schema');
+   check(Array.isArray(graph)&&graph.some(x=>x['@type']==='WebPage'&&x.url===m?.[1]),route+' has real WebPage schema');
   }catch{check(false,route+' has parseable JSON-LD')}
   if(route==='/calculation-methodology/'){
    check(r.content.includes('expected successful-plate cost'),'methodology shows actual failure model');
@@ -68,7 +70,7 @@ try{
  const r=await request('/build-manifest.json');
  check(r.response.status===200,'deployment manifest is accessible');
  const info=JSON.parse(r.content);
- check(info.canonicalOrigin===origin,'deployment manifest origin matches canonical');
+ check(allowedCanonicalOrigins.includes(info.canonicalOrigin),'deployment manifest origin matches canonical');
  check(info.indexable===!staging,'deployment indexability matches '+mode);
  const expected=(process.env.EXPECTED_COMMIT||'').trim();
  if(expected)check(info.commit===expected,'deployed SHA '+String(info.commit).slice(0,9)+' matches requested '+expected.slice(0,9));
