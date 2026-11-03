@@ -110,11 +110,6 @@ body{
 .field input{background:#fff;border-color:var(--pc-line-strong);color:var(--pc-ink)}
 .field input:hover{border-color:#76A5A9;background:#fff}
 .field input:focus{background:#fff;border-color:var(--pc-primary);box-shadow:0 0 0 4px var(--pc-focus-ring)}
-.workspace .field input:focus,.workspace .field input:focus-visible{
-  border-color:var(--pc-primary)!important;
-  box-shadow:0 0 0 4px var(--pc-focus-ring)
-}
-
 .field input[aria-invalid=true]{border-color:#B33848;background:#FFF7F7;box-shadow:0 0 0 3px rgba(179,56,72,.11)}
 .details-section{border-top-color:var(--pc-line)}
 .details-section:hover,.details-section[open]{background:var(--pc-primary-tint)}
@@ -202,6 +197,8 @@ body{
 .related-link:hover{border-color:var(--pc-focus)}
 .related-link span{color:var(--pc-primary)}
 .long-section,.editorial{color:var(--pc-ink)}
+.editorial a:not(.primary-link){color:var(--pc-primary)}
+.editorial a:not(.primary-link):hover{color:var(--pc-primary-hover)}
 .long-section a,.editorial a,.faq a,.geo-answer a,.geo-method-article a{
   color:var(--pc-primary)
 }

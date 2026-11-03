@@ -88,6 +88,7 @@ try{
  await run('Industrial teal A: focus, status and mobile segment colors remain consistent',async()=>{
   await visit('/');
   await page.locator('input[name="spoolPrice"]').click();
+  await page.waitForTimeout(260); // Respect the existing native focus transition.
   const focusDetails=await page.locator('input[name="spoolPrice"]').evaluate(el=>({
    border:getComputedStyle(el).borderTopColor,active:document.activeElement===el,
    matches:el.matches('.workspace .field input:focus'),parent:el.parentElement?.parentElement?.className,
