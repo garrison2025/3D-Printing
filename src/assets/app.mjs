@@ -12,7 +12,8 @@ if(form){
  let mode='cost', lastValid=null, valueMotion=null;
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
- const theoreticalMoney=(n)=>Number.isFinite(n)?'Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—';
+  const theoreticalMoney=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—';
+  const moneyPerGram=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—';
  const allFields=[...form.querySelectorAll('input[name]')];
  const scenarioButtons=[...document.querySelectorAll('[data-scenario]')];
  let exampleSelection='';
