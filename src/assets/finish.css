@@ -63,9 +63,7 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .info-card p,.related-link p{font-size:13px}
 .faq p,.section-lead{font-size:14px}
 .long-section{margin-top:66px}
-/* Avoid hiding important indexable content until an animation observer fires. */
-.motion-ready .long-section,.motion-ready .info-card{opacity:1;transform:none}
-.motion-ready .long-section.in-view,.motion-ready .info-card.in-view{opacity:1;transform:none}
+/* Content is visible without waiting for JavaScript or a scroll observer. */
 /* Animate only the live value, not layout or giant shadows. */
 .result-number,.mobile-estimate-value{will-change:auto}
 @media(min-width:931px){.workspace-grid{grid-template-columns:minmax(0,1.08fr) minmax(355px,.92fr)}.result-panel{top:85px}}
@@ -85,7 +83,6 @@ body{background:#f5f7fb;color:var(--finish-ink)}
  .field input{font-size:16px}
  .mobile-estimate{top:66px;box-shadow:0 8px 18px rgba(19,62,130,.10)}
  /* On active number input, free the visible viewport rather than covering input labels. */
- .mobile-input-active .mobile-estimate{position:relative;top:auto;z-index:auto;box-shadow:none}
  .mobile-estimate a{font-size:11px}
  .quote-settings{padding:13px 17px}
  .quote-settings-copy strong{font-size:12px}
@@ -131,7 +128,6 @@ body{background:#f5f7fb;color:var(--finish-ink)}
   .workspace .field-control { min-width: 0; }
   .workspace .field input { width: 100%; min-width: 0; }
   .workspace .mobile-estimate { position: sticky; top: 12px; }
-  .workspace .mobile-input-active .mobile-estimate { position: relative; top: auto; }
   .workspace .result-metrics { gap: 10px; }
   .workspace .metric-value { font-size: 20px; }
 }
@@ -320,7 +316,6 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .motion-ready .info-card:nth-child(2).in-view{animation-delay:.045s}
 .motion-ready .info-card:nth-child(3).in-view{animation-delay:.085s}
 @media(max-width:620px){
- .workspace .mobile-input-active .mobile-estimate{position:static;top:auto;box-shadow:none}
  .mobile-estimate{transition:box-shadow .16s ease,background-color .16s ease}
 }
 @media(prefers-reduced-motion:reduce){
@@ -332,3 +327,29 @@ body{background:#f5f7fb;color:var(--finish-ink)}
  .mode-bar .mode-indicator,.details-section[open] > .form-section,.mixed-quote details[open] > .mixed-content,
  .motion-ready .info-card.in-view,.motion-ready .long-section.in-view{animation:none!important}
 }
+
+/* V2.1 — stable keyboard focus, unintrusive action feedback, and universal reduced motion. */
+@media(max-width:620px){
+ .workspace .mobile-input-active .mobile-estimate{
+   position:sticky;top:12px;visibility:hidden;pointer-events:none;box-shadow:none;
+ }
+}
+.toast:not(:empty){display:flex;align-items:flex-start;gap:9px;margin-top:12px;padding:11px 12px;
+ border-radius:10px;border:1px solid #d7e5f5;background:#f4f8ff;color:#234767;
+ font-size:12px;font-weight:650;line-height:1.5}
+.toast:not(:empty)::before{content:"i";display:grid;place-items:center;flex:0 0 18px;
+ width:18px;height:18px;border-radius:50%;background:#dce9fc;color:#245ba3;font-weight:800;font-size:11px}
+.toast[data-tone="success"]:not(:empty){border-color:#c4e6d5;background:#edf8f2;color:#155b42}
+.toast[data-tone="success"]:not(:empty)::before{content:"✓";background:#d0f1df;color:#176344}
+.toast[data-tone="error"]:not(:empty){border-color:#f2c4c5;background:#fff2f2;color:#8d2c36}
+.toast[data-tone="error"]:not(:empty)::before{content:"!";background:#f9d8da;color:#9f283b}
+/* A single final rule disables decorative motion across all five author stylesheets. */
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+ .nav-cta:hover,.text-action:hover,.scenario-button:hover,.scenario-button:active,
+ .mode-button:hover,.mode-button:active,.result-button:hover:not(:disabled),
+ .result-button:active:not(:disabled),.inline-edit-pricing:hover,
+ .info-card:hover,.primary-link:hover{transform:none!important}
+ .motion-ready .info-card,.motion-ready .long-section{opacity:1!important;transform:none!important}
+}
+@media print{.toast{display:none!important}}

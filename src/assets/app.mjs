@@ -68,8 +68,6 @@ if(form){
  }
  function inputValuesSet(obj){for(const name of names){const el=form.elements.namedItem(name),v=obj?.[name];if(typeof v==='number' && Number.isFinite(v))el.value=String(el.dataset.percent==='true'?Number((v*100).toFixed(5)):v);}}
  function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
-  if(mode==='pricing')$('pricing-details').open=true;
-  if(mode==='filament')$('advanced-details').open=false;
   scheduleModeIndicator();
   render('mode');
  }
@@ -164,31 +162,39 @@ if(form){
    }
   }
  }
- function announce(msg){showValue('action-status',msg);}
+ function announce(msg,tone='info'){const status=$('action-status');if(!status)return;status.textContent=msg;status.dataset.tone=tone;}
  form.addEventListener('input',(evt)=>{if(!evt.target.matches('input[name]'))return;scenarioSet('');render('input');saveInput();});
  rememberToggle?.addEventListener('change',()=>{
   rememberInputs=rememberToggle.checked;
   try{
-   if(rememberInputs){localStorage.removeItem(rememberKey);saveInput();announce('Saving input values on this device is on.')}
-   else{localStorage.setItem(rememberKey,'off');localStorage.removeItem(storageKey);showValue('saved-message','Saving off · this tab only');announce('Saved inputs cleared. Changes in this tab will not persist.')}
-  }catch{showValue('saved-message','Browser storage unavailable');announce('Cannot change saving preference in this browser.')}
+   if(rememberInputs){localStorage.removeItem(rememberKey);saveInput();announce('Saving input values on this device is on.','success')}
+   else{localStorage.setItem(rememberKey,'off');localStorage.removeItem(storageKey);showValue('saved-message','Saving off · this tab only');announce('Saved inputs cleared. Changes in this tab will not persist.','success')}
+  }catch{showValue('saved-message','Browser storage unavailable');announce('Cannot change saving preference in this browser.','error')}
  });
  scenarioButtons.forEach(button=>button.addEventListener('click',()=>{
   const key=button.dataset.scenario,values=exampleScenarios[key];if(!values)return;
   inputValuesSet(values);scenarioSet(key);render('scenario');saveInput();
-  announce(`Loaded ${button.textContent.trim()} example. You can change any value.`);
+  announce(`Loaded ${button.textContent.trim()} example. You can change any value.`,'success');
  }));
  form.addEventListener('submit',e=>e.preventDefault());
- form.addEventListener('focusin',event=>{if(event.target.matches('input[name]'))form.classList.add('mobile-input-active')});
- form.addEventListener('focusout',event=>{if(event.target.matches('input[name]'))form.classList.remove('mobile-input-active')});
+ form.addEventListener('focusin',event=>{
+  if(event.target.matches('input[name]'))form.classList.add('mobile-input-active');
+ });
+ form.addEventListener('focusout',event=>{
+  if(!event.target.matches('input[name]'))return;
+  requestAnimationFrame(()=>{
+   if(!form.contains(document.activeElement)||!document.activeElement.matches('input[name]'))
+    form.classList.remove('mobile-input-active');
+  });
+ });
  $('edit-price-inputs')?.addEventListener('click',()=>{const details=$('pricing-details');details.open=true;setMode('pricing');const target=$('input-feeRate');target?.focus({preventScroll:false});announce('Pricing details expanded. Edit fees and margin below.');});
  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
- $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message',rememberInputs?'Example values restored':'Saving off · this tab only');});
- $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
-   const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
+ $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.','success');showValue('saved-message',rememberInputs?'Example values restored':'Saving off · this tab only');});
+ $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.','success');}catch{
+   const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.',ok?'success':'error');}catch{announce('Copy unavailable—use Export CSV.','error')}field.remove();}
  });
  $('export-csv').addEventListener('click',()=>{if(!lastValid)return;const r=lastValid;const rows=[['Key','Value','Unit'],...Object.entries(r.inputs).map(([k,v])=>[k,v,'input']),['costPerUnit',r.costPerUnit,'USD/item'],['checkoutPricePerItem',practicalUsdQuote(r)?.unitPrice??'undefined','USD/item'],['checkoutOrderGross',practicalUsdQuote(r)?.orderGross??'undefined','USD/order'],['orderExpenses',r.orderExpenses,'USD/order'],['checkoutPlatformFees',practicalUsdQuote(r)?.platformFees??'undefined','USD/order'],['checkoutNetProfit',practicalUsdQuote(r)?.netProfit??'undefined','USD/order'],['checkoutMargin',practicalUsdQuote(r)?.actualMargin??'undefined','fraction'],['theoreticalUnitPrice',r.recommendedPrice,'USD/item'],['theoreticalOrderGross',r.orderGross,'USD/order'],['theoreticalNetProfit',r.netProfit,'USD/order'],['theoreticalMargin',r.actualMargin??'undefined','fraction'],['checkoutProfitOverProductionCost',r.costPerUnit>0?(practicalUsdQuote(r)?.netProfit/r.inputs.unitsPerOrder)/r.costPerUnit:'undefined','fraction'],['theoreticalProfitOverProductionCost',r.markupOnProductionCost??'undefined','fraction'],['minimumWholeCentPrice',practicalUsdQuote(r)?.unitPrice??'undefined','USD/item'],['marginAtWholeCentCharge',practicalUsdQuote(r)?.actualMargin??'undefined','fraction']];
-   const csv=rows.map(cells=>cells.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='printcost-studio-estimate.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('CSV exported using current input values.');
+   const csv=rows.map(cells=>cells.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob(["\ufeff",csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='printcost-studio-estimate.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('CSV download started using current inputs.','success');
  });
  $('export-batch-csv')?.addEventListener('click',()=>{
   if(!lastValid)return;
@@ -202,7 +208,7 @@ if(form){
   const url=URL.createObjectURL(blob),el=document.createElement('a');
   el.href=url;el.download='printcost-order-size-comparison.csv';
   document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  announce('Order size comparison exported as CSV.');
+  announce('Order-size CSV download started.','success');
  });
  $('download-current-xlsx')?.addEventListener('click',async()=>{
   if(!lastValid)return;
@@ -217,13 +223,13 @@ if(form){
    link.href=url;link.download='printcost-studio-current-estimate.xlsx';
    document.body.appendChild(link);link.click();link.remove();
    setTimeout(()=>URL.revokeObjectURL(url),1000);
-   announce('Excel workbook saved with your current inputs. Blue cells can be edited.');
+   announce('Excel download started with your current inputs. Blue cells remain editable.','success');
   }catch(err){
    console.error('Excel export failed:',err);
-   announce('Could not personalize Excel. Use the example template link below instead.');
+   announce('Could not personalize Excel. Use the example template link below instead.','error');
   }finally{button.disabled=!lastValid}
  });
- $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Opened your browser print dialog. Choose “Save as PDF” if available.');});
+ $('print-quote').addEventListener('click',()=>{if(!lastValid)return;renderPrint(lastValid);window.print();announce('Print dialog opened. Choose “Save as PDF” in your browser if available.');});
  const filLink=$('filament-link');if(filLink)filLink.addEventListener('click',()=>setMode('filament'));
  // Hash anchors select an existing interaction mode, not a competing SEO route.
  function modeFromHash(){if(location.hash==='#pricing'||location.hash==='#batch-quote'){setMode('pricing');if(location.hash==='#batch-quote')$('batch-quote').open=true;}else if(location.hash==='#filament-mode')setMode('filament');}

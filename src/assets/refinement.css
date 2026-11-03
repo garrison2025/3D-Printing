@@ -43,10 +43,7 @@ body{background-color:#f6f8fd}
 .faq details summary:after{content:'+';display:grid;place-items:center;flex:0 0 26px;height:26px;color:#1d5aca;background:#edf3ff;border-radius:8px;font-size:19px;font-weight:400;transition:transform .2s ease,background .2s ease}
 .faq details[open] summary:after{transform:rotate(45deg);background:#dce9ff}
 /* Below-the-fold only: leave raw HTML visible unless JS enables progressive scroll reveals. */
-.motion-ready .info-card,.motion-ready .long-section{opacity:0;transform:translateY(17px);transition:opacity .48s ease,transform .48s cubic-bezier(.2,.65,.25,1)}
-.motion-ready .info-card.in-view,.motion-ready .long-section.in-view{opacity:1;transform:translateY(0)}
-.motion-ready .info-card:nth-child(2){transition-delay:.07s}
-.motion-ready .info-card:nth-child(3){transition-delay:.14s}
+/* V2.1: Only finish.css owns non-blocking scroll-reveal motion. All text remains visible by default. */
 @media (min-width:931px){.workspace-grid{grid-template-columns:minmax(0,1.16fr) minmax(342px,.84fr)}.hero{padding-top:39px}.hero h1{font-size:clamp(42px,4.7vw,61px)}.result-panel{top:88px}}
 @media (min-width:621px) and (max-width:1030px){.scenario-options{flex-basis:100%}}
 @media(max-width:620px){
