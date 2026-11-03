@@ -40,6 +40,7 @@ for(const route of routes){
 }
 pass(fs.existsSync(path.join(base,'404.html')),'real 404 page');
 pass(fs.existsSync(path.join(base,'sitemap.xml')),'sitemap');
+pass(fs.readFileSync(path.join(base,'index.html'),'utf8').includes('name="twitter:card" content="summary_large_image"'),'social card metadata')
 for(const route of ['/filament-cost-calculator/','/3d-printing-cost-per-hour/']){const html=fs.readFileSync(path.join(base,route.slice(1),'index.html'),'utf8');pass(html.includes('data-seo-calculator='),'operable specialized calculator '+route);pass(html.includes('Calculation formula'),'visible formula '+route)}
 const methods=fs.readFileSync(path.join(base,'calculation-methodology/index.html'),'utf8');
 for(const phrase of ['Whole-plate failure','one-attempt cost','Required order gross','source code','not complete net business income']){

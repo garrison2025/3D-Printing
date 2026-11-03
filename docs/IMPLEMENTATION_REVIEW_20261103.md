@@ -13,3 +13,5 @@ A new genuine Excel resource page addresses two source P2 download/spreadsheet s
 A separate, non-indexable mixed-part quote panel on the homepage handles distinct models through manual cost-per-part and quantity entries, shared order fees and a cent-safe order subtotal. It is not a slicer and deliberately does not allocate prices per SKU. Mixed-order CSV is separate from the single-model Excel sheet.
 
 Still intentionally deferred: STL slicing, resin mode, market-rate APIs, final domain/indexing, advertising and external analytics. Do not invent separate SEO landing pages to target those terms.
+
+- Build no longer rewrites committed SEO/GEO brief, preventing documentation drift. Added Twitter Card and image dimensions with SVG social-preview fallback; PNG preview conversion remains optional.

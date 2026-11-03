@@ -60,3 +60,7 @@ No STL/G-code accuracy claims, no invented testimonials, no paid subscriptions, 
 A downloadable genuine `.xlsx` workbook is generated from the audited template in `src/downloads/3d-print-cost-calculator-template.xlsx` and copied to `/assets/3d-print-cost-calculator-template.xlsx` during `npm run build`. It includes **Cost Calculator** (20 editable inputs and 18 formula results), **Batch Quotes** (quantities 1/5/10/25 and current quantity), and **Read Me**. Defaults reproduce the main website formula, including whole-plate failure probability, per-order fees, margin, shipping and zero-floor behavior. Unlike an exported CSV, changing input cells automatically recalculates results in Excel. Checkout unit prices use Excel `ROUNDUP(...,2)` so a real two-decimal charge does not accidentally fall below the target margin.
 
 This optional static download contains **sample inputs**, not the user's current browser calculation. It does not upload orders or use a paid API. This serves the deferred Excel/spreadsheet research intent without generating a duplicate SEO landing page. Staging remains `noindex`.
+
+## Source documentation protection
+
+`npm run build` writes only generated `dist` files and the untracked offline preview. It does not overwrite the tracked `docs/SEO-GEO-PROJECT-BRIEF.md`. Share metadata has an OG SVG fallback and Twitter Card fields; the static file is not yet a cross-platform PNG preview image.

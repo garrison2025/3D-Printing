@@ -25,3 +25,5 @@ test('static audit checks fragment IDs and live axe scan covers all nine routes'
  for(const route of ['/how-much-does-3d-printing-cost/','/calculation-methodology/','/about/','/privacy/','/contact/'])
   assert.ok(qa.includes("'"+route+"'"),route);
 });
+
+test('build does not overwrite manually curated SEO/GEO project brief',()=>{assert.doesNotMatch(build,/writeFileSync\(path\.join\(root,'docs\/SEO-GEO-PROJECT-BRIEF\.md'/);assert.match(build,/name="twitter:card" content="summary_large_image"/);});
