@@ -57,6 +57,20 @@ jobs:
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/release-acceptance.mjs "$SITE_URL"
+      - name: Recalculate real browser-download xlsx with LibreOffice Calc (not Microsoft Excel)
+        run: |
+          if ! command -v libreoffice >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq libreoffice-calc
+          fi
+          libreoffice --version
+          python3 scripts/libreoffice-acceptance.py
+      - name: Install free Playwright WebKit browser engine for Safari-like checks
+        run: ./node_modules/.bin/playwright install --with-deps webkit
+      - name: Safari-like WebKit checks in iPhone-sized browser (not physical iOS)
+        env:
+          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+        run: node scripts/webkit-acceptance.mjs "$SITE_URL"
       - name: Measure mobile and desktop Lighthouse on Cloudflare
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:

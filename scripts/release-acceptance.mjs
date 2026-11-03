@@ -76,6 +76,7 @@ await check('Customized fees, shipping, maintenance, failure and design match in
  assert.equal((await page.locator('#result-focus-value').innerText()).trim(),money(x.unit));
  assert.equal((await page.locator('#order-gross').innerText()).trim(),money(x.gross));
  const d=await download('#download-current-xlsx');assert.equal(d.filename,'printcost-studio-current-estimate.xlsx');
+ fs.mkdirSync('qa-fixtures',{recursive:true});fs.writeFileSync('qa-fixtures/edited-current-inputs.xlsx',d.bytes);
  assert.equal(d.bytes.subarray(0,2).toString(),'PK');
  const parts=unzip(d.bytes);assert.ok(parts.has('xl/workbook.xml'));
  const xml=parts.get('xl/worksheets/sheet1.xml');
