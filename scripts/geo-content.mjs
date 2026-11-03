@@ -24,7 +24,7 @@ export const ANSWERS = Object.freeze({
   '/how-to-price-3d-prints/': {
     question: 'How do you price 3D prints to achieve a target margin?',
     answer: 'First estimate successful-item production costs. Multiply by the number of items in the order, add packaging and delivery expenses, then add any fixed transaction fee. Divide by (1 − percentage selling fee − target margin) to determine the gross order revenue required. Separate customer-paid shipping from the item subtotal.',
-    detail: 'Using $6.7872 production cost, an 8% fee, a $0.30 fixed order fee, no shipping, and a 30% target margin gives a suggested one-item price near $11.43. Margin means profit ÷ revenue; it is not markup.'
+    detail: 'Using $6.7872 production cost, an 8% fee, a $0.30 fixed order fee, no shipping, and a 30% target margin gives a theoretical one-item price of about $11.4309. The minimum whole-cent checkout amount is $11.44 to meet or exceed the 30% margin target. Margin means profit ÷ revenue; it is not markup.'
   }
 });
 
@@ -70,8 +70,8 @@ export function methodologyPage(){return `<div class="container"><article class=
   <p>The normal formula requires percentage fees plus target margin to be below 100%. If a customer shipping charge exceeds the necessary gross, the calculator floors the suggested item price at zero; the resulting actual margin may then differ from the target. The result is <strong>estimated profit after included expenses and before income tax</strong>, not complete net business income.</p>
   <h2>5. Worked selling-price example</h2>
   <p>With one successful item at $6.7871579 cost, no shipping or packing, a $0.30 fixed payment fee, an 8% percentage fee and a 30% target margin:</p>
-  <div class="math-block">Required customer revenue = ($6.7871579 + $0.30) ÷ (1 − 0.08 − 0.30)<br>= $7.0871579 ÷ 0.62 = $11.4308998 ≈ $11.43<br>Platform fees = ($11.4308998 × 8%) + $0.30 ≈ $1.2145<br>Profit after included expenses ≈ $3.4293, or 30% of gross revenue</div>
-  <p>The underlying calculations keep unrounded values; displayed USD amounts are rounded to cents. Summing displayed components may therefore differ by one cent. A 30% <em>markup</em> and 30% <em>margin</em> are different formulas; see <a href="/how-to-price-3d-prints/">the pricing guide</a>.</p>
+  <div class="math-block">Required customer revenue = ($6.7871579 + $0.30) ÷ (1 − 0.08 − 0.30)<br>= $7.0871579 ÷ 0.62 = $11.4308998 theoretical; charge at least $11.44 if prices must be whole cents<br>Platform fees = ($11.4308998 × 8%) + $0.30 ≈ $1.2145<br>Profit after included expenses ≈ $3.4293, or 30% of gross revenue</div>
+  <p>The model keeps full precision; real customer prices use whole cents. Rounding the theoretical quote to the nearest cent can slightly miss the target margin: use the minimum whole-cent checkout price on the live calculator, which rounds up. Summing separately rounded cost components may also differ by a cent. A 30% <em>markup</em> and 30% <em>margin</em> are different formulas; see <a href="/how-to-price-3d-prints/">the pricing guide</a>.</p>
   <h2>6. Dedicated calculators use narrower models</h2>
   <p>The <a href="/filament-cost-calculator/">filament cost calculator</a> computes spool price divided by net grams and multiplies it by the plate’s used grams. For a $25/1,000 g spool, material is $0.025/g and a 100 g plate costs $2.50. It excludes failure, energy, equipment and labor.</p>
   <p>The <a href="/3d-printing-cost-per-hour/">hourly running-cost calculator</a> adds $400 ÷ 4,000 h = $0.10/h for machine allocation and 120/1,000 × $0.18 = $0.0216/h for energy, for a $0.1216/h example before maintenance or labor. Neither result is a market service quote.</p>
