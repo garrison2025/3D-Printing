@@ -114,6 +114,19 @@ await check('iPhone WebKit Excel generated with currently edited input values',a
  const data=fs.readFileSync(await file.path());assert.equal(data.subarray(0,2).toString(),'PK');
  assert.ok(data.toString('utf8').includes('<x:v>155</x:v>'));
 });
+await check('iPhone WebKit 3D print pricing tool provides accessible responsive quotes',async()=>{
+ await page.setViewportSize({width:390,height:844});await visit('/3d-print-pricing-calculator/');
+ await page.waitForFunction(()=>document.querySelector('#price-quote-unit')?.textContent==='$11.44');
+ await page.locator('[name="unitCost"]').fill('10');
+ await page.locator('[name="quantity"]').fill('5');
+ await page.waitForFunction(()=>document.querySelector('#price-quote-total')?.textContent==='$81.15');
+ await noOverflow();
+ await page.locator('[name="feePercent"]').fill('95');
+ await page.waitForFunction(()=>!document.querySelector('#price-quote-error')?.hidden);
+ assert.equal(await page.locator('#price-quote-results').isHidden(),true);
+ await page.setViewportSize({width:320,height:700});await noOverflow();
+ await page.setViewportSize({width:390,height:844});
+});
 await check('iPhone WebKit dual-filament and hourly tools actually recalculate',async()=>{
  await visit('/filament-cost-calculator/');
  await page.locator('.seo-tool-advanced > summary').click();

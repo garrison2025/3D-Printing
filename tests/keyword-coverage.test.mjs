@@ -26,10 +26,10 @@ test('approved priority totals do not inflate target-page count',()=>{
  }
 });
 
-test('P0 and P1 intent destinations map to real pages or the existing pricing mode',()=>{
- const pages=new Set(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/']);
+test('P0 and P1 intent destinations map to genuinely implemented calculators and guides',()=>{
+ const pages=new Set(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/']);
  for(const item of keywords.filter(x=>['P0','P1'].includes(x.priority))) {
-  const dest=item.destination.replace(/ \(pricing mode\)$/,'');
+  const dest=item.destination;
   assert.ok(pages.has(dest),item.keyword+' maps to undeveloped route: '+item.destination);
  }
 });

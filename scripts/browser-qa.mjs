@@ -47,6 +47,29 @@ try{
   assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
   await page.locator('#reset-button').click();
  });
+ await run('Dedicated 3D print pricing tool calculates whole-cent customer quotes and rejects invalid margin',async()=>{
+  await page.setViewportSize({width:1440,height:900});await visit('/3d-print-pricing-calculator/');
+  assert.equal((await page.locator('#price-quote-unit').innerText()).trim(),'$11.44');
+  assert.equal((await page.locator('#price-quote-total').innerText()).trim(),'$11.44');
+  assert.equal((await page.locator('#price-quote-profit').innerText()).trim(),'$3.43');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+  assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),origin+'/3d-print-pricing-calculator/');
+  const graph=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText())['@graph'];
+  assert.ok(graph.some(x=>x['@type']==='WebApplication'&&x.url===origin+'/3d-print-pricing-calculator/'));
+  await page.locator('[name="unitCost"]').fill('10');
+  await page.locator('[name="quantity"]').fill('5');
+  await page.waitForFunction(()=>document.querySelector('#price-quote-unit')?.textContent==='$16.23');
+  assert.equal((await page.locator('#price-quote-total').innerText()).trim(),'$81.15');
+  await page.locator('[name="feePercent"]').fill('80');
+  await page.locator('[name="marginPercent"]').fill('30');
+  assert.equal(await page.locator('#price-quote-results').isHidden(),true);
+  assert.equal(await page.locator('#price-quote-error').isVisible(),true);
+  await page.locator('[name="feePercent"]').fill('8');
+  await page.waitForFunction(()=>!document.querySelector('#price-quote-results')?.hidden);
+  await shot('pricing-quote-desktop-1440');
+  await page.setViewportSize({width:390,height:844});await visit('/3d-print-pricing-calculator/');
+  await noOverflow();await shot('pricing-quote-mobile-390');
+ });
  await run('Industrial teal A: published social raster matches the new palette',async()=>{
   const response=await page.request.get(origin+'/og-card.png');
   assert.equal(response.status(),200);
