@@ -34,3 +34,7 @@ The project's original spec explicitly requires running `Website-Starter-Standar
 Command: `python3 _site-standard/tools/seo_audit.py --site-dir dist --base-url https://3dprintcostcalculator.org --output qa-seo/standard-audit.json --fail-on error`
 
 The detailed JSON artifact is retained for 14 days in GitHub Actions. Warnings (such as intentionally noindexed 404s or known download links that the generic scanner categorizes as HTML links) are reviewed rather than equated to Google's ranking rules; `error` findings fail the job. This step **does not** claim the Cloudflare production environment has indexing enabled, nor that Search Console has indexed the pages.
+
+## Exact cents consistency in the pricing guide
+
+An independent arithmetic check found a two-cent-column display inconsistency in the seller guide, not in the calculator's underlying pricing function. For a full-precision successful-item cost of `$6.7871578947`, checkout `$11.44`, 8% fees and a fixed `$0.30`, displayed payment fees round to `$1.22` and profit to `$3.44`. The guide previously showed `$1.21` / `$3.43`, which were wrong for that input. Both display cells are corrected and now covered by a separate independent math test. A separate calculator that starts from an explicitly rounded user-entered cost `$6.79` legitimately displays `$3.43` profit under the same fee assumptions; this distinction is documented in the guide.
