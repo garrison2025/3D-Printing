@@ -13,11 +13,11 @@ const routes=(source,pattern,name)=>{
  assert.equal(new Set(list).size,list.length,'Duplicate '+name+' route');
  return list;
 };
-test('production sitemap and both SEO validators inspect the exact same set of eleven real pages',()=>{
+test('production sitemap and both SEO validators inspect the exact same set of twelve real pages',()=>{
  const built=routes(build,/const pages=\[([^\]]+)\];/,'build sitemap');
  const audited=routes(staticAudit,/const routes=\[([^\]]+)\];/,'static SEO audit');
  const live=routes(liveAudit,/const ROUTES=\[([\s\S]*?)\];/,'live SEO audit');
- assert.equal(built.length,11);
+ assert.equal(built.length,12);
  assert.deepEqual([...audited].sort(),[...built].sort());
  assert.deepEqual([...live].sort(),[...built].sort());
 });

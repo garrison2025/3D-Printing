@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const script=fs.readFileSync(new URL('../scripts/seo-live-audit.mjs',import.meta.url),'utf8');
-test('production SEO check covers all eleven actual published routes and indexability',()=>{
+test('production SEO check covers all twelve actual published routes and indexability',()=>{
  const routes=script.match(/const ROUTES=\[([\s\S]*?)\];/)?.[1]||'';
- assert.equal((routes.match(/'\/[^']*'/g)||[]).length,11);
+ assert.equal((routes.match(/'\/[^']*'/g)||[]).length,12);
  for(const route of ['/','/3d-print-pricing-calculator/','/filament-cost-calculator/','/how-much-does-3d-printing-cost/'])
   assert.ok(routes.includes("'"+route+"'"),route);
  for(const term of ['indexable','noindex','<loc>','canonical','WebPage','X-Robots-Tag'])assert.ok(script.includes(term)||script.toLowerCase().includes(term.toLowerCase()),term);
