@@ -13,7 +13,7 @@ const ROUTES=[
  '/','/filament-cost-calculator/','/3d-printing-cost-per-hour/',
  '/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/',
  '/how-to-price-3d-prints/','/calculation-methodology/',
- '/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'
+ '/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'
 ];
 const failures=[],blockers=[],warnings=[],details=[];
 const fail=(why)=>failures.push(why);

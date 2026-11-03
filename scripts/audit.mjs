@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
 function canonicalOriginFor(route,html){return html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]}
 const titles=new Set();
