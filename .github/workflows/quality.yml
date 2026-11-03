@@ -60,3 +60,6 @@ jobs:
       - name: Independently diagnose owned-domain HTTPS and indexing readiness (read-only)
         if: always()
         run: node scripts/domain-readiness.mjs
+      - name: Inspect all 11 owned-domain SEO pages (read-only; report blockers)
+        if: always()
+        run: node scripts/seo-live-audit.mjs
