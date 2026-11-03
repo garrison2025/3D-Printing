@@ -70,6 +70,49 @@ export async function personalizeWorkbook(template,inputs,calculate){
  });
  main.data=encoder.encode(m);batch.data=encoder.encode(b);
  const book=get('xl/workbook.xml'),xml=decoder.decode(book.data);
- book.data=encoder.encode(xml.replace('</x:workbook>','<x:calcPr fullCalcOnLoad="1" forceFullCalc="1" /></x:workbook>'));
+ book.data=encoder.encode(xml.includes('<x:calcPr')?xml.replace(/<x:calcPr[^>]*\/>/,'<x:calcPr fullCalcOnLoad="1" forceFullCalc="1" />'):xml.replace('</x:workbook>','<x:calcPr fullCalcOnLoad="1" forceFullCalc="1" /></x:workbook>'));
+ return zip(parts);
+}
+/** Make downloaded example templates safe when edited offline in Excel/LibreOffice.
+ * The template remains the original OOXML workbook with real user-editable formulas.
+ * This operation is also run at build time, never on a remote service.
+ */
+export async function hardenWorkbookTemplate(sourceBytes){
+ const parts=await unzip(sourceBytes);
+ const find=name=>{const f=parts.find(p=>p.name===name);if(!f)throw Error('Template part missing '+name);return f};
+ const main=find('xl/worksheets/sheet1.xml'),batch=find('xl/worksheets/sheet2.xml');
+ let m=decoder.decode(main.data),b=decoder.decode(batch.data);
+ if(m.includes('r="G26"'))throw Error('Template already contains validation; do not apply twice');
+ // Reject missing/text entries, negative and excessive values, non-integer quantities,
+ // invalid denominators, impossible failure rates and fee+margin combinations.
+ const validation='IF(AND(COUNT(B6:B25)=20,MIN(B6:B25)>=0,MAX(B6:B25)<=10000000000,B7>0,B14>0,B10>=1,MOD(B10,1)=0,B10<=100000,B22>=1,MOD(B22,1)=0,B22<=100000,B17<=0.95,B19<1,B21<1,B19+B21<1),"VALID","INVALID INPUTS - review blue cells")';
+ const row='<x:row r="26" ht="28" customHeight="1">'+
+ '<x:c r="F26" s="10" t="str"><x:v>INPUT STATUS</x:v></x:c>'+
+ '<x:c r="G26" t="str"><x:f>'+validation+'</x:f><x:v>VALID</x:v></x:c>'+
+ '<x:c r="H26" t="str"><x:v>Invalid values make prices blank, never zero.</x:v></x:c>'+
+ '</x:row><x:row r="27"><x:c r="F27" t="str"><x:v>Fix blue fields before quoting.</x:v></x:c>'+
+ '<x:c r="G27" t="str"><x:v>Failure 0-95%; item counts whole; fee + margin below 100%.</x:v></x:c></x:row>';
+ if(!m.includes('<x:row r="28"'))throw Error('Template lacks insertion position');
+ m=m.replace('<x:row r="28"',row+'<x:row r="28"');
+ const wrap=(xml,cell,guard)=>{
+  const re=new RegExp('<x:c\\s+[^>]*\\br="'+cell+'"[^>]*>[\\s\\S]*?<\\/x:c>');let found=0;
+  const out=xml.replace(re,content=>{
+   found++;
+   if(!/<x:f>[^<]*<\/x:f>/.test(content))throw Error('Missing formula in '+cell);
+   return content.replace(/<x:f>([^<]+)<\/x:f>/,(all,f)=>'<x:f>IF('+guard+','+f+',"")</x:f>');
+  });
+  if(found!==1)throw Error('Missing computed cell '+cell);
+  return out;
+ };
+ for(let row=6;row<=23;row++)m=wrap(m,'G'+row,'$G$26="VALID"');
+ for(let row=5;row<=9;row++){
+  if(row===9)b=wrap(b,'A9',"'Cost Calculator'!$G$26=\"VALID\"");
+  for(const c of 'BCDEF')b=wrap(b,c+row,"'Cost Calculator'!$G$26=\"VALID\"");
+ }
+ main.data=encoder.encode(m);batch.data=encoder.encode(b);
+ const book=find('xl/workbook.xml');
+ let x=decoder.decode(book.data);
+ if(!x.includes('<x:calcPr'))x=x.replace('</x:workbook>','<x:calcPr fullCalcOnLoad="1" forceFullCalc="1" /></x:workbook>');
+ book.data=encoder.encode(x);
  return zip(parts);
 }

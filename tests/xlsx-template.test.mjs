@@ -60,3 +60,22 @@ test('client-side Excel export rejects impossible profit assumptions',async()=>{
  const {personalizeWorkbook}=await import('../src/assets/xlsx-personalize.mjs');
  await assert.rejects(personalizeWorkbook(data,{...DEFAULTS,feeRate:0.8,margin:0.3},calculate),/invalid inputs/i);
 });
+
+test('published workbook has editable offline input validation and no misleading zero quote',async()=>{
+ const {hardenWorkbookTemplate,personalizeWorkbook}=await import('../src/assets/xlsx-personalize.mjs');
+ const {DEFAULTS,calculate}=await import('../src/lib/calculations.mjs');
+ const hardened=Buffer.from(await hardenWorkbookTemplate(data));
+ const parts=unzipLocalEntries(hardened);
+ const main=parts.get('xl/worksheets/sheet1.xml').toString();
+ const batch=parts.get('xl/worksheets/sheet2.xml').toString();
+ const book=parts.get('xl/workbook.xml').toString();
+ assert.match(main,/r="G26"[^>]*><x:f>IF\(AND\(COUNT\(B6:B25\)=20/);
+ assert.match(main,/INVALID INPUTS - review blue cells/);
+ assert.match(main,/<x:f>IF\(\$G\$26="VALID",IFERROR\(G11\/\(1-B17\),0\),""\)<\/x:f>/);
+ assert.match(batch,/<x:f>IF\('Cost Calculator'!\$G\$26="VALID"/);
+ assert.match(book,/fullCalcOnLoad="1"/);
+ const personalized=Buffer.from(await personalizeWorkbook(hardened,{...DEFAULTS,usedGrams:145},calculate));
+ const rep=unzipLocalEntries(personalized);
+ assert.match(rep.get('xl/worksheets/sheet1.xml').toString(),/r="B8"[^>]*><x:v>145<\/x:v>/);
+ assert.equal((rep.get('xl/workbook.xml').toString().match(/<x:calcPr /g)||[]).length,1);
+});

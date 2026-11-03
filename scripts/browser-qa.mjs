@@ -92,6 +92,7 @@ try{
      assert.equal(file.suggestedFilename(),'3d-print-cost-calculator-template.xlsx');
      const content=fs.readFileSync(await file.path());
      assert.equal(content.subarray(0,4).toString(),'PK\\x03\\x04'.replaceAll('\\x03','\x03').replaceAll('\\x04','\x04'));
+     assert.ok(content.toString('utf8').includes('INVALID INPUTS - review blue cells'),'Downloaded workbook lacks validation');
    }
  });
  await run('Current-input Excel downloads real formulas with edited grams',async()=>{

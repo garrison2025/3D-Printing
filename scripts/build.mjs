@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dst=path.join(root,'dist');
 import {resolveSiteConfig} from '../src/lib/site-config.mjs';
+import {hardenWorkbookTemplate} from '../src/assets/xlsx-personalize.mjs';
 import {seoToolPages} from './seo-pages.mjs';
 import {answerPanel,methodologyPage} from './geo-content.mjs';
 const {site,live}=resolveSiteConfig(process.env);
@@ -94,7 +95,7 @@ fs.copyFileSync(path.join(root,'src/assets/site.css'),path.join(dst,'assets/site
 fs.copyFileSync(path.join(root,'src/assets/polish.css'),path.join(dst,'assets/polish.css'));
 fs.copyFileSync(path.join(root,'src/assets/refinement.css'),path.join(dst,'assets/refinement.css'));
 fs.copyFileSync(path.join(root,'src/assets/finish.css'),path.join(dst,'assets/finish.css'));
-fs.copyFileSync(path.join(root,'src/downloads/3d-print-cost-calculator-template.xlsx'),path.join(dst,'assets/3d-print-cost-calculator-template.xlsx'));
+fs.writeFileSync(path.join(dst,'assets/3d-print-cost-calculator-template.xlsx'),await hardenWorkbookTemplate(fs.readFileSync(path.join(root,'src/downloads/3d-print-cost-calculator-template.xlsx'))));
 fs.copyFileSync(path.join(root,'src/assets/app.mjs'),path.join(dst,'assets/app.mjs'));
 fs.copyFileSync(path.join(root,'src/lib/quote-precision.mjs'),path.join(dst,'assets/quote-precision.mjs'));
 fs.copyFileSync(path.join(root,'src/assets/xlsx-personalize.mjs'),path.join(dst,'assets/xlsx-personalize.mjs'));
