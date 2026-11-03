@@ -86,6 +86,9 @@ body{
 .panel-top{background:linear-gradient(112deg,#FFFFFF 72%,var(--pc-primary-tint) 100%);border-bottom-color:var(--pc-line)}
 .form-footer{background:var(--pc-primary-tint);border-top-color:var(--pc-line)}
 .site-footer{background:var(--pc-surface);border-top-color:var(--pc-line)}
+.footer-inner p,.footer-links{color:var(--pc-muted)}
+.footer-links a:hover,.footer-links a:focus-visible{color:var(--pc-primary)}
+
 
 /* Tabs, examples, fields, settings and focus states. */
 .mode-button{background:#F0F5F5;border-color:var(--pc-line);color:var(--pc-muted)}
