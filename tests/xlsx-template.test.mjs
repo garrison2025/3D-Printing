@@ -84,3 +84,11 @@ test('published workbook has editable offline input validation and no misleading
  assert.match(rep.get('xl/worksheets/sheet1.xml').toString(),/r="B8"[^>]*><x:v>145<\/x:v>/);
  assert.equal((rep.get('xl/workbook.xml').toString().match(/<x:calcPr /g)||[]).length,1);
 });
+
+test('validation formula is XML-escaped, including every inequality',async()=>{
+ const {hardenWorkbookTemplate}=await import('../src/assets/xlsx-personalize.mjs');
+ const m=unzipLocalEntries(Buffer.from(await hardenWorkbookTemplate(data))).get('xl/worksheets/sheet1.xml').toString();
+ assert.match(m,/B19&amp;lt;1|B19&lt;1/);
+ assert.doesNotMatch(m,/B19<1/);
+ assert.match(m,/B17&lt;=0\.95/);
+});

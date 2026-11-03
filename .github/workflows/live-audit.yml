@@ -57,6 +57,8 @@ jobs:
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/release-acceptance.mjs "$SITE_URL"
+      - name: Check browser-personalized XLSX is standards-compliant XML
+        run: python3 scripts/validate-xlsx-xml.py qa-fixtures/edited-current-inputs.xlsx
       - name: Recalculate real browser-download xlsx with LibreOffice Calc (not Microsoft Excel)
         run: |
           if ! command -v libreoffice >/dev/null 2>&1; then

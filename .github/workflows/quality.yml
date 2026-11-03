@@ -24,6 +24,8 @@ jobs:
         run: npm run build
         env:
           SITE_URL: https://3d-printing-1r7.pages.dev
+      - name: Validate all published Excel OpenXML parts
+        run: python3 scripts/validate-xlsx-xml.py dist/assets/3d-print-cost-calculator-template.xlsx
       - name: Staging SEO audit
         run: node scripts/audit.mjs
       - name: Keyword-to-page coverage audit
