@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const source=fs.readFileSync(new URL('../scripts/live-audit.mjs',import.meta.url),'utf8');
-test('live audit includes all nine published page templates',()=>{
+test('live audit includes all ten published page templates',()=>{
  const list=source.match(/const routes=\[([^\]]+)\]/)?.[1]||'';
  assert.equal((list.match(/'\/[^']*'/g)||[]).length,9);
  for(const path of ['/','/calculation-methodology/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-to-price-3d-prints/'])assert.ok(list.includes("'"+path+"'"),path);
