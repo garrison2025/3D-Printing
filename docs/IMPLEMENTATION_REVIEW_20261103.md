@@ -17,3 +17,5 @@ Still intentionally deferred: STL slicing, resin mode, market-rate APIs, final d
 - Build no longer rewrites committed SEO/GEO brief, preventing documentation drift. Added Twitter Card and image dimensions with SVG social-preview fallback; PNG preview conversion remains optional.
 
 - Narrow 320px viewport overflow was independently reproduced and traced to the redundant home navigation link beside the home-branded logo; limited display override keeps task links visible. Checkout and theoretical profit-over-cost ratios are explicitly separated in single-quote CSV.
+
+- Converted existing in-repo 1200×630 SVG sharing artwork to a real static PNG using a one-time free CI conversion; both Open Graph and Twitter metadata now publish the PNG, with SVG retained for fallback. Cross-platform social crawler preview acceptance is distinct from image endpoint/meta checks.

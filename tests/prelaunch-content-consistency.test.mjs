@@ -27,3 +27,11 @@ test('static audit checks fragment IDs and live axe scan covers all nine routes'
 });
 
 test('build does not overwrite manually curated SEO/GEO project brief',()=>{assert.doesNotMatch(build,/writeFileSync\(path\.join\(root,'docs\/SEO-GEO-PROJECT-BRIEF\.md'/);assert.match(build,/name="twitter:card" content="summary_large_image"/);});
+
+test('published share preview uses actual static PNG, not unsupported SVG OG tags',()=>{
+ const png=new URL('../public/og-card.png',import.meta.url);
+ assert.ok(fs.existsSync(png),'1200x630 PNG must be committed before publishing');
+ assert.match(build,/og:image" content="\$\{escape\(site\)\}\/og-card\.png/);
+ assert.match(build,/twitter:image" content="\$\{escape\(site\)\}\/og-card\.png/);
+ assert.match(build,/og:image:type" content="image\/png/);
+});
