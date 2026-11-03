@@ -285,3 +285,9 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 .mixed-results[data-error="true"]{background:#fff1ed;color:#983a2f}
 .mixed-note{font-size:12px!important;color:#52677f!important}
 @media(max-width:690px){.mixed-line{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mixed-line label:first-child{grid-column:1/-1}.mixed-line button{justify-self:start}.mixed-quote>details>summary{align-items:flex-start;flex-direction:column}.mixed-quote .mixed-content{padding:0 15px 17px}}
+
+/* Real-device 320px audit: brand goes home, so hide the duplicate Calculator nav link at ultra-narrow widths. */
+@media (max-width:350px){
+ .site-header .nav-links > a[href="/"]{display:none}
+ .site-header .nav-links{gap:8px;min-width:0}
+}

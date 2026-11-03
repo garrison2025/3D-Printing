@@ -15,3 +15,5 @@ A separate, non-indexable mixed-part quote panel on the homepage handles distinc
 Still intentionally deferred: STL slicing, resin mode, market-rate APIs, final domain/indexing, advertising and external analytics. Do not invent separate SEO landing pages to target those terms.
 
 - Build no longer rewrites committed SEO/GEO brief, preventing documentation drift. Added Twitter Card and image dimensions with SVG social-preview fallback; PNG preview conversion remains optional.
+
+- Narrow 320px viewport overflow was independently reproduced and traced to the redundant home navigation link beside the home-branded logo; limited display override keeps task links visible. Checkout and theoretical profit-over-cost ratios are explicitly separated in single-quote CSV.

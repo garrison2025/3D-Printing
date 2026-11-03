@@ -59,3 +59,9 @@ test('build includes every local JavaScript module and offline preview resolves 
  assert.match(fs.readFileSync(new URL('../scripts/audit.mjs',import.meta.url),'utf8'),/resolves local JavaScript import/);
  assert.match(fs.readFileSync(new URL('../scripts/live-audit.mjs',import.meta.url),'utf8'),/\/assets\/quote-precision\.mjs/);
 });
+
+test('320px header does not demand three redundant navigation links',()=>{
+ const css=fs.readFileSync(new URL('../src/assets/finish.css',import.meta.url),'utf8');
+ assert.match(css,/@media \(max-width:350px\)/);
+ assert.match(css,/\.site-header \.nav-links > a\[href="\/"\]\{display:none\}/);
+});
