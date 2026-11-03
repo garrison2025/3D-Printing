@@ -6,8 +6,9 @@ const build=fs.readFileSync(new URL('../scripts/build.mjs',import.meta.url),'utf
 const keywords=JSON.parse(fs.readFileSync(new URL('../src/content/keyword-intent-map.json',import.meta.url),'utf8')).keywords;
 
 test('primary navigation links to the actual pricing tool, not only an explanatory guide',()=>{
- assert.match(build,/href="\/3d-print-pricing-calculator\/"[^\n]*>Price calculator<\/a>/);
- assert.doesNotMatch(build,/href="\/how-to-price-3d-prints\/"[^\n]*>Pricing guide<\/a>/);
+ const header=build.split('\n').find(line=>line.startsWith('const header='))||'';
+ assert.match(header,/href="\/3d-print-pricing-calculator\/"[^\n]*>Price calculator<\/a>/);
+ assert.doesNotMatch(header,/href="\/how-to-price-3d-prints\/"[^\n]*>Pricing guide<\/a>/);
 });
 test('seller guide main CTA opens the canonical price calculator URL',()=>{
  assert.match(build,/route==='\/how-to-price-3d-prints\/'\?'\/3d-print-pricing-calculator\/'/);
