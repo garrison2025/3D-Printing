@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {chromium} from 'playwright-core';
 
 const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origin;
-if(!origin.startsWith('https://'))throw Error('HTTPS preview required');
+if(!origin.startsWith('https://')&&!/^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(origin))throw Error('HTTPS preview or loopback QA origin required');
 fs.mkdirSync('qa-screenshots',{recursive:true});
 const results=[],errors=[];
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});

@@ -30,6 +30,21 @@ jobs:
         run: node scripts/audit.mjs
       - name: Keyword-to-page coverage audit
         run: node scripts/keyword-audit.mjs
+      - name: Install test-only Chrome and Safari-like WebKit controller
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1 axe-core@4.14.0
+          node node_modules/playwright-core/cli.js install --with-deps webkit
+      - name: Test this exact built commit in local browser before Cloudflare deploy
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory dist >/tmp/printcost-testserver.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for retry in 1 2 3 4 5; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/browser-qa.mjs http://127.0.0.1:4173
+          node scripts/webkit-acceptance.mjs http://127.0.0.1:4173
       - name: Custom-domain publication simulation (not deployed)
         run: |
           SITE_URL=https://example.org ENABLE_INDEXING=1 npm run build
