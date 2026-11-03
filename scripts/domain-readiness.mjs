@@ -24,7 +24,11 @@ add('Homepage canonical points to owner domain',canonical===origin+'/',canonical
 const robots=home.body.match(/<meta name="robots" content="([^"]+)"/)?.[1]||'';
 add('Homepage indexing is active',robots==='index,follow'&&!/noindex/i.test(home.headers.get('x-robots-tag')||''),robots||'(missing)');
 const contact=await fetchPath('/contact/');
-add('Contact page loads and displays configured email',contact.ok&&contact.body.includes('mailto:contact@3dprintcostcalculator.org'),contact.error||contact.status);
+const mailInRawHtml=contact.body.includes('mailto:contact@3dprintcostcalculator.org');
+const cfEmailObfuscation=/cdn-cgi\/l\/email-protection|__cf_email__|data-cfemail/i.test(contact.body);
+const pageTitle=contact.body.match(/<title>([^<]+)/i)?.[1]||'(no title)';
+add('Contact page loads and displays configured email',contact.ok&&mailInRawHtml,
+ contact.error||('HTTP '+contact.status+'; title='+pageTitle+'; CF email obfuscation='+cfEmailObfuscation+'; raw mailto='+mailInRawHtml));
 const robot=await fetchPath('/robots.txt');
 add('Robots advertises the owned-domain sitemap',robot.ok&&robot.body.includes('Sitemap: '+origin+'/sitemap.xml'),robot.error||robot.status);
 const sitemap=await fetchPath('/sitemap.xml');
