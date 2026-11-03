@@ -74,7 +74,7 @@ try{
   ]);
   assert.deepEqual(c.swatches,c.chart,'chart legend must use same six industrial palette tokens');
   const contrast=(a,b)=>{
-   const rgb=s=>s.match(/\\d+/g).slice(0,3).map(Number).map(x=>{
+   const rgb=s=>s.match(/\d+/g).slice(0,3).map(Number).map(x=>{
     const n=x/255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4;
    });
    const lum=s=>{const t=rgb(s);return .2126*t[0]+.7152*t[1]+.0722*t[2]};
