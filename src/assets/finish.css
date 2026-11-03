@@ -291,3 +291,12 @@ body{background:#f5f7fb;color:var(--finish-ink)}
  .site-header .nav-links > a[href="/"]{display:none}
  .site-header .nav-links{gap:8px;min-width:0}
 }
+
+/* Original owner spec: explicit device-only input-saving opt-out, reachable on narrow screens. */
+.form-panel .form-footer{flex-wrap:wrap;gap:10px 14px}
+.remember-control{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:0;font-size:12px;font-weight:650;color:#253d59;cursor:pointer}
+.remember-control input{width:19px;height:19px;min-width:19px;margin:0;accent-color:#1567e8;cursor:pointer}
+.remember-control span{overflow-wrap:anywhere}
+.form-panel .form-footer .saved-state{margin-left:auto}
+@media(max-width:620px){.form-panel .form-footer{display:grid;grid-template-columns:minmax(0,1fr) auto}.form-panel .form-footer .remember-control{grid-column:1/-1}.form-panel .form-footer .saved-state{margin-left:0}}
+@media print{.form-panel .form-footer{display:none!important}}

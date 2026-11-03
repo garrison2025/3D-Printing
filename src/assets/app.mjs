@@ -9,6 +9,11 @@ if(form){
   seller:{...DEFAULTS,usedGrams:90,hours:6,unitsPerOrder:3,feeRate:0.11,margin:0.35,packagingPerOrder:1.5,shippingCostPerOrder:5,shippingChargedPerOrder:5}
  };
  const storageKey='printcost.studio.settings.v1';
+ const rememberKey='printcost.studio.remember.v1';
+ const rememberToggle=$('remember-inputs');
+ let rememberInputs=true;
+ try{rememberInputs=localStorage.getItem(rememberKey)!=='off';if(!rememberInputs)localStorage.removeItem(storageKey)}catch{}
+ if(rememberToggle)rememberToggle.checked=rememberInputs;
  let mode='cost', lastValid=null, valueMotion=null;
  const money=(n)=>Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n):'—';
  const pct=(n)=>Number.isFinite(n)?`${(n*100).toFixed(1)}%`:'—';
@@ -29,7 +34,11 @@ if(form){
  const setFieldErrors=(errors={})=>{
   for(const el of allFields){const name=el.name, err=errors[name]||'';el.setAttribute('aria-invalid',String(Boolean(err)));showValue('error-'+name,err);}
  };
- function saveInput(){try{localStorage.setItem(storageKey,JSON.stringify(stateFromInputs()));showValue('saved-message','● Saved on this device');}catch{showValue('saved-message','Cannot save in this browser');}}
+ function saveInput(){
+  if(!rememberInputs){showValue('saved-message','Saving off · this tab only');return}
+  try{localStorage.setItem(storageKey,JSON.stringify(stateFromInputs()));showValue('saved-message','● Saved on this device')}
+  catch{showValue('saved-message','Cannot save in this browser')}
+ }
  function inputValuesSet(obj){for(const name of names){const el=form.elements.namedItem(name),v=obj?.[name];if(typeof v==='number' && Number.isFinite(v))el.value=String(el.dataset.percent==='true'?Number((v*100).toFixed(5)):v);}}
  function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
   if(mode==='pricing')$('pricing-details').open=true;
@@ -104,7 +113,14 @@ if(form){
   }
  }
  function announce(msg){showValue('action-status',msg);}
- form.addEventListener('input',(evt)=>{if(!evt.target.matches('input'))return;scenarioSet('');render();saveInput();});
+ form.addEventListener('input',(evt)=>{if(!evt.target.matches('input[name]'))return;scenarioSet('');render();saveInput();});
+ rememberToggle?.addEventListener('change',()=>{
+  rememberInputs=rememberToggle.checked;
+  try{
+   if(rememberInputs){localStorage.removeItem(rememberKey);saveInput();announce('Saving input values on this device is on.')}
+   else{localStorage.setItem(rememberKey,'off');localStorage.removeItem(storageKey);showValue('saved-message','Saving off · this tab only');announce('Saved inputs cleared. Changes in this tab will not persist.')}
+  }catch{showValue('saved-message','Browser storage unavailable');announce('Cannot change saving preference in this browser.')}
+ });
  scenarioButtons.forEach(button=>button.addEventListener('click',()=>{
   const key=button.dataset.scenario,values=exampleScenarios[key];if(!values)return;
   inputValuesSet(values);scenarioSet(key);render();saveInput();
@@ -115,7 +131,7 @@ if(form){
  form.addEventListener('focusout',event=>{if(event.target.matches('input[name]'))form.classList.remove('mobile-input-active')});
  $('edit-price-inputs')?.addEventListener('click',()=>{const details=$('pricing-details');details.open=true;setMode('pricing');const target=$('input-feeRate');target?.focus({preventScroll:false});announce('Pricing details expanded. Edit fees and margin below.');});
  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
- $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message','Example values restored');});
+ $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.');showValue('saved-message',rememberInputs?'Example values restored':'Saving off · this tab only');});
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.');}catch{
    const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.');}catch{announce('Copy unavailable—use Export CSV.')}field.remove();}
  });
@@ -160,7 +176,8 @@ if(form){
  // Hash anchors select an existing interaction mode, not a competing SEO route.
  function modeFromHash(){if(location.hash==='#pricing'||location.hash==='#batch-quote'){setMode('pricing');if(location.hash==='#batch-quote')$('batch-quote').open=true;}else if(location.hash==='#filament-mode')setMode('filament');}
  window.addEventListener('hashchange',modeFromHash);
- try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored});}catch{}
+ if(rememberInputs){try{const stored=JSON.parse(localStorage.getItem(storageKey)||'null');if(stored && typeof stored==='object') inputValuesSet({...DEFAULTS,...stored})}catch{}}
+ else showValue('saved-message','Saving off · this tab only');
  render();
  modeFromHash();
 }
