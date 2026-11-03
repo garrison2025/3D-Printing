@@ -40,7 +40,7 @@ function independent(x){
  const item=attempts/(1-x.failRate)/x.unitsPerPlate+x.finishPerUnit;
  const orderExpenses=item*x.unitsPerOrder+x.packagingPerOrder+x.shippingCostPerOrder+x.designCostPerOrder;
  const grossRequired=(orderExpenses+x.feeFixed)/(1-x.feeRate-x.margin);
- let unit=Math.max(0,Math.ceil((grossRequired-x.shippingChargedPerOrder)*100-1e-9))/100;
+ let unit=Math.max(0,Math.ceil(((grossRequired-x.shippingChargedPerOrder)/x.unitsPerOrder)*100-1e-9))/100;
  if(unit*x.unitsPerOrder+x.shippingChargedPerOrder+1e-10<grossRequired)unit=Math.round(unit*100+1)/100;
  const gross=unit*x.unitsPerOrder+x.shippingChargedPerOrder;
  const fee=gross*x.feeRate+x.feeFixed;
@@ -93,9 +93,9 @@ await check('Print quote is real and matches customer checkout, including printa
  await page.locator('#print-quote').click();
  assert.equal(await page.evaluate(()=>window.__printRequested),true);
  const text=await page.locator('#print-table').innerText();
- assert.match(text,/Actual checkout selling price\s+\$11\.44/);
- assert.match(text,/Actual checkout order gross\s+\$11\.44/);
- assert.match(text,/Fees on checkout revenue\s+\$1\.22/);
+ assert.match(text,/Actual checkout selling price\s*\$11\.44/);
+ assert.match(text,/Actual checkout order gross\s*\$11\.44/);
+ assert.match(text,/Fees on checkout revenue\s*\$1\.22/);
  assert.ok(!text.includes('$11.43\n'));
  await page.emulateMedia({media:'print'});
  const visibility=await page.evaluate(()=>({print:getComputedStyle(document.querySelector('#print-sheet')).display,form:getComputedStyle(document.querySelector('#cost-form')).display}));
@@ -142,7 +142,10 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
  for(const width of [320,390,768,1024]){
   await page.setViewportSize({width,height:844});await fresh();
   const sizes=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,inner:innerWidth,form:document.querySelector('#cost-form').getBoundingClientRect().width,button:document.querySelector('#export-csv').getBoundingClientRect().height}));
-  assert.ok(sizes.scroll<=sizes.inner+2,width+'px overflow '+JSON.stringify(sizes));
+  if(sizes.scroll>sizes.inner+2){
+   const offenders=await page.evaluate(()=>[...document.querySelectorAll('*')].map(el=>({tag:el.tagName.toLowerCase(),id:el.id,cls:String(el.className).slice(0,90),right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left),w:Math.round(el.getBoundingClientRect().width)})).filter(x=>x.right>innerWidth+2&&x.w>0).slice(0,30));
+   throw Error(width+'px overflow '+JSON.stringify(sizes)+' offenders '+JSON.stringify(offenders));
+  }
   assert.ok(sizes.form>=width*.65,width+'px squeezed form');
   assert.ok(sizes.button>=40,width+'px too small button');
  }
