@@ -8,7 +8,8 @@
 - GitHub source: `https://github.com/garrison2025/3D-Printing`
 - Cloudflare Pages preview: `https://3d-printing-1r7.pages.dev/`
 
-**Not yet independently verified**: Pages > Custom domains shows **Active**; public DNS resolution; automatic HTTPS certificate; the domain serves this exact site's static output; mail reception/delivery through an MX provider. Don't label any of these complete merely because a DNS zone exists.
+**Verified by GitHub-hosted public-network probe (2026-11-03):** DNS answers for the owned apex; HTTPS GET / returns HTTP 200; official origin advertises the owned-domain canonical and a deployment manifest for commit `b3ab130`. This is evidence of live site content, not a Cloudflare dashboard **Active** screenshot.
+**Not verified or not required for SEO release:** mailbox sending/receiving. Cloudflare may obfuscate `mailto:` in public source HTML; the visibility check decodes the protected address rather than testing email transport.
 
 ## Current code release guard
 - Canonicals, OG/Twitter URLs, WebPage/WebApplication/Breadcrumb schema, robots and XML sitemap use build-time `SITE_URL`.
@@ -36,6 +37,6 @@
 
 ## Production verification status
 - Source / build configuration: updated for owned domain and support email.
-- **Production site publicly reachable and verified:** pending independent HTTP/HTTPS check.
-- **Inbox receives mail:** pending owner/provider verification.
+- **Production site publicly reachable and verified:** yes, HTTPS 200 and official-domain canonical in the 2026-11-03 GitHub-hosted probe; indexing still off.
+- **Inbox receives mail:** not tested; intentionally outside the Google SEO release gate.
 - **Indexing:** deliberately gated pending active custom-domain verification.

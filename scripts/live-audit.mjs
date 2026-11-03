@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {ownerEmailVisible} from './owner-email-visibility.mjs';
 const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origin;
 const mode=process.argv[3]||'staging';
 if(!['staging','production'].includes(mode))throw Error('Mode must be staging or production');
@@ -41,7 +42,7 @@ for(const route of routes){
   if(route==='/contact/'){
    check(r.content.includes('github.com/garrison2025/3D-Printing/issues/new'),'real support link published');
    check(!r.content.includes('Pre-launch note:'),'no prelaunch placeholder');
-   check(r.content.includes('mailto:contact@3dprintcostcalculator.org'),'new domain email appears on contact route');
+   check(ownerEmailVisible(r.content,'contact@3dprintcostcalculator.org'),'new domain email appears on contact route (including Cloudflare obfuscation)');
   }
  }catch(err){check(false,route+' fetch failed: '+err.message)}
 }
