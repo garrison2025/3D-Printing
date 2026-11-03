@@ -1,6 +1,8 @@
 # PrintCost Studio — 3D Printing Cost & Pricing Tools
 
-A complete **zero-dependency, static** English-language 3D printing cost and pricing website, implemented from the owner's November 2, 2026 V1.1 plan. All calculation logic runs in the browser; no database, login, payment, paid APIs, or hosted runtime is needed.
+A complete **zero-dependency, static** English-first 3D printing cost and pricing website with a real Spanish-language pricing calculator, implemented from the owner's November 2, 2026 V1.1 plan. All calculation logic runs in the browser; no database, login, payment, paid APIs, or hosted runtime is needed.
+
+**New P2 tools:** [Interactive FDM cost comparison](https://3dprintcostcalculator.org/calculation-methodology/#cost-comparison-tool) · [Calculadora de precios de impresión 3D](https://3dprintcostcalculator.org/es/calculadora-precios-impresion-3d/) (español). All seven original P2 terms now map to functional pages or genuinely relevant existing content, without mass-producing duplicate keyword pages.
 
 **Official calculators:** [FDM production cost](https://3dprintcostcalculator.org/) · [Known-cost selling price](https://3dprintcostcalculator.org/3d-print-pricing-calculator/) · [Filament per gram](https://3dprintcostcalculator.org/filament-cost-calculator/) · [Machine hour](https://3dprintcostcalculator.org/3d-printing-cost-per-hour/) · [Free Excel template](https://3dprintcostcalculator.org/3d-print-cost-calculator-excel/).
 
@@ -68,7 +70,7 @@ No STL/G-code accuracy claims, no invented testimonials, no paid subscriptions, 
 
 A downloadable genuine `.xlsx` workbook is generated from the audited template in `src/downloads/3d-print-cost-calculator-template.xlsx` and copied to `/assets/3d-print-cost-calculator-template.xlsx` during `npm run build`. It includes **Cost Calculator** (22 editable inputs and live formulas), **Batch Quotes** (quantities 1/5/10/25 and current quantity), and **Read Me**. Defaults reproduce the main website formula, including whole-plate failure probability, per-order fees, margin, shipping and zero-floor behavior. Unlike an exported CSV, changing input cells automatically recalculates results in Excel. Checkout unit prices use Excel `ROUNDUP(...,2)` so a real two-decimal charge does not accidentally fall below the target margin.
 
-This optional static download contains **sample inputs**, not the user's current browser calculation. It does not upload orders or use a paid API. This serves the deferred Excel/spreadsheet research intent without generating a duplicate SEO landing page. Staging remains `noindex`.
+This optional static download contains **sample inputs**, not the user's current browser calculation. It does not upload orders or use a paid API. This serves both approved P2 Excel/spreadsheet search intents without generating a duplicate SEO landing page. Staging remains `noindex`.
 
 ## Source documentation protection
 

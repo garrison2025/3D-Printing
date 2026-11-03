@@ -15,7 +15,7 @@ The only keyword metrics used here are from the owner's Semrush US Organic Posit
 
 The 87 approved P0/P1 strings sum across the rows above as **mapping counts only**, not 87 distinct pages. **Do not sum their search volumes as site traffic forecasts**: variants overlap and may be served by the same SERP.
 
-## Additional live content and deferred terms
+## Additional live content and completed P2 terms
 - `/3d-print-cost-calculator-excel/`: real editable workbook landing page. Two P2 spreadsheet-related terms are mapped here; this does not make them validated P0/P1 opportunities.
 - `/calculation-methodology/`: formulas, exclusions and source-code links for credibility and answer retrieval; no invented search volume.
 - `/about/`, `/privacy/`, `/contact/`: real supporting content; no mass-produced SEO copy.
@@ -42,3 +42,5 @@ Numbers above are preserved, not refreshed. The decisive post-launch evidence mu
 3. Keep one canonical per distinct user task, with readable first-load HTML, direct functional output, unique title/H1, internal links and accurate assumptions.
 4. Only index pages when `SITE_URL=https://3dprintcostcalculator.org` and `ENABLE_INDEXING=1` are set in Cloudflare **Production**, and public deployment checks pass.
 5. Preserve Pages preview `noindex` headers and redirect the `pages.dev` alias after the official domain is stable.
+
+**2026-11-03 P2 completion:** Seven P2 terms now have real canonical destinations: price-calculator intent → `/3d-print-pricing-calculator/`; calculator-app intent → `/`; two spreadsheet intents → `/3d-print-cost-calculator-excel/`; printing-cost information → `/how-much-does-3d-printing-cost/`; side-by-side printing-cost comparison → the live comparator at `/calculation-methodology/#cost-comparison-tool`; Spanish price intent → `/es/calculadora-precios-impresion-3d/` with a working quote engine and bidirectional hreflang. See `docs/KEYWORD_DEPLOYMENT_TRACEABILITY.md` for all 131 exact mappings. The original P0/P1 count remains 87; mapped P2 increases the total mapped search intents to 94.

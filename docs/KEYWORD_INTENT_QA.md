@@ -6,7 +6,7 @@
 |---|---:|---|
 | P0 | 25 | Main cost calculator / existing selling-price mode |
 | P1 | 62 | Cost, pricing, filament, hourly-cost tool or guide |
-| P2 | 7 | Retain in research JSON, no speculative landing page |
+| P2 | 7 | All map to real functions or relevant pages; includes interactive comparison and Spanish pricing |
 | EXCLUDE | 37 | Not SEO targets (mostly printer-purchase intent) |
 
 **Important:** Keywords sharing one intent are not separate pages; search volumes must not be summed to project traffic.
@@ -16,10 +16,10 @@
 - Filament per-gram amounts display four decimal places (e.g. $0.0250/g), rather than misleading cent rounding to $0.03/g.
 - Automated regression checks enforce 131 keyword rows, four priority counts, complete source metrics for P0/P1, valid page destinations, and working pricing deep-link contract.
 
-### Outstanding (do not label complete)
-- Confirm Cloudflare is serving the latest main commit; current agent environment cannot directly fetch the site.
+### Current deployment limitations (not evidence of ranking)
+- Verify the published build-manifest commit and new pages after each deployment; source mapping alone is not proof of indexing.
 - Run real deployed URL and device interaction audits, and Lighthouse when available.
-- Validate content quality and query impressions after official domain purchase; do not expose temporary Pages preview for indexing.
+- The owned domain is already live; evaluate page indexing and real query impressions through Google Search Console, while keeping temporary Pages aliases protected by HTTP noindex.
 - Distinguish generic buyer queries and device purchase-price queries from the cost-of-making-one-print intent.
 
-No new pages, unverified keyword volume, paid APIs, or indexable previews were introduced.
+Only the functional localized Spanish P2 page was added; no unverified keyword volume, paid APIs, or indexable previews were introduced.
