@@ -166,7 +166,7 @@ await check('iPhone WebKit social image URL is accessible and metadata present',
  assert.ok((response.headers()['content-type']||'').includes('image/'));
  console.log('SHARE_IMAGE_EVIDENCE '+JSON.stringify({url:meta,contentType:response.headers()['content-type'],isRasterPng:meta.endsWith('.png')}));
 });
-fs.mkdirSync('qa-screenshots',{recursive:true});await page.screenshot({path:'qa-screenshots/iphone-webkit.png',fullPage:true});
+fs.mkdirSync('qa-screenshots',{recursive:true});await page.screenshot({path:'qa-screenshots/iphone-webkit.png',fullPage:false});
 assert.deepEqual(errors,[],'WebKit page JS errors');
 await context.close();await browser.close();
 console.log('# WebKit iPhone-size acceptance '+results.filter(x=>x.ok).length+'/'+results.length);
