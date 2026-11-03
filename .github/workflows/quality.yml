@@ -62,6 +62,8 @@ jobs:
           node scripts/audit.mjs
           node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('dist/build-manifest.json'));if(!m.indexable||m.canonicalOrigin!=='https://3dprintcostcalculator.org')process.exit(1)"
 
+      - name: Verify reproducible GEO answer evidence in generated production HTML
+        run: node scripts/geo-readiness-audit.mjs
       - name: Checkout pinned Website Starter Standard SEO auditor
         uses: actions/checkout@v4
         with:
@@ -94,6 +96,6 @@ jobs:
       - name: Independently diagnose owned-domain HTTPS and indexing readiness (read-only)
         if: always()
         run: node scripts/domain-readiness.mjs
-      - name: Inspect all 11 owned-domain SEO pages (read-only; report blockers)
+      - name: Inspect all 12 owned-domain SEO pages (read-only; report blockers)
         if: always()
         run: node scripts/seo-live-audit.mjs
