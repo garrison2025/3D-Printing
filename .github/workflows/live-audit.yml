@@ -66,8 +66,10 @@ jobs:
           libreoffice --version
           python3 scripts/libreoffice-acceptance.py
       - name: Install free Playwright WebKit browser engine for Safari-like checks
+        if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         run: ./node_modules/.bin/playwright install --with-deps webkit
       - name: Safari-like WebKit checks in iPhone-sized browser (not physical iOS)
+        if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/webkit-acceptance.mjs "$SITE_URL"

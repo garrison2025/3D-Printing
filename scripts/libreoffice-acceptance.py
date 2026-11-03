@@ -33,6 +33,10 @@ def patch_file(source,target,edits):
                     pattern=re.compile(r'(<x:c\s+r="'+ref+r'"[^>]*>[\s\S]*?<x:v>)([^<]*)(</x:v>)')
                     xml,n=pattern.subn(lambda m:m.group(1)+str(val)+m.group(3),xml,count=1)
                     assert n==1, f'could not edit {ref}'
+                # Editing raw OOXML unlike typing in Calc does not invalidate formula caches.
+                # Clear every formula cache so LibreOffice must recalculate dependencies.
+                xml,cleared=re.subn(r'(</x:f>)<x:v>[^<]*</x:v>',r'\1<x:v></x:v>',xml)
+                assert cleared>=18, f'expected actual formula caches, found {cleared}'
                 content=xml.encode('utf-8')
             out.writestr(info,content)
 def recalc(source,outdir):
