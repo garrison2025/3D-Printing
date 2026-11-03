@@ -36,7 +36,7 @@ def main(argv):
     root=pathlib.Path(argv[2]).resolve()
     if not root.is_dir():
         raise SystemExit("Site output directory not found: "+str(root))
-    known=[],unexpected=[]
+    known,unexpected=[],[]
     for f in report.get("findings",[]):
         (known if approved(f,root) else unexpected).append(f)
     print("Pinned standards audit: scanned",report.get("pages_scanned"),"HTML pages")
