@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const base=path.resolve('dist');let count=0;
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
 function pass(c,msg){count++;if(!c)throw new Error('FAIL '+msg)}
 function canonicalOriginFor(route,html){return html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]}
 const titles=new Set();
@@ -18,7 +18,7 @@ for(const route of routes){
  pass(!!website && website['@id']===canonicalOriginFor('/',fs.readFileSync(path.join(base,'index.html'),'utf8'))+'#website','schema website ID '+route);
  pass(!!webpage && webpage.url===canonicalOriginFor(route,html),'schema webpage canonical URL '+route);
  pass(webpage?.isPartOf?.['@id']===website?.['@id'],'WebPage points to website entity '+route);
- if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/'].includes(route)){
+ if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/'].includes(route)){
   const application=graph.find(x=>x['@type']==='WebApplication');
   pass(!!application && application.url===webpage.url && webpage.mainEntity?.['@id']===application['@id'],'WebApplication matches visible calculator '+route);
  }
@@ -26,7 +26,7 @@ for(const route of routes){
   pass(html.includes('class="geo-answer"'),'readable answer block '+route);
   pass(html.includes('href="/calculation-methodology/"'),'visible methodology link '+route);
  }
- if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
+ if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
   const breadcrumb=graph.find(x=>x['@type']==='BreadcrumbList');
   pass(!!breadcrumb && breadcrumb.itemListElement?.length===2,'breadcrumb markup backed by visible navigation '+route);
  }
@@ -51,6 +51,12 @@ pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
 pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
 pass(fs.existsSync(path.join(base,'index.html'))&&fs.readFileSync(path.join(base,'index.html'),'utf8').includes('id="mixed-quote"')&&fs.existsSync(path.join(base,'assets/mixed-order.mjs')),'real mixed order interface and module');
 pass(fs.existsSync(path.join(base,'assets/seo-calculations.mjs')),'specialized calculator library');
+const quotePage=fs.readFileSync(path.join(base,'3d-print-pricing-calculator/index.html'),'utf8');
+pass(quotePage.includes('data-pricing-calculator'),'dedicated known-cost quote form exists');
+pass(quotePage.includes('id="price-quote-results"'),'dedicated pricing results exist');
+pass(quotePage.includes('src="/assets/pricing-quote.mjs"'),'quote calculator loads functional script');
+pass(fs.existsSync(path.join(base,'assets/pricing-quote.mjs')),'quote calculator browser module ships');
+pass(fs.readFileSync(path.join(base,'index.html'),'utf8').includes('href="/3d-print-pricing-calculator/"'),'home visibly links to quote tool');
 const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8'));
 pass(map.keywords.length===131,'131 source keywords');
 for(const group of ['P0','P1','P2','EXCLUDE'])pass(map.keywords.some(k=>k.priority===group),'group '+group);

@@ -5,7 +5,7 @@ if(!['staging','production'].includes(mode))throw Error('Mode must be staging or
 const staging=mode==='staging';
 if(!staging && new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Refusing production indexing audit on a temporary pages.dev domain. Use staging mode.');
 if(!origin.startsWith('https://'))throw Error('Live audit needs a public HTTPS URL');
-const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
+const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/contact/'];
 const checks=[];
 const check=(ok,desc)=>checks.push({ok:Boolean(ok),desc});
 async function request(path){
@@ -26,6 +26,7 @@ for(const route of routes){
   const m=r.content.match(/<link rel="canonical" href="([^"]+)"/i);
   check(m?.[1]===origin+route,route+' canonical points to production URL');
   if(route==='/')check(r.content.includes('id="cost-form"'), 'home page includes calculator');
+  if(route==='/3d-print-pricing-calculator/')check(r.content.includes('data-pricing-calculator')&&r.content.includes('id="price-quote-results"'),'dedicated price tool has actual form and live results');
   const graphMatch=r.content.match(/<script type="application\/ld\+json">([^<]+)<\/script>/i);
   try{
    const graph=JSON.parse(graphMatch?.[1]||'{}')['@graph'];
@@ -54,7 +55,7 @@ try{
  if(staging)check(!r.content.includes('<loc>'),'staging sitemap has no indexable URL');
  else for(const route of routes)check(r.content.includes('<loc>'+origin+route+'</loc>'),'sitemap lists '+route);
 }catch(err){check(false,'sitemap fetch failed: '+err.message)}
-for(const file of ['/assets/app.mjs','/assets/mixed-order.mjs','/assets/quote-precision.mjs','/assets/calculations.mjs','/assets/xlsx-personalize.mjs','/assets/site.css','/assets/finish.css','/assets/site-bundle.css','/assets/3d-print-cost-calculator-template.xlsx','/favicon.svg']){
+for(const file of ['/assets/app.mjs','/assets/pricing-quote.mjs','/assets/mixed-order.mjs','/assets/quote-precision.mjs','/assets/calculations.mjs','/assets/xlsx-personalize.mjs','/assets/site.css','/assets/finish.css','/assets/site-bundle.css','/assets/3d-print-cost-calculator-template.xlsx','/favicon.svg']){
  try{const r=await request(file);check(r.response.status===200,file+' loads')}
  catch(err){check(false,file+' fetch failed: '+err.message)}
 }
