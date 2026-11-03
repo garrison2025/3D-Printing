@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {inflateRawSync} from 'node:zlib';
 import {chromium} from 'playwright-core';
+import {classifyNetworkRequest} from './network-request-policy.mjs';
 
 const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origin;
 const mode=process.argv[3]||process.env.MODE||'staging';
@@ -161,7 +162,7 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
   assert.ok(sizes.button>=40,width+'px too small button');
  }
 });
-await check('Ten useful routes, download link, no third-party network and no errors',async()=>{
+await check('Published routes, download link, disclosed Cloudflare analytics and no unknown external requests',async()=>{
  await page.setViewportSize({width:1280,height:900});
  const routes=['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/','/about/','/privacy/','/terms/','/contact/'];
  for(const p of routes){
@@ -174,7 +175,10 @@ await check('Ten useful routes, download link, no third-party network and no err
  const a=page.locator('a[href="/assets/3d-print-cost-calculator-template.xlsx"]');assert.equal(await a.count(),1);
  const template=await page.request.get(origin+'/assets/3d-print-cost-calculator-template.xlsx');
  assert.equal(template.status(),200);assert.equal((await template.body()).subarray(0,2).toString(),'PK');
- assert.deepEqual([...new Set(network)],[],'Unexpected remote requests');
+ const unexpected=[...new Set(network.filter(url=>classifyNetworkRequest(url,origin)==='unknown-external'))];
+ assert.deepEqual(unexpected,[],'Unexpected undisclosed remote requests');
+ const known=network.filter(url=>classifyNetworkRequest(url,origin)==='cloudflare-web-analytics');
+ if(known.length)console.log('NOTE — Cloudflare official Web Analytics beacon observed and disclosed in the privacy policy');
  assert.deepEqual(crashes,[],'Uncaught browser exception');
 });
 await context.close();await browser.close();
