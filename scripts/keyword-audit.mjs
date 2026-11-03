@@ -45,7 +45,7 @@ for(const row of rows){
 
 // Route verification is not search-intent validation. Require genuine, visible task evidence.
 const intentProof={
- '/': ['id="cost-form"','id="pricing"','Expected cost per successful item','Required order gross'],
+ '/': ['id="cost-form"','id="pricing"','EXPECTED COST PER ITEM','Required order gross'],
  '/filament-cost-calculator/': ['data-seo-calculator="filament"','Material cost per gram','second filament','Material cost per item'],
  '/3d-printing-cost-per-hour/': ['data-seo-calculator="hourly"','Maintenance','Machine allocation per hour','electricity'],
  '/how-much-does-3d-printing-cost/': ['Worked example','slicer','Electricity','failed'],
