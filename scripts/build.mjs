@@ -17,7 +17,7 @@ const footer=()=>`<footer class="site-footer"><div class="container footer-inner
 function structuredData({route,title,description,url}){
  const siteId=site+'/#website';
  const publisherId=site+'/#publisher';
- const publisher={'@type':'Organization','@id':publisherId,name:'PrintCost Studio',url:site+'/',logo:site+'/og-card.png',description:'Independent FDM printing cost and pricing tools. The site publishing brand is not a claim of registered corporate status.'};
+ const publisher={'@type':'Organization','@id':publisherId,name:'PrintCost Studio',url:site+'/',description:'Independent FDM printing cost and pricing tools. The site publishing brand is not a claim of registered corporate status.'};
  const webSite={'@type':'WebSite','@id':siteId,name:'PrintCost Studio',url:site+'/',inLanguage:'en',publisher:{'@id':publisherId}};
  const pageId=url+'#webpage';
  const page={'@type':'WebPage','@id':pageId,url,name:title,description,inLanguage:'en',isPartOf:{'@id':siteId},publisher:{'@id':publisherId}};
