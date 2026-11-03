@@ -87,9 +87,14 @@ try{
  });
  await run('Industrial teal A: focus, status and mobile segment colors remain consistent',async()=>{
   await visit('/');
-  await page.locator('input[name="spoolPrice"]').focus();
-  const border=await page.locator('input[name="spoolPrice"]').evaluate(el=>getComputedStyle(el).borderTopColor);
-  assert.equal(border,'rgb(21, 94, 117)');
+  await page.locator('input[name="spoolPrice"]').click();
+  const focusDetails=await page.locator('input[name="spoolPrice"]').evaluate(el=>({
+   border:getComputedStyle(el).borderTopColor,active:document.activeElement===el,
+   matches:el.matches('.workspace .field input:focus'),parent:el.parentElement?.parentElement?.className,
+   input:el.outerHTML.slice(0,180),outline:getComputedStyle(el).outlineColor
+  }));
+  assert.equal(focusDetails.active,true,'focus not on spool input: '+JSON.stringify(focusDetails));
+  assert.equal(focusDetails.border,'rgb(21, 94, 117)','focus border theme '+JSON.stringify(focusDetails));
   const m=await page.locator('#mobile-estimate').evaluate(el=>({
    background:getComputedStyle(el).backgroundImage,
    quote:getComputedStyle(el.querySelector('.mobile-estimate-value')).color
@@ -112,12 +117,15 @@ try{
     border:getComputedStyle(document.querySelector('.seo-tool-form')).borderTopColor
    }));
    assert.equal(values.title,'rgb(16, 45, 61)');
-   assert.equal(values.link,'rgb(21, 94, 117)');
+   assert.equal(values.link,'rgb(21, 94, 117)','SEO link theme '+route+' '+JSON.stringify(values));
    assert.equal(values.border,'rgb(220, 230, 232)');
    assert.ok(values.output.includes('rgb(233, 244, 244)'),'SEO tool output still old blue');
   }
   await visit('/how-to-price-3d-prints/');
-  assert.equal(await page.locator('.breadcrumb-calculator').evaluate(el=>getComputedStyle(el).color),'rgb(21, 94, 117)');
+  const breadcrumb=await page.locator('.breadcrumb-calculator').evaluate(el=>({
+   color:getComputedStyle(el).color,markup:el.outerHTML,parent:el.parentElement?.outerHTML.slice(0,190)
+  }));
+  assert.equal(breadcrumb.color,'rgb(21, 94, 117)','editorial breadcrumb theme '+JSON.stringify(breadcrumb));
   assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'),'#F5F7F7');
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
  });
