@@ -61,7 +61,7 @@ try{
   await page.locator('#edit-price-inputs').click();
   assert.notEqual(await pricing.getAttribute('open'),null,'explicit Edit fees must open pricing');
   await page.locator('[data-mode="cost"]').click();
-  assert.notEqual(await pricing.getAttribute('open'),null,'returning to cost should preserve user's open section');
+  assert.notEqual(await pricing.getAttribute('open'),null,"returning to cost should preserve user-selected open sections");
   await visit('/');
  });
  await run('V2.1 mobile input focus retains stable sticky summary geometry and no click obstruction',async()=>{
