@@ -26,6 +26,25 @@ await check('iPhone-sized WebKit homepage paints and defaults to real checkout',
  await noOverflow();
  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
 });
+await check('Industrial teal palette A is visible on iPhone WebKit without changing functionality',async()=>{
+ await visit('/');await page.locator('#reset-button').click();
+ const colors=await page.evaluate(()=>({
+  token:getComputedStyle(document.documentElement).getPropertyValue('--pc-primary').trim().toUpperCase(),
+  button:getComputedStyle(document.querySelector('.nav-cta')).backgroundColor,
+  chart:getComputedStyle(document.querySelector('#cost-bar span:first-child')).backgroundColor,
+  mobile:getComputedStyle(document.querySelector('.mobile-estimate-value')).color,
+  mode:getComputedStyle(document.querySelector('.mode-indicator')).backgroundColor,
+  quote:getComputedStyle(document.querySelector('.result-top')).backgroundImage
+ }));
+ assert.equal(colors.token,'#155E75');
+ assert.equal(colors.button,'rgb(21, 94, 117)');
+ assert.equal(colors.chart,'rgb(21, 94, 117)');
+ assert.equal(colors.mobile,'rgb(21, 94, 117)');
+ assert.equal(colors.mode,'rgb(21, 94, 117)');
+ assert.ok(colors.quote.includes('rgb(16, 45, 61)'));
+ assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+ await noOverflow();
+});
 await check('iPhone touch text input changes quote, then reset restores values',async()=>{
  await page.locator('input[name="usedGrams"]').fill('180');
  await page.waitForFunction(()=>document.querySelector('#result-focus-value')?.textContent!=='$11.44');

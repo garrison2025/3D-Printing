@@ -47,6 +47,80 @@ try{
   assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
   await page.locator('#reset-button').click();
  });
+ await run('Industrial teal A: tokens, active tabs, price card, chart and buttons',async()=>{
+  await page.setViewportSize({width:1440,height:900});await visit('/');
+  const c=await page.evaluate(()=>{
+   const style=el=>getComputedStyle(document.querySelector(el));
+   const tokens=getComputedStyle(document.documentElement);
+   const value=k=>tokens.getPropertyValue(k).trim().toUpperCase();
+   return {
+    primary:value('--pc-primary'),paper:value('--pc-paper'),
+    body:style('body').backgroundImage,nav:style('.nav-cta').backgroundColor,
+    text:style('.nav-cta').color,heading:style('.hero h1 span').backgroundImage,
+    focus:style('.result-top').backgroundImage,primaryButton:style('.result-button.primary').backgroundColor,
+    chart:[...document.querySelectorAll('#cost-bar span')].map(x=>getComputedStyle(x).backgroundColor),
+    swatches:[...document.querySelectorAll('#breakdown .swatch')].map(x=>getComputedStyle(x).backgroundColor),
+    theme:getComputedStyle(document.querySelector('.brand-accent')).color
+   };
+  });
+  assert.equal(c.primary,'#155E75');assert.equal(c.paper,'#F5F7F7');
+  assert.equal(c.nav,'rgb(21, 94, 117)');assert.equal(c.primaryButton,'rgb(21, 94, 117)');
+  assert.equal(c.text,'rgb(255, 255, 255)');assert.equal(c.theme,'rgb(21, 94, 117)');
+  assert.ok(c.heading.includes('rgb(21, 94, 117)'),'hero gradient is not teal '+c.heading);
+  assert.ok(c.focus.includes('rgb(16, 45, 61)'),'quote header not slate-teal '+c.focus);
+  assert.deepEqual(c.chart,[
+    'rgb(21, 94, 117)','rgb(40, 126, 144)','rgb(15, 118, 110)',
+    'rgb(101, 170, 154)','rgb(185, 134, 81)','rgb(135, 122, 164)'
+  ]);
+  assert.deepEqual(c.swatches,c.chart,'chart legend must use same six industrial palette tokens');
+  const contrast=(a,b)=>{
+   const rgb=s=>s.match(/\\d+/g).slice(0,3).map(Number).map(x=>{
+    const n=x/255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4;
+   });
+   const lum=s=>{const t=rgb(s);return .2126*t[0]+.7152*t[1]+.0722*t[2]};
+   const [x,y]=[lum(a),lum(b)];return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
+  };
+  assert.ok(contrast(c.nav,c.text)>=7,'primary text contrast below AAA');
+  await shot('industrial-teal-desktop-1440');
+  await page.setViewportSize({width:390,height:844});await visit('/');await noOverflow();
+  await shot('industrial-teal-mobile-390');
+ });
+ await run('Industrial teal A: focus, status and mobile segment colors remain consistent',async()=>{
+  await visit('/');
+  await page.locator('input[name="spoolPrice"]').focus();
+  const border=await page.locator('input[name="spoolPrice"]').evaluate(el=>getComputedStyle(el).borderTopColor);
+  assert.equal(border,'rgb(21, 94, 117)');
+  const m=await page.locator('#mobile-estimate').evaluate(el=>({
+   background:getComputedStyle(el).backgroundImage,
+   quote:getComputedStyle(el.querySelector('.mobile-estimate-value')).color
+  }));
+  assert.equal(m.quote,'rgb(21, 94, 117)');
+  assert.ok(m.background.includes('rgb(230, 242, 242)'));
+  await page.locator('[data-mode="pricing"]').click();
+  await page.waitForTimeout(260);
+  const selected=await page.locator('.mode-indicator').evaluate(el=>getComputedStyle(el).backgroundColor);
+  assert.equal(selected,'rgb(21, 94, 117)');
+  await visit('/');
+ });
+ await run('Industrial teal A: both SEO calculator tools and editorial pages use the palette',async()=>{
+  for(const route of ['/filament-cost-calculator/','/3d-printing-cost-per-hour/']){
+   await visit(route);
+   const values=await page.evaluate(()=>({
+    title:getComputedStyle(document.querySelector('.seo-tool-form>h2')).color,
+    link:getComputedStyle(document.querySelector('.seo-breadcrumb a')).color,
+    output:getComputedStyle(document.querySelector('.seo-tool-output')).backgroundImage,
+    border:getComputedStyle(document.querySelector('.seo-tool-form')).borderTopColor
+   }));
+   assert.equal(values.title,'rgb(16, 45, 61)');
+   assert.equal(values.link,'rgb(21, 94, 117)');
+   assert.equal(values.border,'rgb(220, 230, 232)');
+   assert.ok(values.output.includes('rgb(233, 244, 244)'),'SEO tool output still old blue');
+  }
+  await visit('/how-to-price-3d-prints/');
+  assert.equal(await page.locator('.breadcrumb-calculator').evaluate(el=>getComputedStyle(el).color),'rgb(21, 94, 117)');
+  assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'),'#F5F7F7');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+ });
  await run('V2.1 mode changes preserve manual advanced-setting accordion choices',async()=>{
   await visit('/');
   const advanced=page.locator('#advanced-details'),pricing=page.locator('#pricing-details');
