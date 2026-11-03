@@ -1,3 +1,4 @@
+import {scenarioEvidenceHtml} from './geo-scenarios.mjs';
 // Human-readable, source-backed explanations of this site's own calculations.
 // These are not special AI-only pages or hidden machine-readable payloads.
 export const ANSWERS = Object.freeze({
@@ -79,6 +80,7 @@ export function methodologyPage(){return `<div class="container"><article class=
   <div class="math-block">Required customer revenue = ($6.7871579 + $0.30) ÷ (1 − 0.08 − 0.30)<br>= $7.0871579 ÷ 0.62 = $11.4308998 theoretical; charge at least $11.44 if prices must be whole cents<br>Platform fees = ($11.4308998 × 8%) + $0.30 ≈ $1.2145<br>Profit after included expenses ≈ $3.4293, or 30% of gross revenue</div>
   <p>At the actual minimum whole-cent checkout of <strong>$11.44</strong>, payment fees are $11.44 × 8% + $0.30 = <strong>$1.2152</strong> (displayed as $1.22) and profit after included expenses is approximately <strong>$3.44</strong>. The preceding theoretical quote is an unrounded mathematical reference, not the final amount charged.</p>
   <p>The model keeps full precision for its intermediate costs and required gross. Actual customer charges and the Excel checkout formulas round the unit price up to whole cents. Rounding the theoretical quote to the nearest cent can slightly miss the target margin: use the minimum whole-cent checkout price on the live calculator, which rounds up. Summing separately rounded cost components may also differ by a cent. A 30% <em>markup</em> and 30% <em>margin</em> are different formulas; see <a href="/how-to-price-3d-prints/">the pricing guide</a>.</p>
+  ${scenarioEvidenceHtml()}
   <h2>6. Dedicated calculators use narrower models</h2>
   <p>The <a href="/filament-cost-calculator/">filament cost calculator</a> computes spool price divided by net grams and multiplies it by the plate’s used grams. For a $25/1,000 g spool, material is $0.025/g and a 100 g plate costs $2.50. It excludes failure, energy, equipment and labor.</p>
   <p>The <a href="/3d-printing-cost-per-hour/">hourly running-cost calculator</a> adds $400 ÷ 4,000 h = $0.10/h for machine allocation and 120/1,000 × $0.18 = $0.0216/h for energy, for a $0.1216/h example before maintenance or labor. Neither result is a market service quote.</p>
