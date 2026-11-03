@@ -47,6 +47,14 @@ try{
   assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
   await page.locator('#reset-button').click();
  });
+ await run('Industrial teal A: published social raster matches the new palette',async()=>{
+  const response=await page.request.get(origin+'/og-card.png');
+  assert.equal(response.status(),200);
+  assert.equal(response.headers()['content-type']?.includes('image/png'),true);
+  const data=await response.body();
+  assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  assert.equal(data.readUInt32BE(16),1200);assert.equal(data.readUInt32BE(20),630);
+ });
  await run('Industrial teal A: tokens, active tabs, price card, chart and buttons',async()=>{
   await page.setViewportSize({width:1440,height:900});await visit('/');
   const c=await page.evaluate(()=>{

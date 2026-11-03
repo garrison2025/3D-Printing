@@ -6,6 +6,7 @@ const dst=path.join(root,'dist');
 import {resolveSiteConfig} from '../src/lib/site-config.mjs';
 import {hardenWorkbookTemplate} from '../src/assets/xlsx-personalize.mjs';
 import {seoToolPages} from './seo-pages.mjs';
+import {recolorSocialCard} from './recolor-social-card.mjs';
 import {answerPanel,methodologyPage} from './geo-content.mjs';
 const {site,live}=resolveSiteConfig(process.env);
 const canonical=(route)=>site+(route==='/'?'/':route);
@@ -112,6 +113,8 @@ fs.copyFileSync(path.join(root,'src/assets/seo-tools.mjs'),path.join(dst,'assets
 fs.copyFileSync(path.join(root,'src/lib/seo-calculations.mjs'),path.join(dst,'assets/seo-calculations.mjs'));
 fs.copyFileSync(path.join(root,'src/lib/calculations.mjs'),path.join(dst,'assets/calculations.mjs'));
 for(const file of ['favicon.svg','og-card.svg','og-card.png']) fs.copyFileSync(path.join(root,'public',file),path.join(dst,file));
+recolorSocialCard(path.join(root,'public/og-card.png'),path.join(dst,'og-card.png'));
+
 // Cloudflare Pages syntax: a route with a trailing slash resolves to the built directory index.
 fs.writeFileSync(path.join(dst,'_headers'),`/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  ${!live?'X-Robots-Tag: noindex, nofollow\n  ':''}\n/assets/*\n  Cache-Control: public, max-age=3600\n\n# Keep Cloudflare preview aliases out of search even after a custom domain launches.\nhttps://3d-printing-1r7.pages.dev/*\n  X-Robots-Tag: noindex\n\nhttps://:version.3d-printing-1r7.pages.dev/*\n  X-Robots-Tag: noindex\n`);
 fs.writeFileSync(path.join(dst,'robots.txt'),live?'User-agent: *\nAllow: /\nSitemap: '+site+'/sitemap.xml\n':'User-agent: *\nAllow: /\n');
