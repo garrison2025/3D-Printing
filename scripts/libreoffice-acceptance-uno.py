@@ -51,9 +51,9 @@ with tempfile.TemporaryDirectory(prefix='printcost-uno-') as tmp:
    return doc
   book=open_book()
   sh=book.Sheets.getByIndex(0)
-  assert sh.getCellRangeByName('B8').Value==150,'Actual source workbook differs from browser QA'
-  assert sh.getCellRangeByName('B26').Value==.22,'Maintenance source input missing'
-  assert sh.getCellRangeByName('B27').Value==6.4,'Design source input missing'
+  approx(sh.getCellRangeByName('B8').Value,150,'Original slicer grams')
+  approx(sh.getCellRangeByName('B26').Value,.22,'Original maintenance reserve')
+  approx(sh.getCellRangeByName('B27').Value,6.4,'Original one-time design cost')
   for cell,value in [('B8',200),('B26',.5),('B27',8.4)]:
    sh.getCellRangeByName(cell).Value=value
   book.calculateAll()
