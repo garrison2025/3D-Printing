@@ -4,7 +4,15 @@ import {inflateRawSync} from 'node:zlib';
 import {chromium} from 'playwright-core';
 
 const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origin;
+const mode=process.argv[3]||process.env.MODE||'staging';
+const officialOrigin='https://3dprintcostcalculator.org';
+if(!['staging','production'].includes(mode))throw Error('Expected staging or production audit mode');
 if(!origin.startsWith('https:'))throw Error('Real deployed HTTPS target required');
+if(mode==='production'&&new URL(origin).hostname.endsWith('.pages.dev'))throw Error('Production audit cannot target a temporary pages.dev URL');
+// Preview pages carry an owned-domain canonical, but must remain noindex.
+// A production audit requires the actual official domain and indexable content.
+const canonicalOrigin=mode==='staging'&&new URL(origin).hostname.endsWith('.pages.dev')?officialOrigin:origin;
+const robotsValue=mode==='staging'?'noindex,nofollow':'index,follow';
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
 const context=await browser.newContext({acceptDownloads:true,viewport:{width:1280,height:900}});
 const page=await context.newPage();page.setDefaultTimeout(12000);
@@ -46,13 +54,15 @@ function independent(x){
  const fee=gross*x.feeRate+x.feeFixed;
  return {item,orderExpenses,unit,gross,fee,profit:gross-orderExpenses-fee};
 }
-await check('Live version, HTTPS and prelaunch noindex remain consistent',async()=>{
+await check('Live version, HTTPS, canonical and indexing mode remain consistent',async()=>{
  const r=await page.request.get(origin+'/build-manifest.json'),m=await r.json();
- assert.equal(r.status(),200);assert.equal(m.indexable,false);assert.equal(m.kind,'staging');
- assert.equal(m.canonicalOrigin,origin);
+ assert.equal(r.status(),200);
+ assert.equal(m.indexable,mode==='production','Manifest must match explicit release mode');
+ assert.equal(m.kind,mode);
+ assert.equal(m.canonicalOrigin,canonicalOrigin,'Canonical must be the owner domain even on Pages preview');
  await visit('/');
- assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
- assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),origin+'/');
+ assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),robotsValue);
+ assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),canonicalOrigin+'/');
 });
 await check('Independent default cent-safe unit quote, CSV fee/profit and cost calculation',async()=>{
  await fresh();await page.locator('[data-mode="pricing"]').click();
@@ -157,7 +167,7 @@ await check('Ten useful routes, download link, no third-party network and no err
  for(const p of routes){
   await visit(p);
   assert.ok(await page.locator('h1').count()===1,p+' heading');
-  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow',p+' index safety');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),robotsValue,p+' index safety');
  }
  await visit('/3d-print-cost-calculator-excel/');
  assert.match(await page.locator('body').innerText(),/22 editable inputs/);
