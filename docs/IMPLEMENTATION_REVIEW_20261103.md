@@ -19,3 +19,5 @@ Still intentionally deferred: STL slicing, resin mode, market-rate APIs, final d
 - Narrow 320px viewport overflow was independently reproduced and traced to the redundant home navigation link beside the home-branded logo; limited display override keeps task links visible. Checkout and theoretical profit-over-cost ratios are explicitly separated in single-quote CSV.
 
 - Converted existing in-repo 1200×630 SVG sharing artwork to a real static PNG using a one-time free CI conversion; both Open Graph and Twitter metadata now publish the PNG, with SVG retained for fallback. Cross-platform social crawler preview acceptance is distinct from image endpoint/meta checks.
+
+- V2 UI motion polish (2026-11-03): native JS/CSS sliding active-mode indicator, small focused quote transitions for changed values, persistent 6-row cost breakdown highlighting the dominant cost, lightweight accordion/open and scroll-reveal animations that do not hide indexable content by default, and mobile focus-sticky moderation. Respect reduced-motion and print. New Chrome/WebKit UI regression checks are required before claiming the release validated.

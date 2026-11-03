@@ -47,6 +47,45 @@ try{
   assert.equal(await page.locator('input[name="usedGrams"]').inputValue(),'211');
   await page.locator('#reset-button').click();
  });
+ await run('V2 mode slider aligns with the selected button on both mobile and desktop',async()=>{
+  for(const width of [390,1280]){
+   await page.setViewportSize({width,height:width>900?900:844});
+   await visit('/');
+   await page.locator('[data-mode="pricing"]').click();
+   await page.waitForTimeout(275);
+   const state=await page.evaluate(()=>{
+    const bar=document.querySelector('.mode-bar'),i=bar?.querySelector('.mode-indicator'),tab=bar?.querySelector('[data-mode="pricing"]');
+    if(!i||!tab)return {missing:true};
+    const a=i.getBoundingClientRect(),b=tab.getBoundingClientRect();
+    return {missing:false,left:Math.abs(a.left-b.left),width:Math.abs(a.width-b.width),pressed:tab.getAttribute('aria-pressed'),pointer:getComputedStyle(i).pointerEvents};
+   });
+   assert.equal(state.missing,false);
+   assert.equal(state.pressed,'true');assert.equal(state.pointer,'none');
+   assert.ok(state.left<2&&state.width<2,width+'px incorrect slider position '+JSON.stringify(state));
+   if(width===1280)await shot('v2-desktop-pricing');
+  }
+  await page.setViewportSize({width:390,height:844});await visit('/');
+ });
+ await run('V2 quote and cost highlights remain numerically correct',async()=>{
+  await page.locator('#reset-button').click();
+  await page.locator('[data-mode="pricing"]').click();
+  assert.equal((await page.locator('#result-focus-value').innerText()).trim(),'$11.44');
+  await page.locator('input[name="usedGrams"]').fill('140');
+  await page.waitForFunction(()=>document.querySelector('#result-focus-value')?.textContent!=='$11.44');
+  assert.equal(await page.locator('#breakdown li').count(),6);
+  assert.equal(await page.locator('#breakdown li.is-top-driver').count(),1);
+ });
+ await run('V2 reduced-motion disables decorative indicator and breakdown transitions',async()=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('[data-mode="filament"]').click();
+  const styles=await page.evaluate(()=>({
+   tab:getComputedStyle(document.querySelector('.mode-indicator')).transitionDuration,
+   row:getComputedStyle(document.querySelector('#breakdown li')).transitionDuration
+  }));
+  assert.ok(styles.tab.split(',').every(v=>parseFloat(v)===0),'indicator still animates under reduced motion');
+  assert.ok(styles.row.split(',').every(v=>parseFloat(v)===0),'cost row still animates under reduced motion');
+  await page.emulateMedia({reducedMotion:'no-preference'});
+ });
  await run('Real-time calculation',async()=>{const before=await page.locator('#result-focus-value').innerText();await page.locator('input[name="usedGrams"]').fill('145');await page.waitForFunction(x=>document.querySelector('#result-focus-value')?.textContent!==x,before)});
  await run('Selling-price mode',async()=>{await page.locator('[data-mode="pricing"]').click();assert.equal(await page.locator('[data-mode="pricing"]').getAttribute('aria-pressed'),'true')});
  await run('Batch quote rows',async()=>{

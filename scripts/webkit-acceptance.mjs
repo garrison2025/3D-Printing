@@ -43,6 +43,19 @@ await check('iPhone WebKit can turn local input saving off and on',async()=>{
  await page.locator('#remember-inputs').check();
  await page.locator('#reset-button').click();
 });
+await check('iPhone WebKit V2 slider and reduced-motion accessibility',async()=>{
+ await visit('/');await page.locator('[data-mode="pricing"]').click();
+ await page.waitForTimeout(285);
+ const aligned=await page.evaluate(()=>{
+  const tab=document.querySelector('.mode-button[aria-pressed="true"]'),ind=document.querySelector('.mode-indicator');
+  return Boolean(ind&&tab&&Math.abs(ind.getBoundingClientRect().left-tab.getBoundingClientRect().left)<2);
+ });
+ assert.equal(aligned,true,'Safari engine active mode indicator does not align');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const disabled=await page.locator('.mode-indicator').evaluate(el=>getComputedStyle(el).transitionDuration);
+ assert.ok(disabled.split(',').every(x=>parseFloat(x)===0));
+ await page.emulateMedia({reducedMotion:'no-preference'});
+});
 await check('iPhone WebKit batch CSV download is real and contains calculated amounts',async()=>{
  await page.locator('#batch-quote > summary').click();
  const pending=page.waitForEvent('download');

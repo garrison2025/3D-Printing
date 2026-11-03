@@ -76,3 +76,16 @@ test('privacy-saving toggle is live, clearable, documented and in first-paint HT
  assert.match(app,/if\(rememberInputs\)\{try\{const stored=/);
  assert.match(css,/\.remember-control/);
 });
+
+test('V2 animations favor user feedback and preserve visible content at rest',()=>{
+ assert.match(app,/scheduleModeIndicator\(\)/);
+ assert.match(app,/valueMotion\?\.cancel\(\)/);
+ assert.match(app,/r\.costBreakdown\.forEach/);
+ assert.match(app,/is-top-driver/);
+ assert.match(css,/\.mode-bar \.mode-indicator/);
+ assert.match(css,/pcs-v2-open/);
+ assert.match(css,/pcs-v2-reveal/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
+ assert.match(css,/animation:none!important/);
+ assert.doesNotMatch(css,/\.motion-ready \.long-section\.in-view\{opacity:0/);
+});
