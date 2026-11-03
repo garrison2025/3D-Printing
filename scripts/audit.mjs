@@ -62,7 +62,8 @@ const methods=fs.readFileSync(path.join(base,'calculation-methodology/index.html
 for(const phrase of ['Whole-plate failure','one-attempt cost','Required order gross','source code','not complete net business income']){
  pass(methods.toLowerCase().includes(phrase.toLowerCase()),'method page explains '+phrase);
 }
-pass(!methods.includes('"@type":"Organization"'),'no fabricated organization entity');
+pass(methods.includes('"@type":"Organization"')&&methods.includes('"name":"PrintCost Studio"'),'publisher markup reflects real site publishing brand');
+pass(!methods.includes('"sameAs"')&&!methods.includes('"aggregateRating"'),'no invented verified profiles or user ratings');
 pass(fs.existsSync(path.join(base,'robots.txt')),'robots');
 pass(fs.existsSync(path.join(base,'assets/calculations.mjs')),'calculation module');
 pass(fs.existsSync(path.join(base,'index.html'))&&fs.readFileSync(path.join(base,'index.html'),'utf8').includes('id="mixed-quote"')&&fs.existsSync(path.join(base,'assets/mixed-order.mjs')),'real mixed order interface and module');
