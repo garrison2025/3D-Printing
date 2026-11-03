@@ -21,5 +21,5 @@ test('material and hourly tools give a practical path to actual slicer inputs',(
  assert.match(pages,/Where to find accurate filament grams/);
  assert.match(pages,/What if estimated print hours differ from real printer time/);
  assert.match(pages,/used-material estimate here, not the 1 kg/);
- assert.match(pages,/do not claim to measure your printer/);
+ assert.match(pages,/does not claim to measure your printer/);
 });
