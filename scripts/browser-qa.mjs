@@ -109,6 +109,8 @@ try{
  });
  await run('Quote rounding shows a cent-safe checkout amount',async()=>{
    await visit('/#pricing');
+   await page.locator('#reset-button').click();
+   await page.locator('[data-mode="pricing"]').click();
    assert.match(await page.locator('#cash-quote-note').innerText(),/\$11\.44/);
    await page.locator('input[name="usedGrams"]').fill('145');
    await page.waitForFunction(()=>document.querySelector('#cash-quote-note')?.textContent?.includes('checkout price'));
