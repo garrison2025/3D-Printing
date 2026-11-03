@@ -12,6 +12,10 @@ const page=await context.newPage();page.setDefaultTimeout(13000);
 page.on('pageerror',e=>errors.push(e.message));
 page.on('response',r=>{if(r.url().includes('/assets/')&&r.status()>=400)errors.push('Missing resource '+r.status()+' '+r.url());});
 async function run(name,fn){try{await fn();results.push({name,ok:true});console.log('PASS '+name)}catch(e){results.push({name,ok:false,error:e.message});console.error('FAIL '+name+': '+e.message)}}
+async function expectedRobots(){
+ const manifest=await (await page.request.get(origin+'/build-manifest.json')).json();
+ return manifest.indexable?'index,follow':'noindex,nofollow';
+}
 async function visit(route){await page.goto(new URL(route,origin).href,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForTimeout(150)}
 async function noOverflow(){const a=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth,form:document.querySelector('#cost-form')?.getBoundingClientRect().width}));assert.ok(a.scroll<=a.w+2,'horizontal overflow '+a.scroll+' > '+a.w);if(a.form!=null)assert.ok(a.form>Math.min(280,a.w*.68),'form width '+a.form)}
 async function shot(name){await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,left:0,behavior:'instant'})});await page.waitForTimeout(120);await page.screenshot({path:'qa-screenshots/'+name+'.png',fullPage:true,animations:'disabled'})}
@@ -52,7 +56,7 @@ try{
   assert.equal((await page.locator('#price-quote-unit').innerText()).trim(),'$11.44');
   assert.equal((await page.locator('#price-quote-total').innerText()).trim(),'$11.44');
   assert.equal((await page.locator('#price-quote-profit').innerText()).trim(),'$3.43');
-  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),await expectedRobots());
   const manifest=await (await page.request.get(origin+'/build-manifest.json')).json();
   assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'),manifest.canonicalOrigin+'/3d-print-pricing-calculator/');
   const graph=JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@graph'];
@@ -160,7 +164,7 @@ try{
   }));
   assert.equal(breadcrumb.color,'rgb(21, 94, 117)','editorial breadcrumb theme '+JSON.stringify(breadcrumb));
   assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'),'#F5F7F7');
-  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),await expectedRobots());
  });
  await run('V2.1 mode changes preserve manual advanced-setting accordion choices',async()=>{
   await visit('/');

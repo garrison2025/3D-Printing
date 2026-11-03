@@ -11,6 +11,10 @@ async function check(name,task){
  try{await task();results.push({name,ok:true});console.log('PASS WebKit — '+name)}
  catch(e){results.push({name,ok:false,error:e.message});console.error('FAIL WebKit — '+name+': '+e.message)}
 }
+async function expectedRobots(){
+ const manifest=await (await page.request.get(origin+'/build-manifest.json')).json();
+ return manifest.indexable?'index,follow':'noindex,nofollow';
+}
 async function visit(route){
  const r=await page.goto(new URL(route,origin).href,{waitUntil:'domcontentloaded',timeout:30000});
  assert.equal(r.status(),200,route);await page.waitForTimeout(150);
@@ -24,7 +28,7 @@ await check('iPhone-sized WebKit homepage paints and defaults to real checkout',
  await page.locator('[data-mode="pricing"]').click();
  await page.waitForFunction(()=>document.querySelector('#result-focus-value')?.textContent==='$11.44');
  await noOverflow();
- assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+ assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),await expectedRobots());
 });
 await check('Industrial teal palette A is visible on iPhone WebKit without changing functionality',async()=>{
  await visit('/');await page.locator('#reset-button').click();
@@ -42,7 +46,7 @@ await check('Industrial teal palette A is visible on iPhone WebKit without chang
  assert.equal(colors.mobile,'rgb(21, 94, 117)');
  assert.equal(colors.mode,'rgb(21, 94, 117)');
  assert.ok(colors.quote.includes('rgb(16, 45, 61)'));
- assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
+ assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),await expectedRobots());
  await noOverflow();
 });
 await check('iPhone touch text input changes quote, then reset restores values',async()=>{
