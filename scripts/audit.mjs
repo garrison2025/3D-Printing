@@ -76,6 +76,22 @@ if(homepage.includes('<meta name="robots" content="index,follow">')){
  pass(!/<loc>/.test(sitemapText),'staging sitemap is empty');
  pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging sends noindex HTTP header');
 }
+// Guard actual rendered fragment IDs, not only route existence.
+// This catches broken guide navigation such as a missing /#pricing anchor.
+for(const route of routes){
+ const source=fs.readFileSync(path.join(base,route.slice(1),'index.html'),'utf8');
+ for(const [,href] of source.matchAll(/href="([^"]+)"/g)){
+  if(!href.includes('#')||/^[a-z][a-z\d+.-]*:/i.test(href))continue;
+  if(!href.startsWith('/')&&!href.startsWith('#'))continue;
+  const url=new URL(href,'https://local.test'+route);
+  if(!url.hash||url.hash==='#')continue;
+  const anchor=decodeURIComponent(url.hash.slice(1));
+  const target=path.join(base,url.pathname.slice(1),'index.html');
+  pass(fs.existsSync(target),'anchor route exists '+route+' → '+href);
+  const targetHTML=fs.readFileSync(target,'utf8');
+  pass(targetHTML.includes('id="'+anchor+'"'),'anchor target exists '+route+' → '+href);
+ }
+}
 // Verify emitted source-module graph to detect missing assets before deployment.
 for(const file of fs.readdirSync(path.join(base,'assets')).filter(x=>x.endsWith('.mjs'))){
  const full=path.join(base,'assets',file),js=fs.readFileSync(full,'utf8');

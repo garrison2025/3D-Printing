@@ -18,3 +18,11 @@ test('no special machine-only payload or fabricated SEO proof',()=>{
  assert.ok(!html.includes('guaranteed rankings'));
  assert.ok(!html.includes('user reviews'));
 });
+
+test('pricing method distinguishes exact mathematical result from a chargeable whole-cent amount',()=>{
+ assert.match(ANSWERS['/how-to-price-3d-prints/'].detail,/\$11\.4309/);
+ assert.match(ANSWERS['/how-to-price-3d-prints/'].detail,/\$11\.44/);
+ const method=methodologyPage();
+ assert.match(method,/\$11\.44/);
+ assert.match(method,/full precision/);
+});

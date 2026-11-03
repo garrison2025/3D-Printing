@@ -72,7 +72,7 @@ try{
  await run('WCAG A/AA accessible markup check',async()=>{
   const violations=[];
   await page.setViewportSize({width:390,height:844});
-  for(const route of ['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-to-price-3d-prints/']){
+  for(const route of ['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/about/','/privacy/','/contact/']){
    await visit(route);
    await page.addScriptTag({path:'node_modules/axe-core/axe.min.js'});
    const result=await page.evaluate(async()=>window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
