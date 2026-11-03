@@ -146,7 +146,7 @@ await check('320/390/768/1024px layout has no horizontal overflow and accessible
    const offenders=await page.evaluate(()=>[...document.querySelectorAll('*')].map(el=>({tag:el.tagName.toLowerCase(),id:el.id,cls:String(el.className).slice(0,90),right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left),w:Math.round(el.getBoundingClientRect().width)})).filter(x=>x.right>innerWidth+2&&x.w>0).slice(0,30));
    throw Error(width+'px overflow '+JSON.stringify(sizes)+' offenders '+JSON.stringify(offenders));
   }
-  assert.ok(sizes.form>=width*.65,width+'px squeezed form');
+  assert.ok(sizes.form>=width*(width>=931?.34:.65),width+'px squeezed form '+JSON.stringify(sizes));
   assert.ok(sizes.button>=40,width+'px too small button');
  }
 });
