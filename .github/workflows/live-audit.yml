@@ -47,11 +47,27 @@ jobs:
           echo "Live deployment did not pass the release gate."
           exit 1
       - name: Install CI-only Chrome controller
-        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1 axe-core@4.14.0 lighthouse@13.6.0
       - name: Browser QA on real Cloudflare preview
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/browser-qa.mjs "$SITE_URL"
+      - name: Measure mobile and desktop Lighthouse on Cloudflare
+        env:
+          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+        run: |
+          mkdir -p qa-lighthouse
+          npx --no-install lighthouse "$SITE_URL/" --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-mobile.json
+          npx --no-install lighthouse "$SITE_URL/" --quiet --preset=desktop --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-desktop.json
+          node scripts/lighthouse-report.mjs
+      - name: Upload Lighthouse evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printcost-lighthouse
+          path: qa-lighthouse/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Publish screenshot evidence
         if: always()
         uses: actions/upload-artifact@v4

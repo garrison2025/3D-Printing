@@ -57,6 +57,21 @@ try{
   await page.setViewportSize({width:1440,height:900});
   for(const route of ['/filament-cost-calculator/','/3d-printing-cost-per-hour/']){await visit(route);await noOverflow()}
  });
+
+ // Automated WCAG checks in CI Chrome; axe-core is never shipped to website visitors.
+ await run('WCAG A/AA accessible markup check',async()=>{
+  const violations=[];
+  await page.setViewportSize({width:390,height:844});
+  for(const route of ['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-to-price-3d-prints/']){
+   await visit(route);
+   await page.addScriptTag({path:'node_modules/axe-core/axe.min.js'});
+   const result=await page.evaluate(async()=>window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
+   for(const issue of result.violations){
+    violations.push(route+' '+issue.id+' '+issue.impact+' '+issue.nodes.slice(0,3).map(n=>n.target.join(' ')).join(', '));
+   }
+  }
+  if(violations.length)throw new Error(violations.join(' | '));
+ });
  await run('No JavaScript crashes',async()=>assert.deepEqual(errors,[]));
 }finally{await context.close();await browser.close()}
 const passed=results.filter(x=>x.ok).length;
