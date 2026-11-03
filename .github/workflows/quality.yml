@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Parse-check every source and test JavaScript module
+        run: find src scripts tests -name '*.mjs' -print0 | xargs -0 -n 1 node --check
       - name: Calculation and UI tests
         run: npm test
       - name: Production-style static build
