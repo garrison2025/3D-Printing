@@ -143,7 +143,7 @@ if(form){
    const li=ul.children[i];
    li.classList.toggle('is-top-driver',item.name===driver.name&&item.value>0);
    li.querySelector('.name').lastChild.textContent=item.name;
-   li.querySelector('.swatch').style.background=['#65b9ff','#7991ff','#70b59c','#9de1cd','#e5b679','#d0a4e5'][i];
+   li.querySelector('.swatch').style.background='var(--pc-chart-'+(i+1)+')';
    li.querySelector('b').textContent=money(item.value);
   });
   const driverHints={'Material':'filament grams and spool price','Electricity':'power draw and electricity rate','Machine wear':'printer lifetime and purchase price','Maintenance reserve':'maintenance reserve per machine hour','Preparation labor':'setup minutes and hourly rate','Finishing / per-item packing':'finishing and supplies per item'};
