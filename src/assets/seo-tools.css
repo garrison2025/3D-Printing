@@ -55,3 +55,23 @@
 .seo-tool-control select:focus-visible{outline:2px solid #216fc8;outline-offset:-3px}
 @media(max-width:900px){.cost-compare-columns{grid-template-columns:1fr}}
 @media(max-width:560px){.cost-compare-group{padding:13px}.cost-compare-group .seo-tool-fields{grid-template-columns:1fr}.cost-compare-results .seo-row{align-items:start;flex-direction:column;gap:3px}}
+
+/* Real client-facing estimate downloads and print-to-PDF; disabled if calculation invalid. */
+.quote-reference-field{margin-top:18px}
+.quote-reference-field>input{width:100%;min-height:44px;border:1px solid #b6cce3;border-radius:9px;padding:10px 12px;font:inherit;font-size:16px}
+.quote-actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.quote-actions button{border:1px solid #165ac4;background:#165ac4;color:#fff;border-radius:9px;padding:11px 15px;font-weight:700;font-size:13px;cursor:pointer}
+.quote-actions button:nth-child(2){background:#fff;color:#165ac4}
+.quote-actions button:disabled{cursor:not-allowed;opacity:.45}
+.quote-print-sheet{display:none}
+@media print{
+ body *{visibility:hidden!important}
+ #quote-print-sheet,#quote-print-sheet *{visibility:visible!important}
+ #quote-print-sheet{display:block!important;position:absolute!important;top:0!important;left:0!important;width:100%!important;margin:0!important;padding:24px!important;background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important}
+ #quote-print-sheet h2{font:700 25px system-ui,sans-serif;margin:0 0 15px}
+ #quote-print-sheet p{color:#333;font:13px/1.5 system-ui,sans-serif;margin:8px 0 15px}
+ #quote-print-sheet table{width:100%;border-collapse:collapse;margin:18px 0}
+ #quote-print-sheet th,#quote-print-sheet td{padding:10px;border-bottom:1px solid #ccd2dc;text-align:left;font:13px system-ui,sans-serif}
+ #quote-print-sheet th{font-weight:650;width:65%}
+ @page{size:auto;margin:14mm}
+}
