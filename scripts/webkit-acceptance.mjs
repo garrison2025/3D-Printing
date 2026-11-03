@@ -21,7 +21,7 @@ async function visit(route){
 }
 async function noOverflow(){
  const sizes=await page.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth}));
- assert.ok(sizes.scroll<=sizes.inner+2,'iPhone WebKit overflow '+JSON.stringify(sizes));
+ const offenders=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2?[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.right>innerWidth+2&&r.width>0}).slice(0,8).map(el=>({tag:el.tagName,className:String(el.className).slice(0,80),right:Math.round(el.getBoundingClientRect().right)})):[]);assert.ok(sizes.scroll<=sizes.inner+2,'iPhone WebKit overflow '+JSON.stringify(sizes)+'; offenders='+JSON.stringify(offenders));
 }
 await check('iPhone-sized WebKit homepage paints and defaults to real checkout',async()=>{
  await visit('/');await page.locator('#reset-button').click();
