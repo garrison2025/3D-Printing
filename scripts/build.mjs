@@ -96,6 +96,7 @@ fs.copyFileSync(path.join(root,'src/assets/refinement.css'),path.join(dst,'asset
 fs.copyFileSync(path.join(root,'src/assets/finish.css'),path.join(dst,'assets/finish.css'));
 fs.copyFileSync(path.join(root,'src/downloads/3d-print-cost-calculator-template.xlsx'),path.join(dst,'assets/3d-print-cost-calculator-template.xlsx'));
 fs.copyFileSync(path.join(root,'src/assets/app.mjs'),path.join(dst,'assets/app.mjs'));
+fs.copyFileSync(path.join(root,'src/lib/quote-precision.mjs'),path.join(dst,'assets/quote-precision.mjs'));
 fs.copyFileSync(path.join(root,'src/assets/xlsx-personalize.mjs'),path.join(dst,'assets/xlsx-personalize.mjs'));
 fs.copyFileSync(path.join(root,'src/assets/seo-tools.css'),path.join(dst,'assets/seo-tools.css'));
 fs.copyFileSync(path.join(root,'src/assets/seo-tools.mjs'),path.join(dst,'assets/seo-tools.mjs'));

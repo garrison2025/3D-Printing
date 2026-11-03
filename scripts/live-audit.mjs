@@ -53,7 +53,7 @@ try{
  if(staging)check(!r.content.includes('<loc>'),'staging sitemap has no indexable URL');
  else for(const route of routes)check(r.content.includes('<loc>'+origin+route+'</loc>'),'sitemap lists '+route);
 }catch(err){check(false,'sitemap fetch failed: '+err.message)}
-for(const file of ['/assets/app.mjs','/assets/site.css','/assets/finish.css','/assets/3d-print-cost-calculator-template.xlsx','/favicon.svg']){
+for(const file of ['/assets/app.mjs','/assets/quote-precision.mjs','/assets/calculations.mjs','/assets/xlsx-personalize.mjs','/assets/site.css','/assets/finish.css','/assets/3d-print-cost-calculator-template.xlsx','/favicon.svg']){
  try{const r=await request(file);check(r.response.status===200,file+' loads')}
  catch(err){check(false,file+' fetch failed: '+err.message)}
 }

@@ -76,4 +76,10 @@ if(homepage.includes('<meta name="robots" content="index,follow">')){
  pass(!/<loc>/.test(sitemapText),'staging sitemap is empty');
  pass(fs.readFileSync(path.join(base,'_headers'),'utf8').includes('X-Robots-Tag: noindex, nofollow'),'staging sends noindex HTTP header');
 }
+// Verify emitted source-module graph to detect missing assets before deployment.
+for(const file of fs.readdirSync(path.join(base,'assets')).filter(x=>x.endsWith('.mjs'))){
+ const full=path.join(base,'assets',file),js=fs.readFileSync(full,'utf8');
+ for(const [,rel] of js.matchAll(/\b(?:from\s*|import\s*\(\s*)['"](\.[^'"]+)['"]/g))
+  pass(fs.existsSync(path.resolve(path.dirname(full),rel)),file+' resolves local JavaScript import '+rel);
+}
 console.log('PASS',count,'static build assertions');

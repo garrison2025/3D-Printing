@@ -52,3 +52,10 @@ test('profit over production cost is disclosed separately from revenue margin',(
  assert.match(app,/markupOnProductionCost/);
  assert.match(app,/profitOverProductionCost/);
 });
+
+test('build includes every local JavaScript module and offline preview resolves quote code',()=>{
+ assert.match(build,/src\/lib\/quote-precision\.mjs/);
+ assert.match(offline,/dist\/assets\/quote-precision\.mjs/);
+ assert.match(fs.readFileSync(new URL('../scripts/audit.mjs',import.meta.url),'utf8'),/resolves local JavaScript import/);
+ assert.match(fs.readFileSync(new URL('../scripts/live-audit.mjs',import.meta.url),'utf8'),/\/assets\/quote-precision\.mjs/);
+});

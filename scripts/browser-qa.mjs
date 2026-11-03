@@ -10,6 +10,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-
 const context=await browser.newContext({acceptDownloads:true});
 const page=await context.newPage();page.setDefaultTimeout(13000);
 page.on('pageerror',e=>errors.push(e.message));
+page.on('response',r=>{if(r.url().includes('/assets/')&&r.status()>=400)errors.push('Missing resource '+r.status()+' '+r.url());});
 async function run(name,fn){try{await fn();results.push({name,ok:true});console.log('PASS '+name)}catch(e){results.push({name,ok:false,error:e.message});console.error('FAIL '+name+': '+e.message)}}
 async function visit(route){await page.goto(new URL(route,origin).href,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForTimeout(150)}
 async function noOverflow(){const a=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth,form:document.querySelector('#cost-form')?.getBoundingClientRect().width}));assert.ok(a.scroll<=a.w+2,'horizontal overflow '+a.scroll+' > '+a.w);if(a.form!=null)assert.ok(a.form>Math.min(280,a.w*.68),'form width '+a.form)}
