@@ -3,14 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       site_url:
-        description: Public HTTPS preview now; owned production domain later
+        description: Live owned domain (preview branches may still use staging mode)
         required: true
-        default: https://3d-printing-1r7.pages.dev
+        default: https://3dprintcostcalculator.org
         type: string
       mode:
         description: Check prelaunch noindex or approved production indexing
         required: true
-        default: staging
+        default: production
         type: choice
         options:
           - staging
@@ -34,8 +34,8 @@ jobs:
       - name: Verify deployed commit and staging SEO without third-party APIs
         id: deploy_smoke
         env:
-          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
-          MODE: ${{ inputs.mode || 'staging' }}
+          SITE_URL: ${{ inputs.site_url || 'https://3dprintcostcalculator.org' }}
+          MODE: ${{ inputs.mode || 'production' }}
           EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
         run: |
           for attempt in 1 2 3 4 5 6; do
@@ -49,14 +49,14 @@ jobs:
           exit 1
       - name: Install CI-only Chrome controller
         run: npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1 axe-core@4.14.0 lighthouse@13.6.0
-      - name: Browser QA on real Cloudflare preview
+      - name: Browser QA on live Cloudflare target
         env:
-          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+          SITE_URL: ${{ inputs.site_url || 'https://3dprintcostcalculator.org' }}
         run: node scripts/browser-qa.mjs "$SITE_URL"
       - name: Independent customer checkout, Excel and print acceptance on live Cloudflare
         env:
-          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
-          MODE: ${{ inputs.mode || 'staging' }}
+          SITE_URL: ${{ inputs.site_url || 'https://3dprintcostcalculator.org' }}
+          MODE: ${{ inputs.mode || 'production' }}
         run: node scripts/release-acceptance.mjs "$SITE_URL" "$MODE"
       - name: Check browser-personalized XLSX is standards-compliant XML
         run: python3 scripts/validate-xlsx-xml.py qa-fixtures/edited-current-inputs.xlsx
@@ -75,12 +75,12 @@ jobs:
       - name: Safari-like WebKit checks in iPhone-sized browser (not physical iOS)
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
-          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+          SITE_URL: ${{ inputs.site_url || 'https://3dprintcostcalculator.org' }}
         run: node scripts/webkit-acceptance.mjs "$SITE_URL"
       - name: Measure mobile and desktop Lighthouse on Cloudflare
         if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
-          SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
+          SITE_URL: ${{ inputs.site_url || 'https://3dprintcostcalculator.org' }}
         run: |
           mkdir -p qa-lighthouse
           npx --no-install lighthouse "$SITE_URL/" --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --only-categories=performance,accessibility,best-practices --output=json --output-path=qa-lighthouse/home-mobile.json

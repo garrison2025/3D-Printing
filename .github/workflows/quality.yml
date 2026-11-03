@@ -57,6 +57,11 @@ jobs:
         run: |
           SITE_URL=https://3dprintcostcalculator.org ENABLE_INDEXING=1 npm run build
           node scripts/audit.mjs
+          # Exact Pages main build with old environment variables must index owned domain.
+          CF_PAGES=1 CF_PAGES_BRANCH=main SITE_URL=https://3d-printing-1r7.pages.dev ENABLE_INDEXING=0 npm run build
+          node scripts/audit.mjs
+          node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('dist/build-manifest.json'));if(!m.indexable||m.canonicalOrigin!=='https://3dprintcostcalculator.org')process.exit(1)"
+
       - name: Checkout pinned Website Starter Standard SEO auditor
         uses: actions/checkout@v4
         with:
