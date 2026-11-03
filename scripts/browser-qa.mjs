@@ -17,7 +17,7 @@ async function expectedRobots(){
  return manifest.indexable?'index,follow':'noindex,nofollow';
 }
 async function visit(route){await page.goto(new URL(route,origin).href,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForTimeout(150)}
-async function noOverflow(){const a=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth,form:document.querySelector('#cost-form')?.getBoundingClientRect().width}));assert.ok(a.scroll<=a.w+2,'horizontal overflow '+a.scroll+' > '+a.w);if(a.form!=null)assert.ok(a.form>Math.min(280,a.w*.68),'form width '+a.form)}
+async function noOverflow(){const a=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth,form:document.querySelector('#cost-form')?.getBoundingClientRect().width}));const offenders=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2?[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.right>innerWidth+2&&r.width>0}).slice(0,8).map(el=>({tag:el.tagName,className:String(el.className).slice(0,80),right:Math.round(el.getBoundingClientRect().right)})):[]);assert.ok(a.scroll<=a.w+2,'horizontal overflow '+a.scroll+' > '+a.w+'; offenders='+JSON.stringify(offenders));if(a.form!=null)assert.ok(a.form>Math.min(280,a.w*.68),'form width '+a.form)}
 async function shot(name){await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,left:0,behavior:'instant'})});await page.waitForTimeout(120);await page.screenshot({path:'qa-screenshots/'+name+'.png',fullPage:true,animations:'disabled'})}
 try{
  for(const width of [360,390,768,1024,1440])await run('Homepage '+width+'px responsive',async()=>{
