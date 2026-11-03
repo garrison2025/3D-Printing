@@ -16,11 +16,19 @@ for(const route of routes){
  const website=graph.find(x=>x['@type']==='WebSite');
  const webpage=graph.find(x=>x['@type']==='WebPage');
  pass(!!website && website['@id']===canonicalOriginFor('/',fs.readFileSync(path.join(base,'index.html'),'utf8'))+'#website','schema website ID '+route);
+ pass(graph.filter(x=>x['@type']==='WebSite').length===1,'exactly one WebSite entity '+route);
+ pass(graph.filter(x=>x['@type']==='WebPage').length===1,'exactly one WebPage entity '+route);
+ const canonical=canonicalOriginFor(route,html);
+ pass(html.includes('<meta property="og:url" content="'+canonical+'">'),'og:url matches canonical '+route);
+ pass(html.includes('<meta property="og:image" content="'+new URL(canonical).origin+'/og-card.png">'),'social preview image uses owned canonical domain '+route);
+ pass(html.includes('<meta name="twitter:card" content="summary_large_image">'),'twitter card metadata '+route);
  pass(!!webpage && webpage.url===canonicalOriginFor(route,html),'schema webpage canonical URL '+route);
  pass(webpage?.isPartOf?.['@id']===website?.['@id'],'WebPage points to website entity '+route);
  if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/'].includes(route)){
   const application=graph.find(x=>x['@type']==='WebApplication');
   pass(!!application && application.url===webpage.url && webpage.mainEntity?.['@id']===application['@id'],'WebApplication matches visible calculator '+route);
+  pass(application?.isAccessibleForFree===true&&application?.offers?.price===0,'free tool offer reflects browser-only calculator '+route);
+  pass(graph.filter(x=>x['@type']==='WebApplication').length===1,'one WebApplication per actual tool '+route);
  }
  if(['/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/'].includes(route)){
   pass(html.includes('class="geo-answer"'),'readable answer block '+route);
@@ -29,6 +37,10 @@ for(const route of routes){
  if(['/filament-cost-calculator/','/3d-printing-cost-per-hour/','/3d-print-pricing-calculator/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/','/calculation-methodology/','/3d-print-cost-calculator-excel/'].includes(route)){
   const breadcrumb=graph.find(x=>x['@type']==='BreadcrumbList');
   pass(!!breadcrumb && breadcrumb.itemListElement?.length===2,'breadcrumb markup backed by visible navigation '+route);
+  const entries=breadcrumb?.itemListElement||[];
+  pass(entries[0]?.position===1 && entries[0]?.item===canonicalOriginFor('/',fs.readFileSync(path.join(base,'index.html'),'utf8')),'breadcrumb root uses homepage canonical '+route);
+  pass(entries[1]?.position===2 && entries[1]?.item===canonicalOriginFor(route,html),'breadcrumb child uses page canonical '+route);
+  pass(Boolean(entries[0]?.name)&&Boolean(entries[1]?.name),'breadcrumb names are present '+route);
  }
 
  const schema=html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];pass(!!JSON.parse(schema),'parse jsonld '+route);

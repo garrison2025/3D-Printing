@@ -5,6 +5,7 @@
  * green code-build status. With --strict, blockers fail the audit.
  */
 import fs from 'node:fs';
+import {assessPreviewRoute} from './seo-preview-policy.mjs';
 
 const ORIGIN='https://3dprintcostcalculator.org';
 const PREVIEW='https://3d-printing-1r7.pages.dev';
@@ -19,14 +20,14 @@ const fail=(why)=>failures.push(why);
 const block=(why)=>blockers.push(why);
 const warn=(why)=>warnings.push(why);
 const extract=(html,re)=>html.match(re)?.[1]||'';
-async function get(url){
+async function get(url,{redirect='follow'}={}){
  try{
   const response=await fetch(url,{
-   redirect:'follow',signal:AbortSignal.timeout(17000),
+   redirect,signal:AbortSignal.timeout(17000),
    headers:{'User-Agent':'PrintCostOwnedDomainSEOAudit/1.0'}
   });
   return {status:response.status,url:response.url,
-   xrobots:response.headers.get('x-robots-tag')||'',
+   xrobots:response.headers.get('x-robots-tag')||'',location:response.headers.get('location')||'',
    text:await response.text()};
  }catch(error){return {status:0,url,xrobots:'',text:'',error:String(error?.message||error)}}
 }
@@ -81,10 +82,14 @@ if(production){
  if(locs.length!==ROUTES.length||new Set(locs).size!==ROUTES.length||ROUTES.some(r=>!locs.includes(ORIGIN+r)))fail('Production sitemap missing, duplicated or foreign canonical URLs');
 }else if(locs.length)fail('Staging sitemap contains discoverable URLs; expected zero');
 if(notfound.status!==404||!/noindex,nofollow/.test(notfound.text))fail('Unknown page must return actual HTTP 404 with noindex HTML');
-if(preview.status>=300&&preview.status<400)warn('Preview redirects but the fetch client followed it; verify redirect location separately');
-else if(preview.status===200 && !/noindex/i.test(preview.xrobots)){
-  fail('Preview alias returns HTTP 200 without X-Robots-Tag noindex; configure a 301 to the owned domain or enforce host-specific noindex');
+const previewRoutes=['/','/filament-cost-calculator/'];
+const previewDirect=await Promise.all(previewRoutes.map(route=>get(PREVIEW+route,{redirect:'manual'})));
+const previewAssessments=previewDirect.map((reply,i)=>assessPreviewRoute(reply,PREVIEW,ORIGIN,previewRoutes[i]));
+for(let i=0;i<previewAssessments.length;i++){
+ const assessment=previewAssessments[i];
+ if(!assessment.ok)fail('Unsafe preview alias '+previewRoutes[i]+': '+assessment.detail);
 }
+
 const report=[
  '# PrintCost Studio — real production-origin SEO inspection',
  'Origin: '+ORIGIN,'Live manifest commit: '+String(manifest.commit||'unknown'),
@@ -98,7 +103,7 @@ const report=[
  '',
  'Sitemap URLs: '+locs.length+'; expected after release: '+ROUTES.length,
  'robots.txt includes production sitemap: '+robot.text.includes('Sitemap: '+ORIGIN+'/sitemap.xml'),
- 'Preview alias HTTP: '+preview.status+'; X-Robots-Tag: '+(preview.xrobots||'(none)'),
+ 'Preview aliases: '+previewAssessments.map((item,i)=>previewRoutes[i]+' '+(item.ok?'SAFE':'UNSAFE')+' ['+item.detail+']').join('; '),
  '',
  ...blockers.map(s=>'BLOCKER — '+s),
  ...failures.map(s=>'FAIL — '+s),
