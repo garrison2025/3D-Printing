@@ -57,6 +57,12 @@ pass(quotePage.includes('id="price-quote-results"'),'dedicated pricing results e
 pass(quotePage.includes('src="/assets/pricing-quote.mjs"'),'quote calculator loads functional script');
 pass(fs.existsSync(path.join(base,'assets/pricing-quote.mjs')),'quote calculator browser module ships');
 pass(fs.readFileSync(path.join(base,'index.html'),'utf8').includes('href="/3d-print-pricing-calculator/"'),'home visibly links to quote tool');
+const homeMainNav=homepageNavigation=>homepageNavigation.match(/<nav class="nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';
+const homeNav=homeMainNav(fs.readFileSync(path.join(base,'index.html'),'utf8'));
+pass(homeNav.includes('href="/3d-print-pricing-calculator/"')&&homeNav.includes('>Price calculator</a>'),'home nav prioritizes validated selling-price calculator intent');
+const pricingGuideCTA=fs.readFileSync(path.join(base,'how-to-price-3d-prints/index.html'),'utf8');
+pass(pricingGuideCTA.includes('href="/3d-print-pricing-calculator/" class="primary-link"'),'seller guide CTA opens dedicated pricing tool');
+
 const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8'));
 pass(map.keywords.length===131,'131 source keywords');
 for(const group of ['P0','P1','P2','EXCLUDE'])pass(map.keywords.some(k=>k.priority===group),'group '+group);
