@@ -87,6 +87,19 @@ try{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.locator('[data-mode="cost"]').click();
  });
+ await run('V2 below-fold reveal animates only after scroll; readable before it starts',async()=>{
+  await page.setViewportSize({width:390,height:844});await visit('/');
+  const card=page.locator('.info-card').first();
+  const first=await card.evaluate(el=>({display:getComputedStyle(el).display,opacity:getComputedStyle(el).opacity}));
+  assert.notEqual(first.display,'none');
+  assert.ok(Number(first.opacity)>.5,'SEO content hidden pending motion observer');
+  await card.scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>document.querySelector('.info-card')?.classList.contains('in-view'));
+  const animated=await card.evaluate(el=>getComputedStyle(el).animationName);
+  assert.ok(animated.includes('pcs-v2-reveal'),'scroll did not activate subtle V2 entrance animation: '+animated);
+  await page.screenshot({path:'qa-screenshots/v2-scroll-cards.png',fullPage:true,animations:'disabled'});
+  await visit('/');
+ });
  await run('Real-time calculation',async()=>{const before=await page.locator('#result-focus-value').innerText();await page.locator('input[name="usedGrams"]').fill('145');await page.waitForFunction(x=>document.querySelector('#result-focus-value')?.textContent!==x,before)});
  await run('Selling-price mode',async()=>{await page.locator('[data-mode="pricing"]').click();assert.equal(await page.locator('[data-mode="pricing"]').getAttribute('aria-pressed'),'true')});
  await run('Batch quote rows',async()=>{

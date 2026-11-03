@@ -45,6 +45,14 @@ jobs:
           done
           node scripts/browser-qa.mjs http://127.0.0.1:4173
           node scripts/webkit-acceptance.mjs http://127.0.0.1:4173
+      - name: Upload accepted local Chrome and WebKit screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printcost-v2-local-screenshots
+          path: qa-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Custom-domain publication simulation (not deployed)
         run: |
           SITE_URL=https://example.org ENABLE_INDEXING=1 npm run build
