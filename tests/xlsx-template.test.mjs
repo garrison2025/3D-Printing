@@ -51,7 +51,7 @@ test('client-side Excel export preserves editable formulas and includes changed 
  const content=Buffer.from(personalized).toString('utf8');
  assert.match(content,/<x:c r="B8"[^>]*><x:v>145<\/x:v><\/x:c>/);
  assert.match(content,/<x:c r="B22"[^>]*><x:v>9<\/x:v><\/x:c>/);
- assert.match(content,/<x:c r="A9"[^>]*><x:v>9<\/x:v><\/x:c>/);
+ assert.match(content,/<x:c r="A9"[^>]*><x:f>[^<]+<\/x:f><x:v>9<\/x:v><\/x:c>/);
  assert.match(content,/<x:f>IFERROR\(G11\/\(1-B17\),0\)<\/x:f>/);
  assert.match(content,/forceFullCalc="1"/);
 });
