@@ -4,6 +4,7 @@ const map=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8
 const rows=map.keywords;
 const validRoutes=new Map([
  ['/',{kind:'home',marker:'id="cost-form"'}],
+ ['/3d-print-pricing-calculator/',{kind:'pricing',marker:'data-pricing-calculator'}],
  ['/filament-cost-calculator/',{kind:'filament',marker:'data-seo-calculator="filament"'}],
  ['/3d-printing-cost-per-hour/',{kind:'hourly',marker:'data-seo-calculator="hourly"'}],
  ['/how-much-does-3d-printing-cost/',{kind:'cost-guide',marker:'Worked'}],
@@ -26,8 +27,8 @@ for(const row of rows){
  active++;
  assert(Number.isFinite(row.us_volume),'No supplied volume for '+row.keyword);
  assert(Number.isFinite(row.kd),'No supplied keyword difficulty for '+row.keyword);
- const pricing=row.destination==='/'+' (pricing mode)';
- const destination=pricing?'/':row.destination;
+ const pricing=row.destination==='/3d-print-pricing-calculator/';
+ const destination=row.destination;
  const spec=validRoutes.get(destination);
  assert(Boolean(spec),'No approved destination for '+row.keyword+' -> '+row.destination);
  if(!spec)continue;
@@ -39,8 +40,8 @@ for(const row of rows){
  assert(html.includes(spec.marker),'Missing '+spec.kind+' functionality on '+destination);
  assert(html.includes('<meta name="description"'),'Missing metadata on '+destination);
  if(pricing){
-  assert(homepage.includes('id="pricing"'),'Pricing mode deep link missing');
-  assert(app.includes("location.hash==='#pricing'"),'Pricing deep link is not activated');
+  assert(html.includes('id="price-quote-results"'),'Dedicated pricing results not found');
+  assert(html.includes('href="/how-to-price-3d-prints/"'),'Pricing tool must link methodology guide');
  }
 }
 
@@ -49,6 +50,7 @@ const excelTerms=rows.filter(x=>['3d printing cost calculator excel','3d printin
 assert(excelTerms.length===2&&excelTerms.every(x=>x.destination==='/3d-print-cost-calculator-excel/'),'Two source P2 spreadsheet terms must map to live downloadable resource');
 const intentProof={
  '/': ['id="cost-form"','id="pricing"','EXPECTED COST PER ITEM','Required order gross'],
+ '/3d-print-pricing-calculator/': ['data-pricing-calculator','id="price-quote-results"','Required customer gross','whole-cent'],
  '/filament-cost-calculator/': ['data-seo-calculator="filament"','Material cost per gram','second filament','Material cost per item'],
  '/3d-printing-cost-per-hour/': ['data-seo-calculator="hourly"','Maintenance','Machine allocation per hour','electricity'],
  '/how-much-does-3d-printing-cost/': ['Worked example','slicer','Electricity','failed'],
@@ -75,3 +77,8 @@ const report=[
 console.log(report);
 if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,report+'\n');
 if(errors.length)process.exitCode=1;
+
+const pricingMapped=rows.filter(r=>r.destination==='/3d-print-pricing-calculator/'&&['P0','P1'].includes(r.priority));
+assert(pricingMapped.length===20,'Exactly 20 price/quote intents map to dedicated calculator');
+assert(homepage.includes('href="/3d-print-pricing-calculator/"'),'Homepage links dedicated price calculator');
+assert(app.includes("location.hash==='#pricing'"),'Original homepage pricing deep-link works');

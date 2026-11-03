@@ -31,13 +31,14 @@ The `pages.dev` hostname remains a **preview alias**. The site owner's domain is
 - `/` — the complete FDM cost/pricing/filament calculator; one canonical tool page
 - `/how-much-does-3d-printing-cost/` — unique explanatory cost guide
 - `/how-to-price-3d-prints/` — unique seller pricing guide
+- `/3d-print-pricing-calculator/` — independent known-unit-cost calculator for customer quote, quantity, fees, shipping and margin
 - `/filament-cost-calculator/` — real per-gram/material cost tool
 - `/3d-printing-cost-per-hour/` — real per-hour electricity and machine allocation tool
 - `/calculation-methodology/` — transparent formula reference, assumptions and inspectable source links
 - `/3d-print-cost-calculator-excel/` — distinct editable offline XLSX download and usage guide (two source P2 intents)
 - `/about/`, `/privacy/`, `/contact/` — site support and truthful policies
 
-No generated near-duplicate landing pages. Search-intent assignments for 131 exact US keyword strings, including source metrics and competitor ranking fields, are in `src/content/keyword-intent-map.json` and described in `docs/RESEARCH-HANDOFF.md`.
+No generated near-duplicate landing pages. The new pricing calculator covers 20 existing price/quote keyword intents while the homepage retains distinct slicer-based FDM production cost estimation. Search-intent assignments for 131 exact US keyword strings, including source metrics and competitor ranking fields, are in `src/content/keyword-intent-map.json` and described in `docs/RESEARCH-HANDOFF.md`.
 
 ## Product details
 
