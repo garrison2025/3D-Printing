@@ -10,4 +10,11 @@ const sheet=files['xl/worksheets/sheet1.xml'],batch=files['xl/worksheets/sheet2.
 function formulas(xml,refs){return Object.fromEntries(refs.map(ref=>{const c=xml.match(new RegExp('<x:c r="'+ref+'"[^>]*>[\\s\\S]*?<\\/x:c>'))?.[0]||'';return [ref,{formula:c.match(/<x:f>([^<]+)<\/x:f>/)?.[1]||null,cell:c.slice(0,250)}]}))}
 console.log('WORKBOOK_FORMULA_AUDIT '+JSON.stringify({main:formulas(sheet,['G9','G11','G12','G14','G15','G16','G17','G18','G19','G20','G21','G22','G23']),batch:formulas(batch,['B5','C5','D5','E5','F5','B6','E6']),lastSheetRow:[...sheet.matchAll(/<x:row r="(\d+)"/g)].map(x=>Number(x[1])).at(-1)}));
 
-console.log('WORKBOOK_INPUT_ROW_STRUCTURE '+JSON.stringify([25,26,27,28].map(n=>{const r=[...sheet.matchAll(new RegExp('<x:row r="'+n+'"[^>]*>[\\s\\S]*?<\\/x:row>','g'))].map(x=>x[0]);return {row:n,count:r.length,cells:r.flatMap(xml=>[...xml.matchAll(/<x:c r="([A-Z]+[0-9]+)"/g)].map(x=>x[1])),samples:r.map(x=>x.slice(0,420))}}))));
+const inspectRows=[];
+for(const n of [25,26,27,28]){
+ const startTag='<x:row r="'+n+'"', count=sheet.split(startTag).length-1;
+ const start=sheet.indexOf(startTag),end=sheet.indexOf('</x:row>',start);
+ const row=start>=0&&end>start?sheet.slice(start,end+8):'';
+ inspectRows.push({row:n,count,cells:[...row.matchAll(/<x:c r="([A-Z]+[0-9]+)"/g)].map(x=>x[1])});
+}
+console.log('WORKBOOK_INPUT_ROW_STRUCTURE '+JSON.stringify(inspectRows));
