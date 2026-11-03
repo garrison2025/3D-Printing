@@ -66,6 +66,11 @@ for(const [tier,count] of Object.entries({P0:25,P1:62,P2:7,EXCLUDE:37}))
  assert(counts[tier]===count,'Priority '+tier+': '+counts[tier]+' vs '+count);
 assert(active===87,'Expected 87 approved active keyword mappings');
 assert(rows.find(r=>r.keyword==='cost of pla per gram')?.destination==='/filament-cost-calculator/','PLA per-gram intent should go to dedicated tool');
+const pricingMapped=rows.filter(r=>r.destination==='/3d-print-pricing-calculator/'&&['P0','P1'].includes(r.priority));
+assert(pricingMapped.length===20,'Exactly 20 price/quote intents map to dedicated calculator');
+assert(homepage.includes('href="/3d-print-pricing-calculator/"'),'Homepage links dedicated price calculator');
+assert(app.includes("location.hash==='#pricing'"),'Original homepage pricing deep-link works');
+
 const report=[
  '# Keyword implementation audit',
  'Imported: '+rows.length+' unique Semrush US query strings. Active mapped intent: '+active+' P0/P1 terms.',
@@ -78,7 +83,3 @@ console.log(report);
 if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,report+'\n');
 if(errors.length)process.exitCode=1;
 
-const pricingMapped=rows.filter(r=>r.destination==='/3d-print-pricing-calculator/'&&['P0','P1'].includes(r.priority));
-assert(pricingMapped.length===20,'Exactly 20 price/quote intents map to dedicated calculator');
-assert(homepage.includes('href="/3d-print-pricing-calculator/"'),'Homepage links dedicated price calculator');
-assert(app.includes("location.hash==='#pricing'"),'Original homepage pricing deep-link works');

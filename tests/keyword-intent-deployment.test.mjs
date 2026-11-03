@@ -6,7 +6,7 @@ test('PLA price per gram query resolves to an actual material calculator',()=>{
  assert.equal(entry.destination,'/filament-cost-calculator/');
 });
 test('all priority 0 and 1 keywords have an implemented on-site destination',()=>{
- const valid=new Set(['/','/ (pricing mode)','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/']);
+ const valid=new Set(['/','/3d-print-pricing-calculator/','/filament-cost-calculator/','/3d-printing-cost-per-hour/','/how-much-does-3d-printing-cost/','/how-to-price-3d-prints/']);
  for(const r of keywords.filter(x=>x.priority==='P0'||x.priority==='P1'))
   assert.ok(valid.has(r.destination),r.keyword+': '+r.destination);
 });
