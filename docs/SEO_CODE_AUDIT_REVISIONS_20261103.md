@@ -21,3 +21,8 @@ Inspected the real static generator (\`scripts/build.mjs\`, \`scripts/seo-pages.
 - Cloudflare absolute-URL \`_headers\` and \`:version\` placeholder syntax: https://developers.cloudflare.com/pages/configuration/headers/
 - Cloudflare Pages to owned domain redirects: https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/
 - Google breadcrumb markup: https://developers.google.com/search/docs/appearance/structured-data/breadcrumb
+
+## Cross-check added: sitemap ↔ validators ↔ keyword route registry
+A regression test now compares all 11 routes found in the site builder's sitemap, static generated-HTML SEO audit, and real hosted-domain SEO audit. This prevents the common issue where a new useful page is generated but silently absent from the sitemap or from technical inspection. It also requires every imported P0/P1 keyword destination to be a real published route and locks in both Cloudflare preview-alias noindex host rules.
+
+The original 131 keyword records and estimated US search metrics are not changed. This test is a code consistency guarantee, not evidence of organic rankings or indexing.
