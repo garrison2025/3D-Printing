@@ -30,7 +30,7 @@ def patch_file(source,target,edits):
             if info.filename=='xl/worksheets/sheet1.xml':
                 xml=content.decode('utf-8')
                 for ref,val in edits.items():
-                    pattern=re.compile(r'(<x:c\\s+r="'+ref+r'"[^>]*>[\\s\\S]*?<x:v>)([^<]*)(</x:v>)')
+                    pattern=re.compile(r'(<x:c\s+r="'+ref+r'"[^>]*>[\s\S]*?<x:v>)([^<]*)(</x:v>)')
                     xml,n=pattern.subn(lambda m:m.group(1)+str(val)+m.group(3),xml,count=1)
                     assert n==1, f'could not edit {ref}'
                 content=xml.encode('utf-8')
