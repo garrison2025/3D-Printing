@@ -45,12 +45,15 @@ await check('iPhone WebKit can turn local input saving off and on',async()=>{
 });
 await check('iPhone WebKit V2 slider and reduced-motion accessibility',async()=>{
  await visit('/');await page.locator('[data-mode="pricing"]').click();
- await page.waitForTimeout(285);
- const aligned=await page.evaluate(()=>{
-  const tab=document.querySelector('.mode-button[aria-pressed="true"]'),ind=document.querySelector('.mode-indicator');
-  return Boolean(ind&&tab&&Math.abs(ind.getBoundingClientRect().left-tab.getBoundingClientRect().left)<2);
+ await page.waitForTimeout(600);
+ const alignment=await page.evaluate(()=>{
+  const tab=document.querySelector('.mode-button[aria-pressed="true"]'),ind=document.querySelector('.mode-indicator'),bar=document.querySelector('.mode-bar');
+  if(!tab||!ind||!bar)return {missing:true};
+  const tr=tab.getBoundingClientRect(),ir=ind.getBoundingClientRect(),br=bar.getBoundingClientRect();
+  return {missing:false,diff:ir.left-tr.left,tabLeft:tr.left,indicatorLeft:ir.left,widthDiff:ir.width-tr.width,barLeft:br.left,transform:getComputedStyle(ind).transform,pressed:tab.getAttribute('data-mode')};
  });
- assert.equal(aligned,true,'Safari engine active mode indicator does not align');
+ assert.equal(alignment.missing,false,'Safari indicator not created: '+JSON.stringify(alignment));
+ assert.ok(Math.abs(alignment.diff)<2&&Math.abs(alignment.widthDiff)<2,'Safari mode indicator misaligned: '+JSON.stringify(alignment));
  await page.emulateMedia({reducedMotion:'reduce'});
  const disabled=await page.locator('.mode-indicator').evaluate(el=>getComputedStyle(el).transitionDuration);
  assert.ok(disabled.split(',').every(x=>parseFloat(x)===0));

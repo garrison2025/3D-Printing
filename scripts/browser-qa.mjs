@@ -85,6 +85,7 @@ try{
   assert.ok(styles.tab.split(',').every(v=>parseFloat(v)===0),'indicator still animates under reduced motion');
   assert.ok(styles.row.split(',').every(v=>parseFloat(v)===0),'cost row still animates under reduced motion');
   await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.locator('[data-mode="cost"]').click();
  });
  await run('Real-time calculation',async()=>{const before=await page.locator('#result-focus-value').innerText();await page.locator('input[name="usedGrams"]').fill('145');await page.waitForFunction(x=>document.querySelector('#result-focus-value')?.textContent!==x,before)});
  await run('Selling-price mode',async()=>{await page.locator('[data-mode="pricing"]').click();assert.equal(await page.locator('[data-mode="pricing"]').getAttribute('aria-pressed'),'true')});
