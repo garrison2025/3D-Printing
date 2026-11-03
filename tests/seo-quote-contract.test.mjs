@@ -4,7 +4,8 @@ import fs from 'node:fs';
 const build=fs.readFileSync(new URL('../scripts/build.mjs',import.meta.url),'utf8');
 const map=JSON.parse(fs.readFileSync(new URL('../src/content/keyword-intent-map.json',import.meta.url),'utf8'));
 test('twenty validated pricing/quote intents route to one functional dedicated page',()=>{
- assert.equal(map.keywords.filter(x=>x.destination==='/3d-print-pricing-calculator/').length,20);
+ assert.equal(map.keywords.filter(x=>x.destination==='/3d-print-pricing-calculator/'&&['P0','P1'].includes(x.priority)).length,20);
+ assert.equal(map.keywords.filter(x=>x.destination==='/3d-print-pricing-calculator/').length,21,'one additional P2 intent uses the same functional page');
  assert.ok(!map.keywords.some(x=>x.destination==='/ (pricing mode)'));
  assert.match(build,/pricingQuotePage\(\)/);
  assert.match(build,/href="\/3d-print-pricing-calculator\/"/);
