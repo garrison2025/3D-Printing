@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify deployed commit and staging SEO without third-party APIs
+        id: deploy_smoke
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
           MODE: ${{ inputs.mode || 'staging' }}
@@ -53,6 +54,7 @@ jobs:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: node scripts/browser-qa.mjs "$SITE_URL"
       - name: Measure mobile and desktop Lighthouse on Cloudflare
+        if: ${{ !cancelled() && steps.deploy_smoke.outcome == 'success' }}
         env:
           SITE_URL: ${{ inputs.site_url || 'https://3d-printing-1r7.pages.dev' }}
         run: |

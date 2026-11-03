@@ -230,3 +230,14 @@ body{background:#f5f7fb;color:var(--finish-ink)}
 /* Hide the keyboard skip-link offscreen until specifically focused. The
    mobile full-document screenshot should never show a phantom skip-link. */
 .skip-link:not(:focus-visible) { transform: translateY(-210%); }
+
+/* A11y: WCAG color-contrast pass. Avoid faint gray microcopy on pale surfaces. */
+.example-note,.scenario-label,.scenario-note,.field-hint,
+.form-panel .panel-description,.saved-state,.disclaimer,
+.editorial .intro,.editorial p,.editorial li,
+.section-lead,.hero-bullets span,
+.quote-settings-copy span,.extra-stats small,
+.result-body .breakdown-list li,.result-body .cost-insight,
+.result-body .disclaimer {color:#3e526a!important}
+.geo-answer .geo-eyebrow,.geo-answer .geo-source,.geo-answer .geo-proof{color:#3d526e!important}
+@media(max-width:620px){.example-note,.scenario-note,.scenario-label{color:#354962!important}}

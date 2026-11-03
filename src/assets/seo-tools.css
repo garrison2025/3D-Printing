@@ -32,3 +32,9 @@
 @media(max-width:900px){.seo-tool-grid{grid-template-columns:minmax(0,1fr)}.seo-tool-output{position:static}}
 @media(max-width:560px){.seo-tool-grid{gap:13px}.seo-tool-form,.seo-tool-output{padding:17px}.seo-tool-fields,.seo-tool-advanced .seo-tool-fields{grid-template-columns:minmax(0,1fr);gap:16px}.seo-tool-output .seo-row{align-items:center}.seo-row strong{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.seo-tool-control{transition:none}}
+
+/* WCAG A/AA: contrasting helper text on near-white panels */
+.seo-breadcrumb,.seo-tool-field p,.seo-tool-help,
+.seo-tool-form>p,.seo-tool-advanced>p,.seo-row span,
+.seo-tool-article .intro,.seo-explanation p {color:#3d526b!important}
+.seo-tool-output .seo-row strong{color:#123a6d}

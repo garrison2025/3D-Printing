@@ -67,7 +67,7 @@ try{
    await page.addScriptTag({path:'node_modules/axe-core/axe.min.js'});
    const result=await page.evaluate(async()=>window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
    for(const issue of result.violations){
-    violations.push(route+' '+issue.id+' '+issue.impact+' '+issue.nodes.slice(0,3).map(n=>n.target.join(' ')).join(', '));
+    violations.push(route+' '+issue.id+' '+issue.impact+' '+issue.nodes.slice(0,35).map(n=>n.target.join(' ')+' ['+(n.failureSummary||'').replaceAll('\\n',' ').slice(0,90)+']').join(', '));
    }
   }
   if(violations.length)throw new Error(violations.join(' | '));
