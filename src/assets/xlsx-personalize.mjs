@@ -1,3 +1,4 @@
+import {practicalUsdQuote} from '../lib/quote-precision.mjs';
 /** Client-only Excel personalization. Preserves Office formulas and existing workbook styling. */
 const encoder=new TextEncoder(),decoder=new TextDecoder();
 export const workbookMime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -14,6 +15,21 @@ function changeCell(xml,ref,value){
  });
  if(hit!==1)throw Error('Missing template cell '+ref);
  return changed;
+}
+/** Wrap only the unit-price formula; every dependent order figure then recalculates from the customer charge.
+ * On hardened sheets this must happen inside (not outside) the input-validation IF guard.
+ */
+function checkoutFormula(xml,cell){
+ const re=new RegExp('<x:c\\s+[^>]*\\br="'+cell+'"[^>]*>[\\s\\S]*?<\\/x:c>');
+ let found=0;
+ const result=xml.replace(re,content=>{
+  found++;
+  if(content.includes('ROUNDUP('))return content;
+  if(!/<x:f>[^<]+<\/x:f>/.test(content))throw Error('Missing checkout formula '+cell);
+  return content.replace(/<x:f>([^<]+)<\/x:f>/,(_full,formula)=>'<x:f>ROUNDUP('+formula+',2)</x:f>');
+ });
+ if(found!==1)throw Error('Missing checkout cell '+cell);
+ return result;
 }
 function crc32(bytes){let c=0xffffffff;for(const n of bytes){c^=n;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
 async function unzip(buffer){
@@ -60,13 +76,15 @@ export async function personalizeWorkbook(template,inputs,calculate){
  const main=get('xl/worksheets/sheet1.xml'),batch=get('xl/worksheets/sheet2.xml');
  let m=decoder.decode(main.data),b=decoder.decode(batch.data);
  for(const [key,cell] of Object.entries(inputCells))m=changeCell(m,cell,current.inputs[key]);
- const calculated={G6:current.costPerGram,G7:current.materialPerPlate,G8:current.energyPerPlate,G9:current.machinePerPlate,G10:current.prepPerPlate,G11:current.attemptCost,G12:current.expectedPlateCost,G13:current.costPerUnit,G14:current.orderExpenses,G15:current.requiredOrderGross,G16:current.recommendedPrice,G17:current.orderGross,G18:current.platformFees,G19:current.netProfit,G20:current.actualMargin??0,G21:current.profitPerUnit,G22:current.markupOnProductionCost??0,G23:current.machineHourly+current.electricityHourly};
+ m=checkoutFormula(m,'G16');for(let row=5;row<=9;row++)b=checkoutFormula(b,'B'+row);
+ const actual=practicalUsdQuote(current);if(!actual)throw Error('Cannot form a whole-cent checkout quote');
+ const calculated={G6:current.costPerGram,G7:current.materialPerPlate,G8:current.energyPerPlate,G9:current.machinePerPlate,G10:current.prepPerPlate,G11:current.attemptCost,G12:current.expectedPlateCost,G13:current.costPerUnit,G14:current.orderExpenses,G15:current.requiredOrderGross,G16:actual.unitPrice,G17:actual.orderGross,G18:actual.platformFees,G19:actual.netProfit,G20:actual.actualMargin??0,G21:actual.netProfit/current.inputs.unitsPerOrder,G22:current.costPerUnit>0?actual.netProfit/current.inputs.unitsPerOrder/current.costPerUnit:0,G23:current.machineHourly+current.electricityHourly};
  for(const [cell,value] of Object.entries(calculated))m=changeCell(m,cell,value);
  [1,5,10,25,current.inputs.unitsPerOrder].forEach((quantity,i)=>{
   const v=calculate({...current.inputs,unitsPerOrder:quantity});
-  if(!v.ok)throw Error('Invalid Excel batch quote');
+  if(!v.ok)throw Error('Invalid Excel batch quote');const cash=practicalUsdQuote(v);if(!cash)throw Error('Invalid cent-safe Excel batch quote');
   const r=i+5;
-  for(const [col,value] of Object.entries({A:quantity,B:v.recommendedPrice,C:v.orderGross,D:v.platformFees,E:v.netProfit,F:v.actualMargin??0}))b=changeCell(b,col+r,value);
+  for(const [col,value] of Object.entries({A:quantity,B:cash.unitPrice,C:cash.orderGross,D:cash.platformFees,E:cash.netProfit,F:cash.actualMargin??0}))b=changeCell(b,col+r,value);
  });
  main.data=encoder.encode(m);batch.data=encoder.encode(b);
  const book=get('xl/workbook.xml'),xml=decoder.decode(book.data);
@@ -104,6 +122,7 @@ export async function hardenWorkbookTemplate(sourceBytes){
   if(found!==1)throw Error('Missing computed cell '+cell);
   return out;
  };
+ m=checkoutFormula(m,'G16');for(let row=5;row<=9;row++)b=checkoutFormula(b,'B'+row);
  for(let row=6;row<=23;row++)m=wrap(m,'G'+row,'$G$26="VALID"');
  for(let row=5;row<=9;row++){
   if(row===9)b=wrap(b,'A9',"'Cost Calculator'!$G$26=\"VALID\"");

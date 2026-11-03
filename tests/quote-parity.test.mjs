@@ -38,15 +38,15 @@ for(const [name,patch] of cases)test(name+': reconcile website, Excel and indepe
  near(f.perPlate,r.materialPerPlate,'filament');near(hourly.total,r.machineHourly+r.electricityHourly,'hourly');
  const bytes=await personalizeWorkbook(original,inputs,calculate);
  const main=getXml(bytes,'xl/worksheets/sheet1.xml'),batch=getXml(bytes,'xl/worksheets/sheet2.xml');
- for(const [cell,n] of Object.entries({G13:r.costPerUnit,G15:r.requiredOrderGross,G16:r.recommendedPrice,G17:r.orderGross,G18:r.platformFees,G19:r.netProfit,G20:r.actualMargin??0}))
+ const cash=practicalUsdQuote(r);
+ for(const [cell,n] of Object.entries({G13:r.costPerUnit,G15:r.requiredOrderGross,G16:cash.unitPrice,G17:cash.orderGross,G18:cash.platformFees,G19:cash.netProfit,G20:cash.actualMargin??0}))
   near(value(main,cell),n,'main '+cell);
  for(const [i,quantity] of [1,5,10,25,inputs.unitsPerOrder].entries()){
   const v=calculate({...inputs,unitsPerOrder:quantity}),row=i+5;
   near(value(batch,'A'+row),quantity,'quantity');
-  near(value(batch,'B'+row),v.recommendedPrice,'price');
-  near(value(batch,'E'+row),v.netProfit,'profit');
+  near(value(batch,'B'+row),practicalUsdQuote(v).unitPrice,'price');
+  near(value(batch,'E'+row),practicalUsdQuote(v).netProfit,'profit');
  }
- const cash=practicalUsdQuote(r);
  assert.ok(cash,'Should represent cash quote');
  assert.ok(cash.unitPrice+1e-10>=r.recommendedPrice,'Cash price below theoretical');
  if(cash.orderGross>0)assert.ok(cash.actualMargin+1e-10>=inputs.margin,'Cash price below target margin');

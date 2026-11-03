@@ -106,6 +106,7 @@ try{
   assert.equal(bytes.subarray(0,2).toString(),'PK');
   assert.match(content,/<x:c r="B8"[^>]*><x:v>145<\/x:v><\/x:c>/);
   assert.match(content,/<x:f>IF\(\$G\$26="VALID",IFERROR\(G11\/\(1-B17\),0\),""\)<\/x:f>/);
+  assert.match(content,/r="G16"[^>]*><x:f>IF\(\$G\$26="VALID",ROUNDUP\(/);
   assert.match(content,/forceFullCalc="1"/);
  });
  await run('Quote rounding shows a cent-safe checkout amount',async()=>{

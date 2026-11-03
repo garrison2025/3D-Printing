@@ -81,7 +81,7 @@ if(form){
   const cashQuote=practicalUsdQuote(r);
   showValue('cash-quote-note',cashQuote?
     'Actual checkout price: '+money(cashQuote.unitPrice)+' per item. Margin at checkout: '+
-    pct(cashQuote.actualMargin)+'. The mathematical quote is '+theoreticalMoney(r.recommendedPrice)+'; Excel formula cells remain full-precision unless labeled checkout.':
+    pct(cashQuote.actualMargin)+'. The mathematical quote is '+theoreticalMoney(r.recommendedPrice)+'; Excel workbook uses the same cent-safe checkout charge; the intermediate required gross remains full-precision.':
     'A safe whole-cent checkout quote is unavailable for this numeric range.');
   showValue('quote-assumptions',`${(inputs.margin*100).toFixed(1)}% target margin · ${(inputs.feeRate*100).toFixed(1)}% fees · ${money(inputs.feeFixed)} per order`);$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=!cashQuote;if($('download-current-xlsx'))$('download-current-xlsx').disabled=!cashQuote;lastValid=cashQuote?r:null;
   let focusLabel,focusVal,focusContext,aLabel,aVal,bLabel,bVal;

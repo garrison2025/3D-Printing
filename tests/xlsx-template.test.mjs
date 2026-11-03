@@ -74,6 +74,7 @@ test('published workbook has editable offline input validation and no misleading
  assert.match(main,/<x:f>IF\(\$G\$26="VALID",IFERROR\(G11\/\(1-B17\),0\),""\)<\/x:f>/);
  assert.match(batch,/<x:f>IF\('Cost Calculator'!\$G\$26="VALID"/);
  assert.match(book,/fullCalcOnLoad="1"/);
+ assert.match(main,/r="G16"[^>]*><x:f>IF\(\$G\$26="VALID",ROUNDUP\(/);
  const personalized=Buffer.from(await personalizeWorkbook(hardened,{...DEFAULTS,usedGrams:145},calculate));
  const rep=unzipLocalEntries(personalized);
  assert.match(rep.get('xl/worksheets/sheet1.xml').toString(),/r="B8"[^>]*><x:v>145<\/x:v>/);
