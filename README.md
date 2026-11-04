@@ -32,7 +32,7 @@ Open `http://localhost:4173/`. Windows alternative: `py -m http.server 4173 --di
 - Environment variable `SITE_URL`: `https://3dprintcostcalculator.org` for the verified production Pages branch. This variable controls canonical, JSON-LD, OG and sitemap URLs.
 - No database, API keys, secrets, backend functions, redirects, or additional runtime services.
 
-**Official production:** [3dprintcostcalculator.org](https://3dprintcostcalculator.org/) is HTTPS-enabled and publishes 12 canonical, indexable site pages. The old Pages alias stays HTTP `noindex`. This is search-engine eligibility, not proof of Google indexing or GSC clicks. Mailbox delivery has not been tested; `PAUSE_INDEXING=1` can pause the live indexable build.
+**Official production:** [3dprintcostcalculator.org](https://3dprintcostcalculator.org/) is HTTPS-enabled and publishes 13 canonical, indexable site pages. The old Pages alias stays HTTP `noindex`. This is search-engine eligibility, not proof of Google indexing or GSC clicks. Mailbox delivery has not been tested; `PAUSE_INDEXING=1` can pause the live indexable build.
 
 **Deviation from recommended stack:** the owner spec recommends Astro, but npm registry access was unavailable in the execution environment. To provide an actually runnable, verified build rather than untested Astro source, this implementation uses a zero-dependency Node static generator. The output still has pre-rendered HTML, correct internal links, a client-only computation module, mobile CSS, and Cloudflare Pages compatibility. Replacing the build generator with Astro later is optional, not required for SEO.
 
@@ -49,6 +49,8 @@ Open `http://localhost:4173/`. Windows alternative: `py -m http.server 4173 --di
 - `/about/`, `/privacy/`, `/terms/`, `/contact/` — site support and truthful policies
 
 No generated near-duplicate landing pages. The new pricing calculator covers 20 existing price/quote keyword intents while the homepage retains distinct slicer-based FDM production cost estimation. Search-intent assignments for 131 exact US keyword strings, including source metrics and competitor ranking fields, are in `src/content/keyword-intent-map.json` and described in `docs/RESEARCH-HANDOFF.md`.
+
+**94-phrase quality audit:** [Exact per-query assessment (CSV)](data/keyword-intent-review.csv) · [Editorial risk queue](docs/KEYWORD-QUALITY-REVIEW.md) · [GSC round-two protocol](docs/GSC-ROUND-2-EXECUTION.md). The review distinguishes 67 provisional fits, 16 ambiguous queries, nine evidence gaps and two potential intent mismatches. It is a static implementation review, **not** proof of rankings or GSC traffic. Run `node scripts/keyword-quality-audit.mjs` after `npm run build` to generate the independent CI review report. Real, private page-filtered GSC CSVs can be compared without an API using `node scripts/gsc-query-review.mjs` (see GSC protocol).
 
 ## Product details
 
