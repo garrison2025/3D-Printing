@@ -6,13 +6,24 @@ if(form){
  const update=()=>{
   try{
    const input=Object.fromEntries(new FormData(form).entries());
-   if(Object.values(input).some(v=>String(v).trim()===''))throw new Error('Complete all inputs');
+   const comparing=form.dataset.seoCalculator==='filament'&&Boolean(form.querySelector('#alternative-spool')?.open);
+   const required={...input};
+   if(!comparing){delete required.alternateSpoolPrice;delete required.alternateSpoolGrams;}
+   if(Object.values(required).some(v=>String(v).trim()===''))throw new Error('Complete all visible inputs');
    const x=form.dataset.seoCalculator==='filament'?filamentEstimate(input):hourlyEstimate(input);
    const list=form.dataset.seoCalculator==='filament'?[
     ['Primary filament price per gram',usd(x.perGram)],...(x.hasSecond?[['Second filament price per gram',usd(x.secondaryPerGram)],['Second filament cost per plate',usd(x.secondaryPerPlate)]]:[]),['Combined material cost per plate',usd(x.perPlate)],['Material cost per finished part',usd(x.perItem)],['Primary spool remaining after plate',x.remainingGrams.toFixed(1)+' g'],['Whole plates possible from starting spool(s)',x.fullPlates===null?'Not applicable':String(x.fullPlates)]
    ]:[['Machine cost per hour',usd(x.machine)],['Electricity per hour',usd(x.electricity)],['Maintenance reserve per hour',usd(x.maintenance)],['Active labor per hour',usd(x.operator)],['Total operating cost per hour',usd(x.total)]];
+   if(comparing){
+    const alternative=filamentEstimate({...input,spoolPrice:input.alternateSpoolPrice,spoolGrams:input.alternateSpoolGrams,secondUsedGrams:0,secondSpoolPrice:0});
+    const difference=x.primaryPerPlate-alternative.primaryPerPlate;
+    const status=Math.abs(difference)<1e-9?'Same cost':difference>0?'Alternative saves '+usd(difference)+' per plate':'Alternative costs '+usd(-difference)+' more per plate';
+    list.push(['Alternative spool price per gram',usd(alternative.perGram)],['Alternative primary material per plate',usd(alternative.primaryPerPlate)],['Alternative cost comparison',status]);
+   }
    result.replaceChildren(...list.map(([label,value])=>{const el=document.createElement('div');el.className='seo-row';const l=document.createElement('span');l.textContent=label;const v=document.createElement('strong');v.textContent=value;el.append(l,v);return el}));result.removeAttribute('data-error');
   }catch(err){result.textContent=err.message;result.setAttribute('data-error','true')}
  };
- form.addEventListener('input',update);update();
+ form.addEventListener('input',update);
+ form.querySelector('#alternative-spool')?.addEventListener('toggle',update);
+ update();
 }
