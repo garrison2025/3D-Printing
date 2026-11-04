@@ -40,7 +40,7 @@ const sourceMap=new Map(approved.map(x=>[x.keyword,x]));
 const seen=new Set(),categoryCounts={},routeCounts={},riskRows=[];
 const evidence={
  '/':['id="cost-form"','id="pricing"'],
- '/3d-print-pricing-calculator/':['data-pricing-calculator','id="price-quote-results"'],
+ '/3d-print-pricing-calculator/':['data-pricing-calculator','id="price-quote-results"','data-quote-intent-switch'],
  '/filament-cost-calculator/':['data-seo-calculator="filament"','id="seo-result"'],
  '/3d-printing-cost-per-hour/':['data-seo-calculator="hourly"','id="seo-result"'],
  '/how-much-does-3d-printing-cost/':['id="cost-by-example"','Worked example'],
