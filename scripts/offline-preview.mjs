@@ -7,7 +7,9 @@ const engine=read('dist/assets/calculations.mjs').replaceAll('export const ','co
 const cash=read('dist/assets/quote-precision.mjs').replaceAll('export function ','function ');
 const app=read('dist/assets/app.mjs').replace("import {DEFAULTS,calculate} from './calculations.mjs';",'').replace("import {practicalUsdQuote} from './quote-precision.mjs';",'');
 const mixed=read('dist/assets/mixed-order.mjs').replace("import {DEFAULTS,calculate,calculateMixedOrder} from './calculations.mjs';",'');
-html=html.replace('<link rel="stylesheet" href="/assets/site-bundle.css">',`<style>${css}</style>`);
+const stylesheet=/<link rel="stylesheet" href="\/assets\/site-bundle\.[0-9a-f]{12}\.css">/;
+if(!stylesheet.test(html))throw Error('Offline preview requires one fingerprinted CSS link');
+html=html.replace(stylesheet,`<style>${css}</style>`);
 html=html.replace('<script type="module" src="/assets/app.mjs"></script>',`<script>${engine}\n${cash}\n${app}</script>`);
 html=html.replace('<script type="module" src="/assets/mixed-order.mjs"></script>',`<script>(function(){\n${mixed}\n})();</script>`);
 html=html.replaceAll('href="/favicon.svg"','href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%23162944%22/%3E%3C/svg%3E"');
