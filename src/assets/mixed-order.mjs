@@ -32,7 +32,11 @@ if(host&&form){
   }).filter(Boolean);
  }
  function currentPricing(){
-  const val=(name)=>{const f=form.elements.namedItem(name);return f?Number(f.value)*(f.dataset.percent==='true'?.01:1):NaN};
+  const val=(name)=>{
+   const field=form.elements.namedItem(name);
+   const raw=field?.value.trim();
+   return raw ? Number(raw)*(field.dataset.percent==='true' ? .01 : 1) : NaN;
+  };
   return Object.fromEntries(['feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder','designCostPerOrder'].map(name=>[name,val(name)]));
  }
  function render(){
@@ -62,6 +66,7 @@ if(host&&form){
   addRow('Current print',String(Number(estimate.costPerUnit.toFixed(6))),'1');
  });
  lines.addEventListener('input',render);form.addEventListener('input',render);
+ form.addEventListener('pricing-assumptions-changed',render);
  function csv(rows){
   return rows.map(row=>row.map(v=>{
    const text=String(v),safe=/^[=+@\-\t\r]/.test(text)?"'"+text:text;

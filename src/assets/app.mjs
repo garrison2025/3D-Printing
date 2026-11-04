@@ -116,7 +116,13 @@ if(form){
   }
  }
  function render(reason='init'){const previousFocus=$('result-focus-value')?.textContent;const inputs=stateFromInputs(),r=calculate(inputs);
-  if(!r.ok){showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit','maintenancePerHour'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder','designCostPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('cash-quote-note','Correct inputs to calculate a checkout price.');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
+  if(!r.ok){
+   $('breakdown').replaceChildren();
+   for(const segment of $('cost-bar').children){
+    segment.style.width='0%';
+    segment.classList.remove('is-leading');
+   }
+   showValue('cost-insight-text','Check your values to see which cost component is largest.');setFieldErrors(r.errors);if(Object.keys(r.errors).some(k=>['watts','energyRate','machineCost','lifeHours','prepMinutes','laborRate','failRate','finishPerUnit','maintenancePerHour'].includes(k)))$('advanced-details').open=true;if(Object.keys(r.errors).some(k=>['unitsPerOrder','feeRate','feeFixed','margin','packagingPerOrder','shippingCostPerOrder','shippingChargedPerOrder','designCostPerOrder'].includes(k)))$('pricing-details').open=true;const first=Object.values(r.errors)[0]||'Check invalid inputs.';showValue('result-alert',first);showValue('result-focus-value','—');showValue('quote-assumptions','—');showValue('cash-quote-note','Correct inputs to calculate a checkout price.');showValue('mobile-estimate-value','—');showValue('mobile-estimate-side-value','—');for(const id of ['metric-a','metric-b','order-gross','platform-fees','machine-hourly','achieved-margin','effective-markup'])showValue(id,'—');const comparison=$('batch-quote-rows');if(comparison)comparison.replaceChildren();$('copy-result').disabled=$('export-csv').disabled=$('print-quote').disabled=true;if($('download-current-xlsx'))$('download-current-xlsx').disabled=true;lastValid=null;return;}
   setFieldErrors({});showValue('result-alert','');
   const cashQuote=practicalUsdQuote(r);
   showValue('cash-quote-note',cashQuote?
@@ -178,6 +184,7 @@ if(form){
  scenarioButtons.forEach(button=>button.addEventListener('click',()=>{
   const key=button.dataset.scenario,values=exampleScenarios[key];if(!values)return;
   inputValuesSet(values);scenarioSet(key);render('scenario');saveInput();
+  form.dispatchEvent(new Event('pricing-assumptions-changed'));
   announce(`Loaded ${button.textContent.trim()} example. You can change any value.`,'success');
  }));
  form.addEventListener('submit',e=>e.preventDefault());
@@ -193,7 +200,7 @@ if(form){
  });
  $('edit-price-inputs')?.addEventListener('click',()=>{const details=$('pricing-details');details.open=true;setMode('pricing');const target=$('input-feeRate');target?.focus({preventScroll:false});announce('Pricing details expanded. Edit fees and margin below.');});
  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
- $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');announce('Reset to example values; saved data cleared.','success');showValue('saved-message',rememberInputs?'Example values restored':'Saving off · this tab only');});
+ $('reset-button').addEventListener('click',()=>{scenarioSet('');inputValuesSet(DEFAULTS);try{localStorage.removeItem(storageKey);}catch{}setMode('cost');form.dispatchEvent(new Event('pricing-assumptions-changed'));announce('Reset to example values; saved data cleared.','success');showValue('saved-message',rememberInputs?'Example values restored':'Saving off · this tab only');});
  $('copy-result').addEventListener('click',async()=>{if(!lastValid)return;try{await navigator.clipboard.writeText(exportSummary(lastValid));announce('Summary copied.','success');}catch{
    const field=document.createElement('textarea');field.value=exportSummary(lastValid);field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.select();try{const ok=document.execCommand('copy');announce(ok?'Summary copied.':'Copy unavailable—use Export CSV.',ok?'success':'error');}catch{announce('Copy unavailable—use Export CSV.','error')}field.remove();}
  });

@@ -1,4 +1,4 @@
-const finite=(n,name,min=0)=>{const v=Number(n);if(!Number.isFinite(v)||v<min||v>1e10)throw new RangeError(name+' must be nonnegative');return v};
+const finite=(n,name,min=0)=>{const v=Number(n);if(!Number.isFinite(v)||v<min||v>1e10)throw new RangeError(name+' must be a number from '+min+' to 10,000,000,000.');return v};
 export function filamentEstimate({spoolPrice,spoolGrams,usedGrams,itemsPerPlate=1,secondSpoolPrice=0,secondSpoolGrams=1000,secondUsedGrams=0}){
  const grams=finite(spoolGrams,'Spool grams',.000001),price=finite(spoolPrice,'Spool price'),used=finite(usedGrams,'Used grams'),items=finite(itemsPerPlate,'Items per plate',1);
  if(!Number.isInteger(items))throw new RangeError('Items per plate must be whole');

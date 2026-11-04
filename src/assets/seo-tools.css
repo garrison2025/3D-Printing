@@ -65,9 +65,12 @@
 .quote-actions button:disabled{cursor:not-allowed;opacity:.45}
 .quote-print-sheet{display:none}
 @media print{
- body *{visibility:hidden!important}
- #quote-print-sheet,#quote-print-sheet *{visibility:visible!important}
- #quote-print-sheet{display:block!important;position:absolute!important;top:0!important;left:0!important;width:100%!important;margin:0!important;padding:24px!important;background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important}
+ body:has(#print-sheet) > :not(main),
+ main:has(> #print-sheet) > :not(#print-sheet),
+ body:has(#quote-print-sheet) *:not(:has(#quote-print-sheet), #quote-print-sheet, #quote-print-sheet *){
+  display:none!important
+ }
+ #quote-print-sheet{display:block!important;position:static!important;width:100%!important;margin:0!important;padding:24px!important;background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important}
  #quote-print-sheet h2{font:700 25px system-ui,sans-serif;margin:0 0 15px}
  #quote-print-sheet p{color:#333;font:13px/1.5 system-ui,sans-serif;margin:8px 0 15px}
  #quote-print-sheet table{width:100%;border-collapse:collapse;margin:18px 0}
@@ -81,8 +84,8 @@
 .seo-tool-article .table-scroll:focus-visible{outline:3px solid #76a9ff;outline-offset:2px}
 .seo-tool-article .table-scroll>.compare-table{min-width:570px;max-width:none;width:100%;margin:0}
 @media print{
- .seo-tool-output{position:static!important}
- #quote-print-sheet{position:fixed!important;left:0!important;top:0!important}
+ .seo-quote-page .seo-tool-grid{display:block!important}
+ .seo-quote-page .seo-tool-output{position:static!important}
 }
 
 /* Mobile containment for source-backed retail tables, without hiding their columns. */

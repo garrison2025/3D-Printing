@@ -450,6 +450,44 @@ try{
    await page.locator('input[name="usedGrams"]').fill('145');
    await page.waitForFunction(()=>document.querySelector('#cash-quote-note')?.textContent?.includes('checkout price'));
  });
+ await run('Mixed order uses current assumptions after presets, reset and invalid inputs',async()=>{
+  await visit('/');
+  await page.locator('#reset-button').click();
+  await page.locator('#mixed-quote > details > summary').click();
+  await page.locator('#mixed-lines input[type=number]').first().fill('10');
+  const result=page.locator('#mixed-results');
+  assert.match(await result.innerText(),/Customer order total: \$16\.62/);
+  await page.locator('[data-scenario="seller"]').click();
+  assert.match(await result.innerText(),/Customer order total: \$31\.12/);
+  await page.locator('#reset-button').click();
+  assert.match(await result.innerText(),/Customer order total: \$16\.62/);
+  const fee=page.locator('input[name="feeRate"]');
+  await page.locator('#edit-price-inputs').click();
+  await fee.fill('');
+  assert.equal(await page.locator('#mixed-export').isDisabled(),true);
+  assert.equal(await page.locator('#mixed-copy').isDisabled(),true);
+  assert.equal(await page.locator('#breakdown li').count(),0);
+  await fee.fill('0');
+  assert.equal(await page.locator('#mixed-export').isEnabled(),true);
+  assert.ok(await page.locator('#breakdown li').count()>0);
+ });
+ await run('Print media shows homepage amounts and only customer fields on the customer estimate',async()=>{
+  await visit('/');
+  await page.locator('#reset-button').click();
+  await page.emulateMedia({media:'print'});
+  try{
+   const price=page.locator('#print-table').getByText('$11.44',{exact:true}).first();
+   assert.equal(await price.isVisible(),true);
+   assert.equal((Buffer.from(await page.pdf({format:'A4'})).toString('latin1').match(/\/Type \/Page\b/g)||[]).length,1);
+   await visit('/3d-print-pricing-calculator/');
+   const sheet=page.locator('#quote-print-sheet');
+   assert.equal(await sheet.getByText('$11.44',{exact:true}).first().isVisible(),true);
+   assert.doesNotMatch(await sheet.innerText(),/profit|margin|payment fees|production and order costs/i);
+   assert.equal((Buffer.from(await page.pdf({format:'A4'})).toString('latin1').match(/\/Type \/Page\b/g)||[]).length,1);
+  }finally{
+   await page.emulateMedia({media:'screen'});
+  }
+ });
  await run('No JavaScript crashes',async()=>assert.deepEqual(errors,[]));
 }finally{await context.close();await browser.close()}
 const passed=results.filter(x=>x.ok).length;

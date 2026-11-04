@@ -15,6 +15,17 @@ if(form){
   const r=priceKnownCost(input);
   current=r.ok?{result:r,reference:String(input.projectReference||'').trim().slice(0,80)}:null;
   for(const button of [csvButton,printButton])if(button)button.disabled=!current;
+  for(const field of form.querySelectorAll('input[name]')){
+   const invalid=!r.ok && (Object.hasOwn(r.errors,field.name) ||
+    (field.name==='feePercent' && r.errors.marginPercent?.startsWith('Fee percentage plus')));
+   if(invalid){
+    field.setAttribute('aria-invalid','true');
+    field.setAttribute('aria-errormessage',error.id);
+   }else{
+    field.removeAttribute('aria-invalid');
+    field.removeAttribute('aria-errormessage');
+   }
+  }
   if(!r.ok){
    error.textContent=Object.values(r.errors)[0]||'Check the input values.';
    error.hidden=false;results.hidden=true;
@@ -55,10 +66,6 @@ if(form){
   show('quote-print-subtotal',money(r.itemSubtotal));
   show('quote-print-shipping',money(r.inputs.shippingChargedPerOrder));
   show('quote-print-total',money(r.orderGross));
-  show('quote-print-costs',money(r.totalExpenses));
-  show('quote-print-fees',money(r.platformFees));
-  show('quote-print-profit',money(r.netProfit));
-  show('quote-print-margin',r.actualMargin===null?'Not applicable':(r.actualMargin*100).toFixed(2)+'%');
  };
  // The project reference is user-supplied: neutralize spreadsheet formula prefixes.
  const safeCsvCell=(value)=>{

@@ -1,8 +1,8 @@
 # Verified build and release gates — PrintCost Studio
 
-Updated: 2026-11-03. **PREVIEW ONLY**: `https://3d-printing-1r7.pages.dev/` remains deliberately `noindex,nofollow` until the owner purchases and explicitly approves a production domain. Canonical and sitemap follow staging rules.
+Production baseline checked 2026-11-04: [3dprintcostcalculator.org](https://3dprintcostcalculator.org/) served commit `4db2f07` with 13 canonical, indexable routes. The Pages alias remains excluded by its HTTP robots header. Search Console indexation and mailbox delivery require separate verification.
 
-The older 2026-11-02 log covering just six routes and reporting Browser QA as NOT RUN described an intermediate revision. It is no longer current. Current site has **10 genuine routes**, including a filament tool, hourly cost tool, calculation methodology and useful Excel resource page. 131 Semrush source keywords (P0 25, P1 62, P2 7, EXCLUDE 37) remain research evidence rather than a traffic claim.
+The following table records the historical preview acceptance snapshot.
 
 | Gate | Last verified full release evidence |
 |---|---|
