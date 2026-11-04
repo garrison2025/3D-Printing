@@ -363,6 +363,7 @@ try{
 
  await run('Pricing tool compares quantity, revenue and margin without fake discounts',async()=>{
   await page.setViewportSize({width:390,height:844});await visit('/3d-print-pricing-calculator/');
+  await page.locator('#quote-size-compare > summary').click();
   assert.equal(await page.locator('#quote-size-rows tr').count(),4);
   await page.locator('[name="unitCost"]').fill('10');
   await page.locator('[name="quantity"]').fill('5');
