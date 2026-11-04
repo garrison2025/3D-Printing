@@ -387,6 +387,7 @@ try{
   await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('Alternative costs $1.30 more per plate'));
   await noOverflow();
   await page.locator('#alternative-spool > summary').click();
+  await page.waitForFunction(()=>!document.querySelector('#seo-result')?.textContent?.includes('Alternative cost comparison'));
   assert.equal((await page.locator('#seo-result').innerText()).includes('Alternative cost comparison'),false);
  });
  await run('Cost guide has engine-computed failure sensitivity and no mobile overflow',async()=>{
