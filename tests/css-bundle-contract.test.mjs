@@ -6,14 +6,15 @@ const offline=fs.readFileSync(new URL('../scripts/offline-preview.mjs',import.me
 test('CSS preserves visual cascade order while shipping one browser stylesheet',()=>{
  assert.match(build,/cssFiles=/);
  for(const file of ['site.css','polish.css','refinement.css','finish.css','seo-tools.css','theme-industrial.css'])assert.ok(build.includes(file));
- assert.ok(build.includes('href="/assets/site-bundle.css"'));
+ assert.ok(build.includes('href="${cssAsset}"'),'all HTML must reference the fingerprinted CSS asset');
+ assert.match(build,/createHash\('sha256'\)/,'bundle must use a deterministic content hash');
  assert.ok(offline.includes('dist/assets/site-bundle.css'));
 });
  
 test('industrial teal A is the final and only additional build-time CSS layer',()=>{
  const mark=build.match(/const cssFiles=\[([^\]]+)\]/);
  assert.ok(mark,'CSS bundle configuration not found');
- assert.ok(mark[1].trim().endsWith('"theme-industrial.css"'),'theme must override old blue layers last');
+ assert.ok(mark[1].trim().endsWith("'theme-industrial.css'"),'theme must override old blue layers last');
  const theme=fs.readFileSync(new URL('../src/assets/theme-industrial.css',import.meta.url),'utf8');
  const app=fs.readFileSync(new URL('../src/assets/app.mjs',import.meta.url),'utf8');
  for(const token of ['--pc-paper:#F5F7F7','--pc-primary:#155E75','--pc-navy:#102D3D','--pc-teal:#0F766E',
