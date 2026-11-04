@@ -22,6 +22,21 @@ All search volumes and KD above are **2026-11-02 competitor-research estimates**
 4. Save an unfiltered Pages export too, and a second equal-length comparison window only when available. Keep all GSC exports private, local and separate from the public keyword map.
 5. Do not call zero impressions a ranking failure: distinguish not indexed, no visible impressions, mismatched page intent and data not yet available.
 
+## Offline real-data comparison (no paid APIs)
+
+The repo now provides `scripts/gsc-query-review.mjs` to join **one real GSC Queries export filtered to exactly one page** against the existing 94 phrases. It never calls Google and does not fetch site analytics by itself. Store actual Google exports in `gsc-private/` (gitignored; **do not publish them in the public GitHub repository**).
+
+Example from the project root (Windows PowerShell or any Node.js 20+ shell):
+
+```powershell
+mkdir gsc-private
+node scripts/gsc-query-review.mjs --csv "gsc-private/pricing.csv" --page "/3d-print-pricing-calculator/" --period "2026-10-01..2026-10-28" --country US
+```
+
+Replace the filename, **actual exported date window** and country filter. Repeat for `/filament-cost-calculator/` and `/how-much-does-3d-printing-cost/`. CSV needs the English GSC header columns: `Top queries` (or `Query`), `Clicks`, `Impressions`, `CTR`, `Position`. The script displays exact-matched queries within the 8–20 average position review band and queries observed on a landing page different from their existing mapped route; this is a **work queue, not an automated edit or claim of success**. It will not replace missing query rows with estimates.
+
+**Actual GSC data remain unavailable in this task.** A synthetic unit test exercises parsing and the join algorithm, but synthetic test figures are never treated as this site's traffic.
+
 ## Decision logic for the next edit
 
 - **Indexing before CTR:** fix wrong canonical/noindex/crawl/404/duplicate page selection before rewriting titles.
