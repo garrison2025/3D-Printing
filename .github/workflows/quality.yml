@@ -30,6 +30,16 @@ jobs:
         run: node scripts/audit.mjs
       - name: Keyword-to-page coverage audit
         run: node scripts/keyword-audit.mjs
+      - name: Review all 94 mapped keyword intents without claiming GSC performance
+        run: node scripts/keyword-quality-audit.mjs
+      - name: Preserve per-keyword intent review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printcost-94-keyword-intent-review
+          path: qa-seo/keyword-intent-review.md
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Install test-only Chrome and Safari-like WebKit controller
         run: |
           npm install --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1 axe-core@4.14.0
