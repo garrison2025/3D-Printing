@@ -133,7 +133,7 @@ await check('iPhone WebKit 3D print pricing tool provides accessible responsive 
 });
 await check('iPhone WebKit dual-filament and hourly tools actually recalculate',async()=>{
  await visit('/filament-cost-calculator/');
- await page.locator('.seo-tool-advanced > summary').click();
+ await page.locator('.seo-tool-advanced > summary').first().click();
  await page.locator('input[name="secondUsedGrams"]').fill('25');
  await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('$3.125'));
  await noOverflow();
