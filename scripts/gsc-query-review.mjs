@@ -22,7 +22,7 @@ if(!file||!page||!period||!country){
 }
 if(!/^\d{4}-\d{2}-\d{2}\.\.\d{4}-\d{2}-\d{2}$/.test(period))throw Error('Supply the real GSC period');
 if(!/^[A-Z]{2}$/.test(country))throw Error('Supply the actual GSC country filter');
-if(!path.resolve(file).includes('/gsc-private/'))console.warn('Privacy: place GSC exports under gitignored gsc-private/');
+if(!path.resolve(file).split(path.sep).includes('gsc-private'))console.warn('Privacy: place GSC exports under gitignored gsc-private/');
 const original=JSON.parse(fs.readFileSync('src/content/keyword-intent-map.json','utf8')).keywords.filter(r=>r.priority!=='EXCLUDE');
 if(!original.some(r=>r.destination===page))throw Error('Unknown existing mapped page');
 const key=s=>String(s).trim().toLowerCase().replace(/\s+/g,' ');
