@@ -5,6 +5,8 @@ if(form){
  const error=document.getElementById('price-quote-error');
  const csvButton=document.getElementById('quote-download-csv');
  const printButton=document.getElementById('quote-print');
+ const quantityPanel=document.getElementById('quote-size-compare');
+ const quantityRows=document.getElementById('quote-size-rows');
  const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
  const show=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
  let current=null;
@@ -15,9 +17,30 @@ if(form){
   for(const button of [csvButton,printButton])if(button)button.disabled=!current;
   if(!r.ok){
    error.textContent=Object.values(r.errors)[0]||'Check the input values.';
-   error.hidden=false;results.hidden=true;return;
+   error.hidden=false;results.hidden=true;
+   if(quantityPanel)quantityPanel.hidden=true;
+   if(quantityRows)quantityRows.replaceChildren();
+   return;
   }
   error.hidden=true;error.textContent='';results.hidden=false;
+  if(quantityPanel)quantityPanel.hidden=false;
+  if(quantityRows){
+   const quantities=[1,5,10,25,r.inputs.quantity].filter((n,i,a)=>a.indexOf(n)===i);
+   const comparisonRows=quantities.map(quantity=>{
+    const quote=priceKnownCost({...input,quantity});
+    const values=quote.ok?[String(quantity),money(quote.unitPrice),money(quote.orderGross),money(quote.netProfit),quote.actualMargin===null?'N/A':(quote.actualMargin*100).toFixed(2)+'%']:[String(quantity),'Outside supported range','—','—','—'];
+    const row=document.createElement('tr');
+    for(const [i,value] of values.entries()){
+     const cell=document.createElement(i===0?'th':'td');
+     if(i===0)cell.scope='row';
+     cell.textContent=value;
+     row.appendChild(cell);
+    }
+    if(quantity===r.inputs.quantity)row.classList.add('quote-current-size');
+    return row;
+   });
+   quantityRows.replaceChildren(...comparisonRows);
+  }
   show('price-quote-unit',money(r.unitPrice));
   show('price-quote-subtotal',money(r.itemSubtotal));
   show('price-quote-total',money(r.orderGross));
