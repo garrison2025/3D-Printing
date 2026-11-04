@@ -346,7 +346,7 @@ try{
  await run('Dual-filament calculator',async()=>{
   await visit('/filament-cost-calculator/');await noOverflow();
   await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('Combined material cost'));
-  await page.locator('.seo-tool-advanced summary').click();await page.locator('input[name="secondUsedGrams"]').fill('25');
+  await page.locator('.seo-tool-advanced summary').first().click();await page.locator('input[name="secondUsedGrams"]').fill('25');
   await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('$3.125'));await shot('filament-390');
  });
  await run('Dual-filament validation',async()=>{await page.locator('input[name="secondSpoolGrams"]').fill('0');await page.waitForFunction(()=>document.querySelector('#seo-result')?.hasAttribute('data-error'))});
