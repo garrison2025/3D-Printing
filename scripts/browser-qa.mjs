@@ -361,6 +361,42 @@ try{
   for(const route of ['/filament-cost-calculator/','/3d-printing-cost-per-hour/']){await visit(route);await noOverflow()}
  });
 
+ await run('Pricing tool compares quantity, revenue and margin without fake discounts',async()=>{
+  await page.setViewportSize({width:390,height:844});await visit('/3d-print-pricing-calculator/');
+  assert.equal(await page.locator('#quote-size-rows tr').count(),4);
+  await page.locator('[name="unitCost"]').fill('10');
+  await page.locator('[name="quantity"]').fill('5');
+  await page.waitForFunction(()=>document.querySelector('#price-quote-total')?.textContent==='$81.15');
+  const current=page.locator('#quote-size-rows tr.quote-current-size');
+  assert.match(await current.innerText(),/\$81\.15/);
+  await page.locator('[name="quantity"]').fill('7');
+  assert.equal(await page.locator('#quote-size-rows tr').count(),5);
+  assert.match(await page.locator('#quote-size-rows tr.quote-current-size').innerText(),/7/);
+  await noOverflow();
+  await page.locator('[name="feePercent"]').fill('85');
+  await page.locator('[name="marginPercent"]').fill('30');
+  assert.equal(await page.locator('#quote-size-rows tr').count(),0,'Stale comparison must be removed for invalid inputs');
+ });
+ await run('Filament alternative spool is a substitution, not extra material',async()=>{
+  await page.setViewportSize({width:390,height:844});await visit('/filament-cost-calculator/');
+  await page.locator('#alternative-spool > summary').click();
+  await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('Alternative spool price per gram'));
+  assert.match(await page.locator('#seo-result').innerText(),/Alternative saves \$0\.60 per plate/);
+  await page.locator('input[name="alternateSpoolGrams"]').fill('500');
+  await page.waitForFunction(()=>document.querySelector('#seo-result')?.textContent?.includes('Alternative costs $1.30 more per plate'));
+  await noOverflow();
+  await page.locator('#alternative-spool > summary').click();
+  assert.equal((await page.locator('#seo-result').innerText()).includes('Alternative cost comparison'),false);
+ });
+ await run('Cost guide has engine-computed failure sensitivity and no mobile overflow',async()=>{
+  for(const width of [320,390,768]){
+   await page.setViewportSize({width,height:844});await visit('/how-much-does-3d-printing-cost/');
+   await noOverflow();
+   const guide=await page.locator('#cost-by-example').innerText();
+   assert.match(guide,/15%/);assert.match(guide,/\$7\.5268/);
+   assert.equal(await page.locator('.cost-guide-table-scroll').count(),3);
+  }
+ });
  // Automated WCAG checks in CI Chrome; axe-core is never shipped to website visitors.
  await run('WCAG A/AA accessible markup check',async()=>{
   const violations=[];
