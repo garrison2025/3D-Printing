@@ -91,3 +91,18 @@
 .seo-tool-article .table-scroll{display:block;width:100%;max-width:100%;min-width:0;contain:inline-size;overflow-x:auto}
 .seo-tool-article .table-scroll>.compare-table{min-width:570px}
 @media print{.seo-tool-article{overflow:visible!important}}
+
+/* Task-first pricing comparison and cost-guide tables: no document-level horizontal scroll. */
+.quote-size-compare{margin:15px 0 12px;padding:0 13px 13px;border:1px solid #cfdee7;border-radius:12px;background:#fff}
+.quote-size-compare[hidden]{display:none!important}
+.quote-size-compare summary{cursor:pointer;padding:14px 0;font-size:13px;font-weight:750;color:#155e75}
+.quote-size-compare>p{margin:0 0 11px;font-size:12px;line-height:1.55;color:#3d526b}
+.quote-scroll,.cost-guide-table-scroll{display:block;max-width:100%;width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;contain:inline-size;margin:15px 0;border:1px solid #dce6e8;border-radius:10px}
+.quote-scroll:focus-visible,.cost-guide-table-scroll:focus-visible{outline:3px solid #155e75;outline-offset:2px}
+.quote-scroll table,.cost-guide-table-scroll .compare-table{border-collapse:collapse;width:100%;max-width:none;margin:0;min-width:580px}
+.quote-scroll th,.quote-scroll td{font-size:12px;line-height:1.5;padding:9px 11px;border-bottom:1px solid #dde8eb;white-space:nowrap;text-align:right;color:#1c3a49}
+.quote-scroll th:first-child{text-align:left}
+.quote-current-size{background:#e9f4f4}
+.editorial{min-width:0;overflow-wrap:anywhere}
+@media(max-width:560px){.quote-size-compare{padding:0 10px 10px}.cost-guide-table-scroll{margin-inline:0}.quote-scroll table{min-width:540px}}
+@media print{.quote-size-compare,.quote-scroll{display:none!important}.cost-guide-table-scroll{overflow:visible!important;contain:none!important}}
