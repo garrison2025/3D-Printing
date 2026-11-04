@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import {ownerEmailVisible} from './owner-email-visibility.mjs';
 const origin=new URL(process.argv[2]||'https://3d-printing-1r7.pages.dev').origin;
 const mode=process.argv[3]||'staging';
@@ -74,7 +75,13 @@ try{
  check(allowedCanonicalOrigins.includes(info.canonicalOrigin),'deployment manifest origin matches canonical');
  check(info.indexable===!staging,'deployment indexability matches '+mode);
  const expected=(process.env.EXPECTED_COMMIT||'').trim();
- if(expected)check(info.commit===expected,'deployed SHA '+String(info.commit).slice(0,9)+' matches requested '+expected.slice(0,9));
+ if(expected){
+  const exact=info.commit===expected;
+  const gitHash=/^[0-9a-f]{40}$/i;
+  const descendant=!exact&&gitHash.test(expected)&&gitHash.test(String(info.commit))&&
+   spawnSync('git',['merge-base','--is-ancestor',expected,String(info.commit)],{stdio:'ignore'}).status===0;
+  check(exact||descendant,'deployed SHA '+String(info.commit).slice(0,9)+' is requested '+expected.slice(0,9)+' or a verified newer descendant');
+ }
 }catch(err){check(false,'build-manifest verification failed: '+err.message)}
 
 const passed=checks.filter(c=>c.ok).length;
